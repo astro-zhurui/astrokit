@@ -12,6 +12,8 @@ import extinction
 from astrokit.externals import sfdmap
 from astrokit import DIR_data
 
+__all__ = ['ExtinctionCorrection']
+
 class ExtinctionCorrection:
     def __init__(self, scaling=0.86, Rv=3.1):
         """
