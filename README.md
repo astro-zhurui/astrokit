@@ -2,6 +2,8 @@
 
 [![PyPI version](https://badge.fury.io/py/astrokit.svg?icon=si%3Apython)](https://badge.fury.io/py/astrokit)
 [![PyPI Downloads](https://static.pepy.tech/badge/astrokit)](https://pepy.tech/projects/astrokit)
+[![Documentation Status](https://readthedocs.org/projects/astrokit/badge/?version=latest)](https://astrokit.readthedocs.io/en/latest/?badge=latest)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15321580.svg)](https://doi.org/10.5281/zenodo.15321580)
 
 
@@ -52,7 +54,13 @@ Account_HSC:
   username: <xxx>
   password: <xxx>
 ```
-- Tip: Because a lot of dependencies are required, it is recommended to use [Miniconda](https://docs.conda.io/en/latest/miniconda.html) to create a new environment and install AstroKit in it. All required packages are listed in the `requirement.txt` file.
+
+- step 3: **Enjoy it!**<br>
+```python
+import astrokit as ak
+```
+
+🔔 Tip: Because a lot of dependencies are required, it is recommended to use [Miniconda](https://docs.conda.io/en/latest/miniconda.html) to create a new environment and install AstroKit in it. All required packages are listed in the `requirement.txt` file.
 
 ```bash
 # Create a new conda environment
@@ -67,7 +75,8 @@ pip install astrokit
 
 
 ## 📖 Documentation
-The documentation is on the way.
+Read the full documentation at [astrokit.readthedocs.io](https://astrokit.readthedocs.io/en/latest/).
+The documentation is still under construction, and the API may change in the future.
 
 
 ## 📜 License
