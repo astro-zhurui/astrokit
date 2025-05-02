@@ -4,18 +4,27 @@ build-backend = "hatchling.build"
 
 [project]
 name = "astrokit"
-version = "beta-0.0"
+version = "v2025.05.02"
 authors = [
-    { name="Rui Zhu", email="zhurui675@gmail.com" },
+    {name="Rui Zhu", email="zhurui675@gmail.com" },
 ]
-description = "A Python ToolKit for Astronomy"
-readme = "README.md"
 requires-python = ">=3.12"
+readme = "README.md"
+description = "AstroKit: A Python ToolKit for Astronomy"
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
+    'Intended Audience :: Science/Research',
+    'Intended Audience :: Developers',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: 3.13',
+    'License :: OSI Approved :: MIT License',
+    'Operating System :: MacOS',
+    'Operating System :: Unix',
+    'Operating System :: POSIX',
+    'Topic :: Software Development',
+    'Topic :: Scientific/Engineering'
 ]
+license = { file = "LICENSE" }
 
 [project.urls]
 "Homepage" = "https://github.com/astro-zhurui/astrokit"
