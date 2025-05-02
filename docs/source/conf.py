@@ -1,40 +1,37 @@
-# Configuration file for the Sphinx documentation builder.
-#
-# For the full list of built-in configuration values, see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
+# docs/source/conf.py
 
-# -- Project information -----------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+# -- Path setup ---------------------------------------------------
+import os
+import sys
+sys.path.insert(0, os.path.abspath('../..'))  # 让 Sphinx 找到你的包
 
-project = 'astrokit'
-copyright = '2025, Rui Zhu'
+# -- Project information ------------------------------------------
+project = 'AstroKit'
 author = 'Rui Zhu'
-release = 'v2025.05.02'
+release = 'v2025.5.2'  # 项目版本号 (建议符合 PEP 440)
 
-# -- General configuration ---------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
-
-extensions = []
+# -- General configuration ----------------------------------------
+extensions = [
+    'myst_parser',
+]
 
 templates_path = ['_templates']
 exclude_patterns = []
 
+# -- MyST (Markdown) configuration -------------------------------
+myst_enable_extensions = [
+    "colon_fence",       # 支持 ::: 块 (admonitions)
+    "linkify",           # 自动链接 http
+]
+myst_heading_anchors = 3   # h1~h3 标题自动生成锚点 (方便链接跳转)
 
-
-# -- Options for HTML output -------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
-
-html_theme = 'alabaster'
+# -- HTML output --------------------------------------------------
+html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
-import os
-import sys
-sys.path.insert(0, os.path.abspath('../..'))
-
-extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon',  # 支持 NumPy/Google docstring
-]
-
-html_theme = 'sphinx_rtd_theme'
-
+# -- Options for HTML theme ---------------------------------------
+html_theme_options = {
+    'navigation_depth': 3,   # 目录树最大深度
+    'collapse_navigation': False,
+    'titles_only': False,
+}
