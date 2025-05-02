@@ -5,7 +5,7 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15321580.svg)](https://doi.org/10.5281/zenodo.15321580)
 
 
-![logo](./docs/images/AstroKit.webp)
+![logo](./logo/AstroKit.webp)
 
 🌟 Current Version: **beta-0.0**
 
