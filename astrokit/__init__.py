@@ -1,7 +1,7 @@
 __author__ = 'Rui Zhu'
 __email__ = 'zhurui675@gmail.com'
 
-__version__ = 'beta-0.0'
+__version__ = '0.1.0'
 
 import sys
 import yaml

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "astrokit"
-version = "v2025.05.02"
+version = "0.1.0"
 authors = [
     {name="Rui Zhu", email="zhurui675@gmail.com" },
 ]

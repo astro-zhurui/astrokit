@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.abspath('../..'))  # 让 Sphinx 找到你的包
 # -- Project information ------------------------------------------
 project = 'AstroKit'
 author = 'Rui Zhu'
-release = 'v2025.5.2'  # 项目版本号 (建议符合 PEP 440)
+release = '0.1.0'  # 项目版本号 (建议符合 PEP 440)
 
 # -- General configuration ----------------------------------------
 extensions = [

@@ -9,16 +9,17 @@
 
 ![logo](./logo/AstroKit.webp)
 
-🌟 Current Version: **beta-0.0**
+🌟 Current Version (BETA): **0.1.0**
 
 ⚠️ **AstroKit is currently under development.**<br>
 Please use it with caution.
 Feedback and suggestions are very welcome — feel free to contact me at zhurui675@gmail.com.
-The official release (v0.0) will be available soon (expected in late 2025).
+The first stable release (version 1.0.0) will be available soon (expected in late 2025).
 
 
 ## 🏁 Quick Start
-**AstroKit** is a Python package for astronomical data analysis (hodgepodge 😁), developed by [Rui Zhu](https://github.com/astro-zhurui). It provides:
+**AstroKit** is a Python package for astronomical data analysis (hodgepodge 😁), developed by [Rui Zhu](https://github.com/astro-zhurui). 
+It provides:
 
 1. **Photometric data preprocessing** — including photometric redshift estimation, extinction correction, and more.  
 2. **Wrappers for classical astronomical software** — such as **GALFIT(M)**, **STILTS**, **EAZY**, and **SExtractor**.  
