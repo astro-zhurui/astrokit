@@ -1,0 +1,1355 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>astrokit.wrapper package &mdash; astrokit v2025.05.02 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=aee3e7f4"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="astrokit.toolbox package" href="astrokit.toolbox.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            astrokit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">astrokit</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="astrokit.html">astrokit package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="astrokit.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="astrokit.ML.html">astrokit.ML package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="astrokit.datasets.html">astrokit.datasets package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="astrokit.extinction.html">astrokit.extinction package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="astrokit.observation.html">astrokit.observation package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="astrokit.phot.html">astrokit.phot package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="astrokit.photoz.html">astrokit.photoz package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="astrokit.spec.html">astrokit.spec package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="astrokit.toolbox.html">astrokit.toolbox package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">astrokit.wrapper package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="astrokit.html#module-astrokit">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">astrokit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">astrokit</a></li>
+          <li class="breadcrumb-item"><a href="astrokit.html">astrokit package</a></li>
+      <li class="breadcrumb-item active">astrokit.wrapper package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/astrokit.wrapper.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="astrokit-wrapper-package">
+<h1>astrokit.wrapper package<a class="headerlink" href="#astrokit-wrapper-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-astrokit.wrapper.eazy">
+<span id="astrokit-wrapper-eazy-module"></span><h2>astrokit.wrapper.eazy module<a class="headerlink" href="#module-astrokit.wrapper.eazy" title="Link to this heading"></a></h2>
+<p>EAZY Wrapper</p>
+<p>&#64; Author: Rui Zhu</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="astrokit.wrapper.eazy.Eazy">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.eazy.</span></span><span class="sig-name descname"><span class="pre">Eazy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_work</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">translate_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname_catalog</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'catalog.cat'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname_translate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'photz.translate'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'photz.param'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname_spectra_param</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'templates.spectra.param'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname_output_zout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'photz.zout'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.eazy.Eazy" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A Wrapper for EAZY</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.eazy.Eazy.config">
+<span class="sig-name descname"><span class="pre">config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.eazy.Eazy.config" title="Link to this definition"></a></dt>
+<dd><p>填写`zphot.param`配置文件</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.eazy.Eazy.default_EAZY_templates">
+<span class="sig-name descname"><span class="pre">default_EAZY_templates</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.eazy.Eazy.default_EAZY_templates" title="Link to this definition"></a></dt>
+<dd><p>load the default templates of EAZY from the EAZY package
+<cite>EAZY_v1.1_lines</cite></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.eazy.Eazy.default_config_file">
+<span class="sig-name descname"><span class="pre">default_config_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.eazy.Eazy.default_config_file" title="Link to this definition"></a></dt>
+<dd><p>Show the default config file of EAZY.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.eazy.Eazy.get_output">
+<span class="sig-name descname"><span class="pre">get_output</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.eazy.Eazy.get_output" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.eazy.Eazy.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">terminal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.eazy.Eazy.run" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.eazy.Eazy.set_bands">
+<span class="sig-name descname"><span class="pre">set_bands</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.eazy.Eazy.set_bands" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.eazy.Eazy.set_templates">
+<span class="sig-name descname"><span class="pre">set_templates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">templates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_age</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_error_amplitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comb_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.eazy.Eazy.set_templates" title="Link to this definition"></a></dt>
+<dd><p>Set templates for EAZY and create the template definition file <cite>xxx.spectra.param</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>templates</strong> (<em>list</em>) – A list of template path.</p></li>
+<li><p><strong>lambda_factor</strong> (<em>float</em><em>, </em><em>optional</em>) – Multiplicative factor to correct wavelength units, by default 1.0</p></li>
+<li><p><strong>model_age</strong> (<em>float</em><em>, </em><em>optional</em>) – Age of template model in Gyr (0 means template is always used), by default 0</p></li>
+<li><p><strong>template_error_amplitude</strong> (<em>float</em><em>, </em><em>optional</em>) – Template error amplitude (for INDIVIDUAL template fits), by default 1.0</p></li>
+<li><p><strong>comb_dict</strong> (<em>dict</em><em>, </em><em>optional</em>) – 手动设置模板组合的方式(从1开始计数, 与tempaltes列表顺序一致), by default None;
+设置为None, 则自动填写为全排列;
+格式为{1: [2, 3, 4], 2: [3, 4], 3: [4]}, 表示1号模板与2, 3, 4号模板组合,
+2号模板与3, 4号模板组合, 3号模板与4号模板组合</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="astrokit.wrapper.eazy.EazyOutput">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.eazy.</span></span><span class="sig-name descname"><span class="pre">EazyOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_output</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.eazy.EazyOutput" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>集中管理EAZY的输出文件</p>
+<p>Note:
+- 代码参考: /Users/rui/Applications/eazy-photoz/inputs/read_eazy_binaries.py</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.eazy.EazyOutput.collect">
+<span class="sig-name descname"><span class="pre">collect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.eazy.EazyOutput.collect" title="Link to this definition"></a></dt>
+<dd><ul class="simple">
+<li><p>NOBJ: number of objects</p></li>
+<li><p>NFILT: number of filters</p></li>
+<li><p>NTEMP: number of templates</p></li>
+<li><p>NZ: number of redshifts (zgrid)</p></li>
+</ul>
+<p>## From tempfilt file
+- lc: mean wavelength of each filters
+- zgrid: redshift grid
+- tempfilt: fluxes derievd from templates at different bandpass
+- fnu: 每个源的观测F_nu, 单位是erg s-1 cm-1 Hz-1, 即使输入的是mag, 也会转换成f_nu
+- efnu: flux error of galaxies</p>
+<p>## From coeff file
+- coeff: coefficients of each template for each object
+- izbest: the index of the best redshift in zgrid
+- tnorm: 在threedhst-eazyPy中被用于估计stellar mass</p>
+<p>## From temp_sed file
+- temp_wave: 输入模板的wave
+- temp_flam: 输入模板的flam
+- da: Da
+- db: Db</p>
+<p>## From pz file
+- NK: number of prior’s mag bins
+- chi2fit: chi2 of each redshift for each object
+- kbins: prior’s mag bins
+- priorzk: prior’s redshift distribution
+- kidx: prior’s mag bin index for each object</p>
+<p>## From zbin file
+- z_a: average z
+- z_p: median z
+- z_m1: z_low
+- z_m2: z_high
+- z_peak: z_peak</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.eazy.EazyOutput.fetch_coeff">
+<span class="sig-name descname"><span class="pre">fetch_coeff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'photz.coeff'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.eazy.EazyOutput.fetch_coeff" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.eazy.EazyOutput.fetch_pz">
+<span class="sig-name descname"><span class="pre">fetch_pz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'photz.pz'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.eazy.EazyOutput.fetch_pz" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.eazy.EazyOutput.fetch_temp_sed">
+<span class="sig-name descname"><span class="pre">fetch_temp_sed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'photz.temp_sed'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.eazy.EazyOutput.fetch_temp_sed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.eazy.EazyOutput.fetch_tempfilt">
+<span class="sig-name descname"><span class="pre">fetch_tempfilt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'photz.tempfilt'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.eazy.EazyOutput.fetch_tempfilt" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.eazy.EazyOutput.fetch_zbin">
+<span class="sig-name descname"><span class="pre">fetch_zbin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'photz.zbin'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.eazy.EazyOutput.fetch_zbin" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.eazy.EazyOutput.fetch_zout">
+<span class="sig-name descname"><span class="pre">fetch_zout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'photz.zout'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.eazy.EazyOutput.fetch_zout" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.eazy.EazyOutput.get_obj_res">
+<span class="sig-name descname"><span class="pre">get_obj_res</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.eazy.EazyOutput.get_obj_res" title="Link to this definition"></a></dt>
+<dd><p>获取索引为idx的目标源的EAZY拟合结果</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>idx</strong> (<em>int</em>) – 目标源在catalog中的index, 从0开始</p></li>
+<li><p><strong>apply_IGM_correction</strong> (<em>bool</em>) – 是否对模板进行IGM修正</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>1. NFILT</strong> (<em>使用的filter的数量</em>)</p></li>
+<li><p><strong>2. NTEMP</strong> (<em>使用的模板的数量</em>)</p></li>
+<li><p><strong>3. NZ</strong> (<em>红移采样数量</em>)</p></li>
+<li><p><strong>4. lc</strong> (<em>filter的中心波长</em>)</p></li>
+<li><p><strong>5. coeff</strong> (<em>每个模板的最佳拟合系数</em>)</p></li>
+<li><p><strong>6. obs_fnu</strong> (<em>catalog里的测光值转换成f_nu, 单位为erg s-1 cm-2 Hz-1</em>)</p></li>
+<li><p><strong>7. obs_efnu</strong> (<em>catalog里的测光值转换成f_nu的误差, 单位为erg s-1 cm-2 Hz-1</em>)</p></li>
+<li><p><strong>8. obs_flambda</strong> (<em>catalog里的测光值转换成f_lambda, 单位为erg s-1 cm-2 AA-1</em>)</p></li>
+<li><p><strong>9. obs_eflambda</strong> (<em>catalog里的测光值转换成f_lambda的误差, 单位为erg s-1 cm-2 AA-1</em>)</p></li>
+<li><p><strong>10. sim_fnu</strong> (<em>模板计算得到的模拟的测光点, 单位为erg s-1 cm-2 Hz-1</em>)</p></li>
+<li><p><strong>11. sim_flambda</strong> (<em>模板计算得到的模拟的测光点, 单位为erg s-1 cm-2 AA-1</em>)</p></li>
+<li><p><strong>12. z_best</strong> (<em>最佳红移</em>)</p></li>
+<li><p><strong>13. lambdaz</strong> (<em>移动模板到观测的波长</em>)</p></li>
+<li><p><strong>14. sim_sed_fnu</strong> (<em>组合多个模板生成的最佳拟合的SED, 单位为erg s-1 cm-2 Hz-1</em>)</p></li>
+<li><p><strong>15. sim_sed_flambda</strong> (<em>组合多个模板生成的最佳拟合的SED, 单位为erg s-1 cm-2 AA-1</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.eazy.EazyOutput.get_obj_zPDF">
+<span class="sig-name descname"><span class="pre">get_obj_zPDF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.eazy.EazyOutput.get_obj_zPDF" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.eazy.EazyOutput.plot_SED">
+<span class="sig-name descname"><span class="pre">plot_SED</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.eazy.EazyOutput.plot_SED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-astrokit.wrapper.galfit">
+<span id="astrokit-wrapper-galfit-module"></span><h2>astrokit.wrapper.galfit module<a class="headerlink" href="#module-astrokit.wrapper.galfit" title="Link to this heading"></a></h2>
+<p>A python warpper for Galfit.</p>
+<p>&#64;author: Rui Zhu
+&#64;creation time: 2023-01-09</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="astrokit.wrapper.galfit.Galfit">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.galfit.</span></span><span class="sig-name descname"><span class="pre">Galfit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_work</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_img_fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_img_fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_img_fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_img_fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psf_img_fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints_fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zeropoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pix_scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convbox_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(50,</span> <span class="pre">50)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'regular'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_option</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_existing_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.galfit.Galfit" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A python wrapper for galfit</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.galfit.Galfit.control_parameters">
+<span class="sig-name descname"><span class="pre">control_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#astrokit.wrapper.galfit.Galfit.control_parameters" title="Link to this definition"></a></dt>
+<dd><p>整合传入的数据, 生成feedme control parameters部分的字符串</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.galfit.Galfit.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#astrokit.wrapper.galfit.Galfit.fit" title="Link to this definition"></a></dt>
+<dd><p>执行galfit拟合</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time_out</strong> (<em>超时时间</em>)</p></li>
+<li><p><strong>show_prompt</strong> (<em>是否打印提示内容</em><em>, </em><em>True显示</em><em>, </em><em>False不显示</em>)</p></li>
+<li><p><strong>Files</strong></p></li>
+<li><p><strong>-----</strong></p></li>
+<li><p><strong>[</strong><strong>galfit_&lt;xxx&gt;.runlog</strong><strong>]</strong> (<em>记录galfit运行时的终端打印结果</em>)</p></li>
+<li><p><strong>[</strong><strong>galfit_&lt;xxx&gt;.fits</strong><strong>]</strong> (<em>galfit结果文件</em>)</p></li>
+<li><p><strong>[</strong><strong>galfit_&lt;xxx&gt;.result</strong><strong>]</strong> (<em>galfit最终拟合参数</em><em>, </em><em>原galfit.01</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.galfit.Galfit.get_result">
+<span class="sig-name descname"><span class="pre">get_result</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.galfit.Galfit.get_result" title="Link to this definition"></a></dt>
+<dd><p>输出拟合结果到dict</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.galfit.Galfit.make_feedme">
+<span class="sig-name descname"><span class="pre">make_feedme</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feedme_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#astrokit.wrapper.galfit.Galfit.make_feedme" title="Link to this definition"></a></dt>
+<dd><p>制作并输出galfit feedme文件</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.galfit.Galfit.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#astrokit.wrapper.galfit.Galfit.plot" title="Link to this definition"></a></dt>
+<dd><p>“预览galfit拟合结果</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="astrokit.wrapper.galfit.Model">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.galfit.</span></span><span class="sig-name descname"><span class="pre">Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">position</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(nan,</span> <span class="pre">nan)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_e</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_sersic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">nan</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.galfit.Model" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>拟合使用的模型生成器</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.galfit.Model.psf">
+<span class="sig-name descname"><span class="pre">psf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#astrokit.wrapper.galfit.Model.psf" title="Link to this definition"></a></dt>
+<dd><p>PSF model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.galfit.Model.sersic">
+<span class="sig-name descname"><span class="pre">sersic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#astrokit.wrapper.galfit.Model.sersic" title="Link to this definition"></a></dt>
+<dd><p>Sersic model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.galfit.Model.show_properties">
+<span class="sig-name descname"><span class="pre">show_properties</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#astrokit.wrapper.galfit.Model.show_properties" title="Link to this definition"></a></dt>
+<dd><p>显示模型的属性</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.galfit.Model.sky">
+<span class="sig-name descname"><span class="pre">sky</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center_bkg_mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sky_grad_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sky_grad_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#astrokit.wrapper.galfit.Model.sky" title="Link to this definition"></a></dt>
+<dd><p>sky model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>center_bkg_mean</strong> (<em>图像中心的背景值</em>)</p></li>
+<li><p><strong>sky_grad_x</strong> (<em>x方向的背景梯度</em>)</p></li>
+<li><p><strong>sky_grad_y</strong> (<em>y方向的背景梯度</em>)</p></li>
+<li><p><strong>fix</strong> (<em>需要固定不变的参数名列表</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.wrapper.galfit.append_galfit_header">
+<span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.galfit.</span></span><span class="sig-name descname"><span class="pre">append_galfit_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncombine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bunit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ELECTRONS'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.galfit.append_galfit_header" title="Link to this definition"></a></dt>
+<dd><p>append 4 keyworlds that GALFIT needed to existed FITS header.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>header</strong> (<em>astropy.io.fits.header.Header</em>) – FITS header need to be appended.</p></li>
+<li><p><strong>exptime</strong> (<em>float</em>) – exposure time of the image.</p></li>
+<li><p><strong>gain</strong> (<em>float</em>) – commanded gain of CCD. Default: 2.5</p></li>
+<li><p><strong>ncombine</strong> (<em>int</em>) – number of image sets combined during CR rejection. Default: 1</p></li>
+<li><p><strong>bunit</strong> (<em>str</em>) – brightness units. Default: ‘ELECTRONS’</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>header</strong> – FITS header appended.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>astropy.io.fits.header.Header</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.wrapper.galfit.calculate_psf_fraction">
+<span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.galfit.</span></span><span class="sig-name descname"><span class="pre">calculate_psf_fraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">galfit_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_point</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.galfit.calculate_psf_fraction" title="Link to this definition"></a></dt>
+<dd><p>calculate the psf fraction of the galaxy</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>galfit_result</strong> (<em>the galfit result dict by astrokit.galfit</em>)</p></li>
+<li><p><strong>zero_point</strong> (<em>the zero point</em><em> of </em><em>the image</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>psf_fraction</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the psf to total flux ratio of the galaxy</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.wrapper.galfit.get_result">
+<span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.galfit.</span></span><span class="sig-name descname"><span class="pre">get_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_output_img_fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">if_show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#astrokit.wrapper.galfit.get_result" title="Link to this definition"></a></dt>
+<dd><p>从galfit拟合结果fits cube中读取结果</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path_output_img_fname</strong> (<em>galfit result fits cube的路径</em>)</p></li>
+<li><p><strong>path_save</strong> (<em>保存输出txt文件的文件夹路径</em><em>, </em><em>默认为None</em><em>, </em><em>不输出文件</em>)</p></li>
+<li><p><strong>if_show</strong> (<em>是否直接打印txt文件内容</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.wrapper.galfit.plot">
+<span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.galfit.</span></span><span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_output_img_fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img1_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Input</span> <span class="pre">Image'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img2_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Model</span> <span class="pre">(GALFIT)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img3_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Residual</span> <span class="pre">Image'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#astrokit.wrapper.galfit.plot" title="Link to this definition"></a></dt>
+<dd><p>plot galfit result</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path_output_img_fname</strong> (<em>galfit result fits cube的路径</em>)</p></li>
+<li><p><strong>path_save</strong> (<em>保存路径或不保存</em><em>(</em><em>默认</em><em>)</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-astrokit.wrapper.sextractor">
+<span id="astrokit-wrapper-sextractor-module"></span><h2>astrokit.wrapper.sextractor module<a class="headerlink" href="#module-astrokit.wrapper.sextractor" title="Link to this heading"></a></h2>
+<p>A Python wrapper for Source Extractor</p>
+<ul class="simple">
+<li><p>Author: Rui Zhu</p></li>
+<li><p>Creation time: 2023-09-01</p></li>
+</ul>
+<dl class="py class">
+<dt class="sig sig-object py" id="astrokit.wrapper.sextractor.SExtractor">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.sextractor.</span></span><span class="sig-name descname"><span class="pre">SExtractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.sextractor.SExtractor" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class provides functionality to run Source Extractor in a Pythonic way.</p>
+<section id="parameter">
+<h3>Parameter<a class="headerlink" href="#parameter" title="Link to this heading"></a></h3>
+<p>path_image: path to the science image</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.sextractor.SExtractor.all_catalog_params">
+<span class="sig-name descname"><span class="pre">all_catalog_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#astrokit.wrapper.sextractor.SExtractor.all_catalog_params" title="Link to this definition"></a></dt>
+<dd><p>Create a Python dictionary from the default catalog parameter file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.sextractor.SExtractor.config">
+<span class="sig-name descname"><span class="pre">config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.sextractor.SExtractor.config" title="Link to this definition"></a></dt>
+<dd><p>Configuring parameters for this SExtractor task.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>1. The parameter <cite>PARAMETERS_NAME</cite> cannot be defined here since it is
+defined in the ‘make_catalog_param_file’ function and will be automatically
+filled in the configuration file.
+2. The parameter <cite>FILTER_NAME</cite> is only the <cite>file name</cite> of the convolution
+kernel, not the full path. The full path will be automatically filled in
+the configuration file. The convolution kernel file is located in the
+directory where the SExtractor is installed, and the default value is
+<cite>/opt/homebrew/Cellar/sextractor/2.28.0/share/sextractor</cite></p>
+<dl class="simple">
+<dt>kwargs: dict, optional</dt><dd><p>The key-value pairs of the configuration parameters. If no parameters
+are defined, the default configuration file will be used.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>CATALOG_NAME<span class="classifier">str</span></dt><dd><p>Name of the output catalog. The default value is ‘&lt;image name&gt;.cat’.</p>
+</dd>
+<dt>CATALOG_TYPE<span class="classifier">str</span></dt><dd><p>Type of output catalog: ASCII_HEAD (default), ASCII, ASCII_SKYCAT, ASCII_VOTABLE,
+FITS_1.0, FITS_LDAC.</p>
+</dd>
+<dt>FILTER_NAME<span class="classifier">str</span></dt><dd><p>Name of the file containing the convolution filter. Check this path
+<cite>/opt/homebrew/Cellar/sextractor/2.28.0/share/sextractor</cite> to choice
+the best filer.</p>
+</dd>
+</dl>
+<p>… (see the default configuration file for more details)</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.sextractor.SExtractor.config_param_class">
+<span class="sig-name descname"><span class="pre">config_param_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#astrokit.wrapper.sextractor.SExtractor.config_param_class" title="Link to this definition"></a></dt>
+<dd><p>Create a dictionary to store configuration parameters along with their
+corresponding types from the default configuration file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.sextractor.SExtractor.default_catalog_param_file">
+<span class="sig-name descname"><span class="pre">default_catalog_param_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#astrokit.wrapper.sextractor.SExtractor.default_catalog_param_file" title="Link to this definition"></a></dt>
+<dd><p>generate the catalog parameter file of SE</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.sextractor.SExtractor.default_config_file">
+<span class="sig-name descname"><span class="pre">default_config_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#astrokit.wrapper.sextractor.SExtractor.default_config_file" title="Link to this definition"></a></dt>
+<dd><p>generate the default configuration file for SE</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.sextractor.SExtractor.get_output_catalog">
+<span class="sig-name descname"><span class="pre">get_output_catalog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.sextractor.SExtractor.get_output_catalog" title="Link to this definition"></a></dt>
+<dd><p>Read the output catalog of SExtractor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.sextractor.SExtractor.make_catalog_param_file">
+<span class="sig-name descname"><span class="pre">make_catalog_param_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span> <span class="pre">|</span> <span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#astrokit.wrapper.sextractor.SExtractor.make_catalog_param_file" title="Link to this definition"></a></dt>
+<dd><p>Generate a catalog parameters file in the working directory with a list
+of required output parameters.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>1. The created catalog parameter file will be automatically saved in
+the working directory.
+2. If the ‘fname’ argument is not defined, the default value is
+‘&lt;image name&gt;.param’.</p>
+<dl class="simple">
+<dt>params: list, required</dt><dd><p>List of parameters required for calculation by SExtractor and
+displayed in the output catalog.</p>
+</dd>
+<dt>fname: str, optional</dt><dd><p>The name of the catalog parameter file. If not defined, the default
+value is ‘&lt;image name&gt;.param’.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.sextractor.SExtractor.make_config_file">
+<span class="sig-name descname"><span class="pre">make_config_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.sextractor.SExtractor.make_config_file" title="Link to this definition"></a></dt>
+<dd><p>Generate the configuration file for SExtractor.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Configuration parameters should be defined using the ‘config’ function
+first. Subsequently, the content in the ‘config’ dictionary will be
+loaded into the configuration file.</p>
+<dl class="simple">
+<dt>fname: str, optional</dt><dd><p>The name of the configuration file. If not defined, the default value
+is <cite>&lt;image file name&gt;.sex</cite></p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.sextractor.SExtractor.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show_in_terminal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname_detection_image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.sextractor.SExtractor.run" title="Link to this definition"></a></dt>
+<dd><p>Run SExtractor in the terminal or in the background.</p>
+<section id="id1">
+<h4>Parameter<a class="headerlink" href="#id1" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>show_in_terminal: bool, optional</dt><dd><p>If True, run SExtractor in the terminal. If False, run SExtractor
+in the background.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+<section id="module-astrokit.wrapper.stilts">
+<span id="astrokit-wrapper-stilts-module"></span><h2>astrokit.wrapper.stilts module<a class="headerlink" href="#module-astrokit.wrapper.stilts" title="Link to this heading"></a></h2>
+<p>A wrapper for the STILTS command line tool.</p>
+<p>&#64; Author: Rui Zhu
+&#64; Date: 2024-10-13
+&#64; STILTS website: <a class="reference external" href="https://www.star.bristol.ac.uk/mbt/stilts/">https://www.star.bristol.ac.uk/mbt/stilts/</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.wrapper.stilts.cdsskymatch">
+<span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.stilts.</span></span><span class="sig-name descname"><span class="pre">cdsskymatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_input_catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_output_catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cds_catalog_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ra'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dec'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">find</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'best'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocksize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.stilts.cdsskymatch" title="Link to this definition"></a></dt>
+<dd><p>Online crossmatch with VizieR tables and the SIMBAD database.</p>
+<p>Website: <a class="reference external" href="https://www.star.bristol.ac.uk/mbt/stilts/sun256/cdsskymatch.html">https://www.star.bristol.ac.uk/mbt/stilts/sun256/cdsskymatch.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path_input_catalog</strong> (<em>str</em><em> | </em><em>Path</em>) – The path to the input catalog.</p></li>
+<li><p><strong>path_output_catalog</strong> (<em>str</em><em> | </em><em>Path</em>) – The path to the output catalog.</p></li>
+<li><p><strong>cds_catalog_name</strong> (<em>str</em>) – The name of the CDS catalog.</p></li>
+<li><p><strong>ra</strong> (<em>str</em><em>, </em><em>optional</em>) – The name of the right ascension column. The default is ‘ra’.</p></li>
+<li><p><strong>dec</strong> (<em>str</em><em>, </em><em>optional</em>) – The name of the declination column. The default is ‘dec’.</p></li>
+<li><p><strong>sep</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum separation (units: arcseconds) between the two objects. The default is 1.0.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.wrapper.stilts.tapskymatch">
+<span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.stilts.</span></span><span class="sig-name descname"><span class="pre">tapskymatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_input_catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_output_catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url_tap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_tap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord_name_local</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord_name_tap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocksize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">find</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.stilts.tapskymatch" title="Link to this definition"></a></dt>
+<dd><p>Crossmatch of a local table with one held in a remote TAP service.</p>
+<p>Website: <a class="reference external" href="https://www.star.bristol.ac.uk/mbt/stilts/sun256/tapskymatch.html">https://www.star.bristol.ac.uk/mbt/stilts/sun256/tapskymatch.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>blocksize</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of rows to be sent to the TAP service in each query. The default is 5000.</p></li>
+<li><p><strong>find</strong> (<em>str</em><em>, </em><em>optional</em>) – ‘all’: All matches.
+‘best’: Matched rows, best remote row for each input row
+‘each’: One row per input row, contains best remote match or blank
+‘each-dist’: One row per input row, column giving distance only for best match</p></li>
+<li><p><strong>sep</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum separation (units: arcseconds) between the two objects. The default is 1.0.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.wrapper.stilts.tcopy">
+<span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.stilts.</span></span><span class="sig-name descname"><span class="pre">tcopy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_input_catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_output_catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.stilts.tcopy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.wrapper.stilts.tmatch2">
+<span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.stilts.</span></span><span class="sig-name descname"><span class="pre">tmatch2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_cat_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_cat_right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_cat_output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord_name_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord_name_right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">find</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'best'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">join</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1and2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'log'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.stilts.tmatch2" title="Link to this definition"></a></dt>
+<dd><p>Performs a crossmatch of two tables based on the proximity of sky positions.</p>
+<p>Website: <a class="reference external" href="https://www.star.bris.ac.uk/~mbt/stilts/sun256/tmatch2.html">https://www.star.bris.ac.uk/~mbt/stilts/sun256/tmatch2.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path_cat_left</strong> (<em>str</em><em> | </em><em>Path</em>) – The path to the left catalog.</p></li>
+<li><p><strong>path_cat_right</strong> (<em>str</em><em> | </em><em>Path</em>) – The path to the right catalog.</p></li>
+<li><p><strong>path_cat_output</strong> (<em>str</em><em> | </em><em>Path</em>) – The path to the output catalog.</p></li>
+<li><p><strong>coord_name_left</strong> (<em>tuple</em><em>, </em><em>optional</em>) – The column names of the coordinates in the left catalog.</p></li>
+<li><p><strong>coord_name_right</strong> (<em>tuple</em><em>, </em><em>optional</em>) – The column names of the coordinates in the right catalog.</p></li>
+<li><p><strong>sep</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum separation (units: arcseconds) between the two objects. The default is 1.0.</p></li>
+<li><p><strong>find</strong> (<em>str</em><em>, </em><em>optional</em>) – The method used to find the closest match. The default is ‘best’.
+‘all’: All matches. Every match between the two tables is included in the result.
+‘best’: 以对称的方式获得最佳匹配
+‘best1’: Best match for each Table 1 row.
+For each row in table 1, only the best match from table 2 will appear in the result.
+Each row from table 1 will appear a maximum of once in the result,
+but rows from table 2 may appear multiple times.
+‘best2’: Best match for each Table 2 row.
+For each row in table 2, only the best match from table 1 will appear in the result.
+Each row from table 2 will appear a maximum of once in the result,
+but rows from table 1 may appear multiple times.</p></li>
+<li><p><strong>join</strong> (<em>str</em><em>, </em><em>optional</em>) – Determines which rows are included in the output table. The default is ‘1and2’.</p></li>
+<li><p><strong>n_cpu</strong> (<em>str</em><em>, </em><em>optional</em>) – The number of CPUs used to run the command.
+‘None’: parallel smaller than 6 CPUs. # Default
+‘all’: parallel all CPUs.
+‘n_cpu’: parallel n CPUs.</p></li>
+<li><p><strong>progress</strong> (<em>str</em><em>, </em><em>optional</em>) – Determines whether information on progress of the match should be output
+to the standard error stream as it progresses.
+For lengthy matches this is a useful reassurance and can give guidance
+about how much longer it will take.
+It can also be useful as a performance diagnostic.
+‘none’: no progress is shown
+‘log’: progress information is shown
+‘time’: progress information and some time profiling information is shown
+‘profile’: progress information and limited time/memory profiling information are shown</p></li>
+<li><p><strong>silence</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to suppress the output information. The default is False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.wrapper.stilts.tskymatch2">
+<span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.stilts.</span></span><span class="sig-name descname"><span class="pre">tskymatch2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_cat_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_cat_right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_cat_output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord_name_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord_name_right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">find</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'best'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">join</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1and2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.stilts.tskymatch2" title="Link to this definition"></a></dt>
+<dd><p>Performs a crossmatch of two tables based on the proximity of sky positions.</p>
+<p>Website: <a class="reference external" href="https://www.star.bris.ac.uk/~mbt/stilts/sun256/tskymatch2.html">https://www.star.bris.ac.uk/~mbt/stilts/sun256/tskymatch2.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path_cat_left</strong> (<em>str</em><em> | </em><em>Path</em>) – The path to the left catalog.</p></li>
+<li><p><strong>path_cat_right</strong> (<em>str</em><em> | </em><em>Path</em>) – The path to the right catalog.</p></li>
+<li><p><strong>path_cat_output</strong> (<em>str</em><em> | </em><em>Path</em>) – The path to the output catalog.</p></li>
+<li><p><strong>coord_name_left</strong> (<em>tuple</em><em>, </em><em>optional</em>) – The column names of the coordinates in the left catalog.</p></li>
+<li><p><strong>coord_name_right</strong> (<em>tuple</em><em>, </em><em>optional</em>) – The column names of the coordinates in the right catalog.</p></li>
+<li><p><strong>sep</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum separation (units: arcseconds) between the two objects. The default is 1.0.</p></li>
+<li><p><strong>find</strong> (<em>str</em><em>, </em><em>optional</em>) – The method used to find the closest match. The default is ‘best’.
+‘all’: All matches. Every match between the two tables is included in the result.
+‘best’: 以对称的方式获得最佳匹配
+‘best1’: Best match for each Table 1 row.
+For each row in table 1, only the best match from table 2 will appear in the result.
+Each row from table 1 will appear a maximum of once in the result,
+but rows from table 2 may appear multiple times.
+‘best2’: Best match for each Table 2 row.
+For each row in table 2, only the best match from table 1 will appear in the result.
+Each row from table 2 will appear a maximum of once in the result,
+but rows from table 1 may appear multiple times.</p></li>
+<li><p><strong>join</strong> (<em>str</em><em>, </em><em>optional</em>) – Determines which rows are included in the output table. The default is ‘1and2’.</p></li>
+<li><p><strong>n_cpu</strong> (<em>str</em><em>, </em><em>optional</em>) – The number of CPUs used to run the command.
+‘None’: parallel smaller than 6 CPUs. # Default
+‘all’: parallel all CPUs.
+‘n_cpu’: parallel n CPUs.</p></li>
+<li><p><strong>silence</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to suppress the output information. The default is False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-astrokit.wrapper">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-astrokit.wrapper" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="astrokit.wrapper.Eazy">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.</span></span><span class="sig-name descname"><span class="pre">Eazy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_work</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">translate_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname_catalog</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'catalog.cat'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname_translate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'photz.translate'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'photz.param'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname_spectra_param</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'templates.spectra.param'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname_output_zout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'photz.zout'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.Eazy" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A Wrapper for EAZY</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.Eazy.config">
+<span class="sig-name descname"><span class="pre">config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.Eazy.config" title="Link to this definition"></a></dt>
+<dd><p>填写`zphot.param`配置文件</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.Eazy.default_EAZY_templates">
+<span class="sig-name descname"><span class="pre">default_EAZY_templates</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.Eazy.default_EAZY_templates" title="Link to this definition"></a></dt>
+<dd><p>load the default templates of EAZY from the EAZY package
+<cite>EAZY_v1.1_lines</cite></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.Eazy.default_config_file">
+<span class="sig-name descname"><span class="pre">default_config_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.Eazy.default_config_file" title="Link to this definition"></a></dt>
+<dd><p>Show the default config file of EAZY.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.Eazy.get_output">
+<span class="sig-name descname"><span class="pre">get_output</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.Eazy.get_output" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.Eazy.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">terminal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.Eazy.run" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.Eazy.set_bands">
+<span class="sig-name descname"><span class="pre">set_bands</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.Eazy.set_bands" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.Eazy.set_templates">
+<span class="sig-name descname"><span class="pre">set_templates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">templates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_age</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_error_amplitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comb_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.Eazy.set_templates" title="Link to this definition"></a></dt>
+<dd><p>Set templates for EAZY and create the template definition file <cite>xxx.spectra.param</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>templates</strong> (<em>list</em>) – A list of template path.</p></li>
+<li><p><strong>lambda_factor</strong> (<em>float</em><em>, </em><em>optional</em>) – Multiplicative factor to correct wavelength units, by default 1.0</p></li>
+<li><p><strong>model_age</strong> (<em>float</em><em>, </em><em>optional</em>) – Age of template model in Gyr (0 means template is always used), by default 0</p></li>
+<li><p><strong>template_error_amplitude</strong> (<em>float</em><em>, </em><em>optional</em>) – Template error amplitude (for INDIVIDUAL template fits), by default 1.0</p></li>
+<li><p><strong>comb_dict</strong> (<em>dict</em><em>, </em><em>optional</em>) – 手动设置模板组合的方式(从1开始计数, 与tempaltes列表顺序一致), by default None;
+设置为None, 则自动填写为全排列;
+格式为{1: [2, 3, 4], 2: [3, 4], 3: [4]}, 表示1号模板与2, 3, 4号模板组合,
+2号模板与3, 4号模板组合, 3号模板与4号模板组合</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="astrokit.wrapper.EazyOutput">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.</span></span><span class="sig-name descname"><span class="pre">EazyOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_output</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.EazyOutput" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>集中管理EAZY的输出文件</p>
+<p>Note:
+- 代码参考: /Users/rui/Applications/eazy-photoz/inputs/read_eazy_binaries.py</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.EazyOutput.collect">
+<span class="sig-name descname"><span class="pre">collect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.EazyOutput.collect" title="Link to this definition"></a></dt>
+<dd><ul class="simple">
+<li><p>NOBJ: number of objects</p></li>
+<li><p>NFILT: number of filters</p></li>
+<li><p>NTEMP: number of templates</p></li>
+<li><p>NZ: number of redshifts (zgrid)</p></li>
+</ul>
+<p>## From tempfilt file
+- lc: mean wavelength of each filters
+- zgrid: redshift grid
+- tempfilt: fluxes derievd from templates at different bandpass
+- fnu: 每个源的观测F_nu, 单位是erg s-1 cm-1 Hz-1, 即使输入的是mag, 也会转换成f_nu
+- efnu: flux error of galaxies</p>
+<p>## From coeff file
+- coeff: coefficients of each template for each object
+- izbest: the index of the best redshift in zgrid
+- tnorm: 在threedhst-eazyPy中被用于估计stellar mass</p>
+<p>## From temp_sed file
+- temp_wave: 输入模板的wave
+- temp_flam: 输入模板的flam
+- da: Da
+- db: Db</p>
+<p>## From pz file
+- NK: number of prior’s mag bins
+- chi2fit: chi2 of each redshift for each object
+- kbins: prior’s mag bins
+- priorzk: prior’s redshift distribution
+- kidx: prior’s mag bin index for each object</p>
+<p>## From zbin file
+- z_a: average z
+- z_p: median z
+- z_m1: z_low
+- z_m2: z_high
+- z_peak: z_peak</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.EazyOutput.fetch_coeff">
+<span class="sig-name descname"><span class="pre">fetch_coeff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'photz.coeff'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.EazyOutput.fetch_coeff" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.EazyOutput.fetch_pz">
+<span class="sig-name descname"><span class="pre">fetch_pz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'photz.pz'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.EazyOutput.fetch_pz" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.EazyOutput.fetch_temp_sed">
+<span class="sig-name descname"><span class="pre">fetch_temp_sed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'photz.temp_sed'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.EazyOutput.fetch_temp_sed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.EazyOutput.fetch_tempfilt">
+<span class="sig-name descname"><span class="pre">fetch_tempfilt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'photz.tempfilt'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.EazyOutput.fetch_tempfilt" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.EazyOutput.fetch_zbin">
+<span class="sig-name descname"><span class="pre">fetch_zbin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'photz.zbin'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.EazyOutput.fetch_zbin" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.EazyOutput.fetch_zout">
+<span class="sig-name descname"><span class="pre">fetch_zout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'photz.zout'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.EazyOutput.fetch_zout" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.EazyOutput.get_obj_res">
+<span class="sig-name descname"><span class="pre">get_obj_res</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.EazyOutput.get_obj_res" title="Link to this definition"></a></dt>
+<dd><p>获取索引为idx的目标源的EAZY拟合结果</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>idx</strong> (<em>int</em>) – 目标源在catalog中的index, 从0开始</p></li>
+<li><p><strong>apply_IGM_correction</strong> (<em>bool</em>) – 是否对模板进行IGM修正</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>1. NFILT</strong> (<em>使用的filter的数量</em>)</p></li>
+<li><p><strong>2. NTEMP</strong> (<em>使用的模板的数量</em>)</p></li>
+<li><p><strong>3. NZ</strong> (<em>红移采样数量</em>)</p></li>
+<li><p><strong>4. lc</strong> (<em>filter的中心波长</em>)</p></li>
+<li><p><strong>5. coeff</strong> (<em>每个模板的最佳拟合系数</em>)</p></li>
+<li><p><strong>6. obs_fnu</strong> (<em>catalog里的测光值转换成f_nu, 单位为erg s-1 cm-2 Hz-1</em>)</p></li>
+<li><p><strong>7. obs_efnu</strong> (<em>catalog里的测光值转换成f_nu的误差, 单位为erg s-1 cm-2 Hz-1</em>)</p></li>
+<li><p><strong>8. obs_flambda</strong> (<em>catalog里的测光值转换成f_lambda, 单位为erg s-1 cm-2 AA-1</em>)</p></li>
+<li><p><strong>9. obs_eflambda</strong> (<em>catalog里的测光值转换成f_lambda的误差, 单位为erg s-1 cm-2 AA-1</em>)</p></li>
+<li><p><strong>10. sim_fnu</strong> (<em>模板计算得到的模拟的测光点, 单位为erg s-1 cm-2 Hz-1</em>)</p></li>
+<li><p><strong>11. sim_flambda</strong> (<em>模板计算得到的模拟的测光点, 单位为erg s-1 cm-2 AA-1</em>)</p></li>
+<li><p><strong>12. z_best</strong> (<em>最佳红移</em>)</p></li>
+<li><p><strong>13. lambdaz</strong> (<em>移动模板到观测的波长</em>)</p></li>
+<li><p><strong>14. sim_sed_fnu</strong> (<em>组合多个模板生成的最佳拟合的SED, 单位为erg s-1 cm-2 Hz-1</em>)</p></li>
+<li><p><strong>15. sim_sed_flambda</strong> (<em>组合多个模板生成的最佳拟合的SED, 单位为erg s-1 cm-2 AA-1</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.EazyOutput.get_obj_zPDF">
+<span class="sig-name descname"><span class="pre">get_obj_zPDF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.EazyOutput.get_obj_zPDF" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.EazyOutput.plot_SED">
+<span class="sig-name descname"><span class="pre">plot_SED</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.EazyOutput.plot_SED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="astrokit.wrapper.Galfit">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.</span></span><span class="sig-name descname"><span class="pre">Galfit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_work</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_img_fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_img_fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_img_fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_img_fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psf_img_fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints_fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zeropoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pix_scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convbox_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(50,</span> <span class="pre">50)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'regular'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_option</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_existing_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.Galfit" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A python wrapper for galfit</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.Galfit.control_parameters">
+<span class="sig-name descname"><span class="pre">control_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#astrokit.wrapper.Galfit.control_parameters" title="Link to this definition"></a></dt>
+<dd><p>整合传入的数据, 生成feedme control parameters部分的字符串</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.Galfit.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#astrokit.wrapper.Galfit.fit" title="Link to this definition"></a></dt>
+<dd><p>执行galfit拟合</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time_out</strong> (<em>超时时间</em>)</p></li>
+<li><p><strong>show_prompt</strong> (<em>是否打印提示内容</em><em>, </em><em>True显示</em><em>, </em><em>False不显示</em>)</p></li>
+<li><p><strong>Files</strong></p></li>
+<li><p><strong>-----</strong></p></li>
+<li><p><strong>[</strong><strong>galfit_&lt;xxx&gt;.runlog</strong><strong>]</strong> (<em>记录galfit运行时的终端打印结果</em>)</p></li>
+<li><p><strong>[</strong><strong>galfit_&lt;xxx&gt;.fits</strong><strong>]</strong> (<em>galfit结果文件</em>)</p></li>
+<li><p><strong>[</strong><strong>galfit_&lt;xxx&gt;.result</strong><strong>]</strong> (<em>galfit最终拟合参数</em><em>, </em><em>原galfit.01</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.Galfit.get_result">
+<span class="sig-name descname"><span class="pre">get_result</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.Galfit.get_result" title="Link to this definition"></a></dt>
+<dd><p>输出拟合结果到dict</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.Galfit.make_feedme">
+<span class="sig-name descname"><span class="pre">make_feedme</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feedme_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#astrokit.wrapper.Galfit.make_feedme" title="Link to this definition"></a></dt>
+<dd><p>制作并输出galfit feedme文件</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.Galfit.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#astrokit.wrapper.Galfit.plot" title="Link to this definition"></a></dt>
+<dd><p>“预览galfit拟合结果</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="astrokit.wrapper.Model">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.</span></span><span class="sig-name descname"><span class="pre">Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">position</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(nan,</span> <span class="pre">nan)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_e</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_sersic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position_angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">nan</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.Model" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>拟合使用的模型生成器</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.Model.psf">
+<span class="sig-name descname"><span class="pre">psf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#astrokit.wrapper.Model.psf" title="Link to this definition"></a></dt>
+<dd><p>PSF model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.Model.sersic">
+<span class="sig-name descname"><span class="pre">sersic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#astrokit.wrapper.Model.sersic" title="Link to this definition"></a></dt>
+<dd><p>Sersic model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.Model.show_properties">
+<span class="sig-name descname"><span class="pre">show_properties</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#astrokit.wrapper.Model.show_properties" title="Link to this definition"></a></dt>
+<dd><p>显示模型的属性</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.Model.sky">
+<span class="sig-name descname"><span class="pre">sky</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center_bkg_mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sky_grad_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sky_grad_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#astrokit.wrapper.Model.sky" title="Link to this definition"></a></dt>
+<dd><p>sky model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>center_bkg_mean</strong> (<em>图像中心的背景值</em>)</p></li>
+<li><p><strong>sky_grad_x</strong> (<em>x方向的背景梯度</em>)</p></li>
+<li><p><strong>sky_grad_y</strong> (<em>y方向的背景梯度</em>)</p></li>
+<li><p><strong>fix</strong> (<em>需要固定不变的参数名列表</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="astrokit.wrapper.SExtractor">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.</span></span><span class="sig-name descname"><span class="pre">SExtractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.SExtractor" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class provides functionality to run Source Extractor in a Pythonic way.</p>
+<section id="id2">
+<h3>Parameter<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<p>path_image: path to the science image</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.SExtractor.all_catalog_params">
+<span class="sig-name descname"><span class="pre">all_catalog_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#astrokit.wrapper.SExtractor.all_catalog_params" title="Link to this definition"></a></dt>
+<dd><p>Create a Python dictionary from the default catalog parameter file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.SExtractor.config">
+<span class="sig-name descname"><span class="pre">config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.SExtractor.config" title="Link to this definition"></a></dt>
+<dd><p>Configuring parameters for this SExtractor task.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>1. The parameter <cite>PARAMETERS_NAME</cite> cannot be defined here since it is
+defined in the ‘make_catalog_param_file’ function and will be automatically
+filled in the configuration file.
+2. The parameter <cite>FILTER_NAME</cite> is only the <cite>file name</cite> of the convolution
+kernel, not the full path. The full path will be automatically filled in
+the configuration file. The convolution kernel file is located in the
+directory where the SExtractor is installed, and the default value is
+<cite>/opt/homebrew/Cellar/sextractor/2.28.0/share/sextractor</cite></p>
+<dl class="simple">
+<dt>kwargs: dict, optional</dt><dd><p>The key-value pairs of the configuration parameters. If no parameters
+are defined, the default configuration file will be used.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>CATALOG_NAME<span class="classifier">str</span></dt><dd><p>Name of the output catalog. The default value is ‘&lt;image name&gt;.cat’.</p>
+</dd>
+<dt>CATALOG_TYPE<span class="classifier">str</span></dt><dd><p>Type of output catalog: ASCII_HEAD (default), ASCII, ASCII_SKYCAT, ASCII_VOTABLE,
+FITS_1.0, FITS_LDAC.</p>
+</dd>
+<dt>FILTER_NAME<span class="classifier">str</span></dt><dd><p>Name of the file containing the convolution filter. Check this path
+<cite>/opt/homebrew/Cellar/sextractor/2.28.0/share/sextractor</cite> to choice
+the best filer.</p>
+</dd>
+</dl>
+<p>… (see the default configuration file for more details)</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.SExtractor.config_param_class">
+<span class="sig-name descname"><span class="pre">config_param_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#astrokit.wrapper.SExtractor.config_param_class" title="Link to this definition"></a></dt>
+<dd><p>Create a dictionary to store configuration parameters along with their
+corresponding types from the default configuration file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.SExtractor.default_catalog_param_file">
+<span class="sig-name descname"><span class="pre">default_catalog_param_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#astrokit.wrapper.SExtractor.default_catalog_param_file" title="Link to this definition"></a></dt>
+<dd><p>generate the catalog parameter file of SE</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.SExtractor.default_config_file">
+<span class="sig-name descname"><span class="pre">default_config_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#astrokit.wrapper.SExtractor.default_config_file" title="Link to this definition"></a></dt>
+<dd><p>generate the default configuration file for SE</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.SExtractor.get_output_catalog">
+<span class="sig-name descname"><span class="pre">get_output_catalog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.SExtractor.get_output_catalog" title="Link to this definition"></a></dt>
+<dd><p>Read the output catalog of SExtractor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.SExtractor.make_catalog_param_file">
+<span class="sig-name descname"><span class="pre">make_catalog_param_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span> <span class="pre">|</span> <span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#astrokit.wrapper.SExtractor.make_catalog_param_file" title="Link to this definition"></a></dt>
+<dd><p>Generate a catalog parameters file in the working directory with a list
+of required output parameters.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>1. The created catalog parameter file will be automatically saved in
+the working directory.
+2. If the ‘fname’ argument is not defined, the default value is
+‘&lt;image name&gt;.param’.</p>
+<dl class="simple">
+<dt>params: list, required</dt><dd><p>List of parameters required for calculation by SExtractor and
+displayed in the output catalog.</p>
+</dd>
+<dt>fname: str, optional</dt><dd><p>The name of the catalog parameter file. If not defined, the default
+value is ‘&lt;image name&gt;.param’.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.SExtractor.make_config_file">
+<span class="sig-name descname"><span class="pre">make_config_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.SExtractor.make_config_file" title="Link to this definition"></a></dt>
+<dd><p>Generate the configuration file for SExtractor.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Configuration parameters should be defined using the ‘config’ function
+first. Subsequently, the content in the ‘config’ dictionary will be
+loaded into the configuration file.</p>
+<dl class="simple">
+<dt>fname: str, optional</dt><dd><p>The name of the configuration file. If not defined, the default value
+is <cite>&lt;image file name&gt;.sex</cite></p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.wrapper.SExtractor.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show_in_terminal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname_detection_image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.SExtractor.run" title="Link to this definition"></a></dt>
+<dd><p>Run SExtractor in the terminal or in the background.</p>
+<section id="id3">
+<h4>Parameter<a class="headerlink" href="#id3" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>show_in_terminal: bool, optional</dt><dd><p>If True, run SExtractor in the terminal. If False, run SExtractor
+in the background.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.wrapper.append_galfit_header">
+<span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.</span></span><span class="sig-name descname"><span class="pre">append_galfit_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncombine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bunit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ELECTRONS'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.append_galfit_header" title="Link to this definition"></a></dt>
+<dd><p>append 4 keyworlds that GALFIT needed to existed FITS header.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>header</strong> (<em>astropy.io.fits.header.Header</em>) – FITS header need to be appended.</p></li>
+<li><p><strong>exptime</strong> (<em>float</em>) – exposure time of the image.</p></li>
+<li><p><strong>gain</strong> (<em>float</em>) – commanded gain of CCD. Default: 2.5</p></li>
+<li><p><strong>ncombine</strong> (<em>int</em>) – number of image sets combined during CR rejection. Default: 1</p></li>
+<li><p><strong>bunit</strong> (<em>str</em>) – brightness units. Default: ‘ELECTRONS’</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>header</strong> – FITS header appended.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>astropy.io.fits.header.Header</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.wrapper.calculate_psf_fraction">
+<span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.</span></span><span class="sig-name descname"><span class="pre">calculate_psf_fraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">galfit_result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_point</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.calculate_psf_fraction" title="Link to this definition"></a></dt>
+<dd><p>calculate the psf fraction of the galaxy</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>galfit_result</strong> (<em>the galfit result dict by astrokit.galfit</em>)</p></li>
+<li><p><strong>zero_point</strong> (<em>the zero point</em><em> of </em><em>the image</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>psf_fraction</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the psf to total flux ratio of the galaxy</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.wrapper.cdsskymatch">
+<span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.</span></span><span class="sig-name descname"><span class="pre">cdsskymatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_input_catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_output_catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cds_catalog_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ra'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dec'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">find</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'best'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocksize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.cdsskymatch" title="Link to this definition"></a></dt>
+<dd><p>Online crossmatch with VizieR tables and the SIMBAD database.</p>
+<p>Website: <a class="reference external" href="https://www.star.bristol.ac.uk/mbt/stilts/sun256/cdsskymatch.html">https://www.star.bristol.ac.uk/mbt/stilts/sun256/cdsskymatch.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path_input_catalog</strong> (<em>str</em><em> | </em><em>Path</em>) – The path to the input catalog.</p></li>
+<li><p><strong>path_output_catalog</strong> (<em>str</em><em> | </em><em>Path</em>) – The path to the output catalog.</p></li>
+<li><p><strong>cds_catalog_name</strong> (<em>str</em>) – The name of the CDS catalog.</p></li>
+<li><p><strong>ra</strong> (<em>str</em><em>, </em><em>optional</em>) – The name of the right ascension column. The default is ‘ra’.</p></li>
+<li><p><strong>dec</strong> (<em>str</em><em>, </em><em>optional</em>) – The name of the declination column. The default is ‘dec’.</p></li>
+<li><p><strong>sep</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum separation (units: arcseconds) between the two objects. The default is 1.0.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.wrapper.get_result">
+<span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.</span></span><span class="sig-name descname"><span class="pre">get_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_output_img_fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">if_show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#astrokit.wrapper.get_result" title="Link to this definition"></a></dt>
+<dd><p>从galfit拟合结果fits cube中读取结果</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path_output_img_fname</strong> (<em>galfit result fits cube的路径</em>)</p></li>
+<li><p><strong>path_save</strong> (<em>保存输出txt文件的文件夹路径</em><em>, </em><em>默认为None</em><em>, </em><em>不输出文件</em>)</p></li>
+<li><p><strong>if_show</strong> (<em>是否直接打印txt文件内容</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.wrapper.plot">
+<span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.</span></span><span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_output_img_fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img1_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Input</span> <span class="pre">Image'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img2_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Model</span> <span class="pre">(GALFIT)'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img3_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Residual</span> <span class="pre">Image'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#astrokit.wrapper.plot" title="Link to this definition"></a></dt>
+<dd><p>plot galfit result</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path_output_img_fname</strong> (<em>galfit result fits cube的路径</em>)</p></li>
+<li><p><strong>path_save</strong> (<em>保存路径或不保存</em><em>(</em><em>默认</em><em>)</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.wrapper.tapskymatch">
+<span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.</span></span><span class="sig-name descname"><span class="pre">tapskymatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_input_catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_output_catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url_tap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_tap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord_name_local</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord_name_tap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocksize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">find</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.tapskymatch" title="Link to this definition"></a></dt>
+<dd><p>Crossmatch of a local table with one held in a remote TAP service.</p>
+<p>Website: <a class="reference external" href="https://www.star.bristol.ac.uk/mbt/stilts/sun256/tapskymatch.html">https://www.star.bristol.ac.uk/mbt/stilts/sun256/tapskymatch.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>blocksize</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of rows to be sent to the TAP service in each query. The default is 5000.</p></li>
+<li><p><strong>find</strong> (<em>str</em><em>, </em><em>optional</em>) – ‘all’: All matches.
+‘best’: Matched rows, best remote row for each input row
+‘each’: One row per input row, contains best remote match or blank
+‘each-dist’: One row per input row, column giving distance only for best match</p></li>
+<li><p><strong>sep</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum separation (units: arcseconds) between the two objects. The default is 1.0.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.wrapper.tcopy">
+<span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.</span></span><span class="sig-name descname"><span class="pre">tcopy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_input_catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_output_catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.tcopy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.wrapper.tmatch2">
+<span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.</span></span><span class="sig-name descname"><span class="pre">tmatch2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_cat_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_cat_right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_cat_output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord_name_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord_name_right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">find</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'best'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">join</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1and2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'log'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.tmatch2" title="Link to this definition"></a></dt>
+<dd><p>Performs a crossmatch of two tables based on the proximity of sky positions.</p>
+<p>Website: <a class="reference external" href="https://www.star.bris.ac.uk/~mbt/stilts/sun256/tmatch2.html">https://www.star.bris.ac.uk/~mbt/stilts/sun256/tmatch2.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path_cat_left</strong> (<em>str</em><em> | </em><em>Path</em>) – The path to the left catalog.</p></li>
+<li><p><strong>path_cat_right</strong> (<em>str</em><em> | </em><em>Path</em>) – The path to the right catalog.</p></li>
+<li><p><strong>path_cat_output</strong> (<em>str</em><em> | </em><em>Path</em>) – The path to the output catalog.</p></li>
+<li><p><strong>coord_name_left</strong> (<em>tuple</em><em>, </em><em>optional</em>) – The column names of the coordinates in the left catalog.</p></li>
+<li><p><strong>coord_name_right</strong> (<em>tuple</em><em>, </em><em>optional</em>) – The column names of the coordinates in the right catalog.</p></li>
+<li><p><strong>sep</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum separation (units: arcseconds) between the two objects. The default is 1.0.</p></li>
+<li><p><strong>find</strong> (<em>str</em><em>, </em><em>optional</em>) – The method used to find the closest match. The default is ‘best’.
+‘all’: All matches. Every match between the two tables is included in the result.
+‘best’: 以对称的方式获得最佳匹配
+‘best1’: Best match for each Table 1 row.
+For each row in table 1, only the best match from table 2 will appear in the result.
+Each row from table 1 will appear a maximum of once in the result,
+but rows from table 2 may appear multiple times.
+‘best2’: Best match for each Table 2 row.
+For each row in table 2, only the best match from table 1 will appear in the result.
+Each row from table 2 will appear a maximum of once in the result,
+but rows from table 1 may appear multiple times.</p></li>
+<li><p><strong>join</strong> (<em>str</em><em>, </em><em>optional</em>) – Determines which rows are included in the output table. The default is ‘1and2’.</p></li>
+<li><p><strong>n_cpu</strong> (<em>str</em><em>, </em><em>optional</em>) – The number of CPUs used to run the command.
+‘None’: parallel smaller than 6 CPUs. # Default
+‘all’: parallel all CPUs.
+‘n_cpu’: parallel n CPUs.</p></li>
+<li><p><strong>progress</strong> (<em>str</em><em>, </em><em>optional</em>) – Determines whether information on progress of the match should be output
+to the standard error stream as it progresses.
+For lengthy matches this is a useful reassurance and can give guidance
+about how much longer it will take.
+It can also be useful as a performance diagnostic.
+‘none’: no progress is shown
+‘log’: progress information is shown
+‘time’: progress information and some time profiling information is shown
+‘profile’: progress information and limited time/memory profiling information are shown</p></li>
+<li><p><strong>silence</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to suppress the output information. The default is False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.wrapper.tskymatch2">
+<span class="sig-prename descclassname"><span class="pre">astrokit.wrapper.</span></span><span class="sig-name descname"><span class="pre">tskymatch2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_cat_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_cat_right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_cat_output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord_name_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord_name_right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">find</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'best'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">join</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1and2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.wrapper.tskymatch2" title="Link to this definition"></a></dt>
+<dd><p>Performs a crossmatch of two tables based on the proximity of sky positions.</p>
+<p>Website: <a class="reference external" href="https://www.star.bris.ac.uk/~mbt/stilts/sun256/tskymatch2.html">https://www.star.bris.ac.uk/~mbt/stilts/sun256/tskymatch2.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path_cat_left</strong> (<em>str</em><em> | </em><em>Path</em>) – The path to the left catalog.</p></li>
+<li><p><strong>path_cat_right</strong> (<em>str</em><em> | </em><em>Path</em>) – The path to the right catalog.</p></li>
+<li><p><strong>path_cat_output</strong> (<em>str</em><em> | </em><em>Path</em>) – The path to the output catalog.</p></li>
+<li><p><strong>coord_name_left</strong> (<em>tuple</em><em>, </em><em>optional</em>) – The column names of the coordinates in the left catalog.</p></li>
+<li><p><strong>coord_name_right</strong> (<em>tuple</em><em>, </em><em>optional</em>) – The column names of the coordinates in the right catalog.</p></li>
+<li><p><strong>sep</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum separation (units: arcseconds) between the two objects. The default is 1.0.</p></li>
+<li><p><strong>find</strong> (<em>str</em><em>, </em><em>optional</em>) – The method used to find the closest match. The default is ‘best’.
+‘all’: All matches. Every match between the two tables is included in the result.
+‘best’: 以对称的方式获得最佳匹配
+‘best1’: Best match for each Table 1 row.
+For each row in table 1, only the best match from table 2 will appear in the result.
+Each row from table 1 will appear a maximum of once in the result,
+but rows from table 2 may appear multiple times.
+‘best2’: Best match for each Table 2 row.
+For each row in table 2, only the best match from table 1 will appear in the result.
+Each row from table 2 will appear a maximum of once in the result,
+but rows from table 1 may appear multiple times.</p></li>
+<li><p><strong>join</strong> (<em>str</em><em>, </em><em>optional</em>) – Determines which rows are included in the output table. The default is ‘1and2’.</p></li>
+<li><p><strong>n_cpu</strong> (<em>str</em><em>, </em><em>optional</em>) – The number of CPUs used to run the command.
+‘None’: parallel smaller than 6 CPUs. # Default
+‘all’: parallel all CPUs.
+‘n_cpu’: parallel n CPUs.</p></li>
+<li><p><strong>silence</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to suppress the output information. The default is False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="astrokit.toolbox.html" class="btn btn-neutral float-left" title="astrokit.toolbox package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Rui Zhu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

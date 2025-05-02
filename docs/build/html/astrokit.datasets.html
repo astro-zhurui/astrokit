@@ -1,0 +1,366 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>astrokit.datasets package &mdash; astrokit v2025.05.02 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=aee3e7f4"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="astrokit.extinction package" href="astrokit.extinction.html" />
+    <link rel="prev" title="astrokit.ML package" href="astrokit.ML.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            astrokit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">astrokit</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="astrokit.html">astrokit package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="astrokit.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="astrokit.ML.html">astrokit.ML package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">astrokit.datasets package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="astrokit.extinction.html">astrokit.extinction package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="astrokit.observation.html">astrokit.observation package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="astrokit.phot.html">astrokit.phot package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="astrokit.photoz.html">astrokit.photoz package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="astrokit.spec.html">astrokit.spec package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="astrokit.toolbox.html">astrokit.toolbox package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="astrokit.wrapper.html">astrokit.wrapper package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="astrokit.html#module-astrokit">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">astrokit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">astrokit</a></li>
+          <li class="breadcrumb-item"><a href="astrokit.html">astrokit package</a></li>
+      <li class="breadcrumb-item active">astrokit.datasets package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/astrokit.datasets.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="astrokit-datasets-package">
+<h1>astrokit.datasets package<a class="headerlink" href="#astrokit-datasets-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-astrokit.datasets.HSCDownloader">
+<span id="astrokit-datasets-hscdownloader-module"></span><h2>astrokit.datasets.HSCDownloader module<a class="headerlink" href="#module-astrokit.datasets.HSCDownloader" title="Link to this heading"></a></h2>
+<p>HSC-SSP数据下载器</p>
+<p>&#64;Author: Rui Zhu
+&#64;Using code from: <a class="reference external" href="https://hsc-gitlab.mtk.nao.ac.jp/ssp-software/data-access-tools">https://hsc-gitlab.mtk.nao.ac.jp/ssp-software/data-access-tools</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="astrokit.datasets.HSCDownloader.HSCDownloader">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">astrokit.datasets.HSCDownloader.</span></span><span class="sig-name descname"><span class="pre">HSCDownloader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">credential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'account_name':</span> <span class="pre">'zhurui',</span> <span class="pre">'password':</span> <span class="pre">'M+bz7NlSVLtqt0aEwVSQ5SPDS8cs6xEcCzpFWHNa'}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'csv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">release_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pdr3-citus-columnar'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">PosixPath('/Users/rui/Downloads')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.datasets.HSCDownloader.HSCDownloader" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>HSC-SSP星表下载器</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.datasets.HSCDownloader.HSCDownloader.auto_download">
+<span class="sig-name descname"><span class="pre">auto_download</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_sql</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">str_sql</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">job_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.datasets.HSCDownloader.HSCDownloader.auto_download" title="Link to this definition"></a></dt>
+<dd><p>提交任务并下载数据</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path_sql</strong> (<em>str</em>) – SQL文件路径</p></li>
+<li><p><strong>str_sql</strong> (<em>str</em>) – SQL字符串</p></li>
+<li><p><strong>job_name</strong> (<em>str</em>) – 任务名称</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.datasets.HSCDownloader.HSCDownloader.delete_job">
+<span class="sig-name descname"><span class="pre">delete_job</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.datasets.HSCDownloader.HSCDownloader.delete_job" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.datasets.HSCDownloader.HSCDownloader.download">
+<span class="sig-name descname"><span class="pre">download</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.datasets.HSCDownloader.HSCDownloader.download" title="Link to this definition"></a></dt>
+<dd><p>从网站上下载对应job_id的数据</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>job_id</strong> (<em>str</em>) – 任务ID</p></li>
+<li><p><strong>fname</strong> (<em>str</em>) – 下载文件名, 默认为job_id, 不包含后缀</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.datasets.HSCDownloader.HSCDownloader.query_job">
+<span class="sig-name descname"><span class="pre">query_job</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.datasets.HSCDownloader.HSCDownloader.query_job" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.datasets.HSCDownloader.HSCDownloader.sent_request">
+<span class="sig-name descname"><span class="pre">sent_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.datasets.HSCDownloader.HSCDownloader.sent_request" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.datasets.HSCDownloader.HSCDownloader.submit_job">
+<span class="sig-name descname"><span class="pre">submit_job</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_sql</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">str_sql</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">job_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.datasets.HSCDownloader.HSCDownloader.submit_job" title="Link to this definition"></a></dt>
+<dd><p>提交SQL任务, 可以选择传入SQL文件路径或SQL字符串</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path_sql</strong> (<em>str</em>) – SQL文件路径</p></li>
+<li><p><strong>str_sql</strong> (<em>str</em>) – SQL字符串</p></li>
+<li><p><strong>job_name</strong> (<em>str</em>) – 任务名称</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.datasets.HSCDownloader.download_hsc_image">
+<span class="sig-prename descclassname"><span class="pre">astrokit.datasets.HSCDownloader.</span></span><span class="sig-name descname"><span class="pre">download_hsc_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bands</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['g',</span> <span class="pre">'r',</span> <span class="pre">'i',</span> <span class="pre">'z',</span> <span class="pre">'y']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutout_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coadd'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">account</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Account_HSC'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.datasets.HSCDownloader.download_hsc_image" title="Link to this definition"></a></dt>
+<dd><p>Download HSC image cutout</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ra</strong> (<em>float</em>) – right ascension</p></li>
+<li><p><strong>dec</strong> (<em>float</em>) – declination</p></li>
+<li><p><strong>path</strong> (<em>str</em><em> or </em><em>Path</em>) – path to save the fits file</p></li>
+<li><p><strong>bands</strong> (<em>list</em>) – list of bands</p></li>
+<li><p><strong>cutout_size</strong> (<em>float</em>) – cutout size in arcsec</p></li>
+<li><p><strong>img_type</strong> (<em>str</em>) – ‘coadd’ (bkg-subtracted) or ‘coadd/bkg’ (coadd with background)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.datasets.HSCDownloader.my_HSC_account">
+<span class="sig-prename descclassname"><span class="pre">astrokit.datasets.HSCDownloader.</span></span><span class="sig-name descname"><span class="pre">my_HSC_account</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">account</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Account_HSC'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.datasets.HSCDownloader.my_HSC_account" title="Link to this definition"></a></dt>
+<dd><p>load HSC account information</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>account</strong> (<em>str</em>) – account name in config.yaml, default is ‘Account_HSC’</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-astrokit.datasets.query">
+<span id="astrokit-datasets-query-module"></span><h2>astrokit.datasets.query module<a class="headerlink" href="#module-astrokit.datasets.query" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.datasets.query.query_NED">
+<span class="sig-prename descclassname"><span class="pre">astrokit.datasets.query.</span></span><span class="sig-name descname"><span class="pre">query_NED</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.datasets.query.query_NED" title="Link to this definition"></a></dt>
+<dd><p>query NED for the object with given ra and dec</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ra</strong> (<em>float</em>) – right ascension in degree</p></li>
+<li><p><strong>dec</strong> (<em>float</em>) – declination in degree</p></li>
+<li><p><strong>sep</strong> (<em>float</em>) – search radius in arcsec. Default is 3 arcsec</p></li>
+<li><p><strong>raw</strong> (<em>bool</em>) – return the raw result from NED. Default is False</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-astrokit.datasets">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-astrokit.datasets" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="astrokit.datasets.HSCDownloader">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">astrokit.datasets.</span></span><span class="sig-name descname"><span class="pre">HSCDownloader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">credential</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'account_name':</span> <span class="pre">'zhurui',</span> <span class="pre">'password':</span> <span class="pre">'M+bz7NlSVLtqt0aEwVSQ5SPDS8cs6xEcCzpFWHNa'}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'csv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">release_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pdr3-citus-columnar'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">PosixPath('/Users/rui/Downloads')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.datasets.HSCDownloader" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>HSC-SSP星表下载器</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.datasets.HSCDownloader.auto_download">
+<span class="sig-name descname"><span class="pre">auto_download</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_sql</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">str_sql</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">job_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.datasets.HSCDownloader.auto_download" title="Link to this definition"></a></dt>
+<dd><p>提交任务并下载数据</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path_sql</strong> (<em>str</em>) – SQL文件路径</p></li>
+<li><p><strong>str_sql</strong> (<em>str</em>) – SQL字符串</p></li>
+<li><p><strong>job_name</strong> (<em>str</em>) – 任务名称</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.datasets.HSCDownloader.delete_job">
+<span class="sig-name descname"><span class="pre">delete_job</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.datasets.HSCDownloader.delete_job" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.datasets.HSCDownloader.download">
+<span class="sig-name descname"><span class="pre">download</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.datasets.HSCDownloader.download" title="Link to this definition"></a></dt>
+<dd><p>从网站上下载对应job_id的数据</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>job_id</strong> (<em>str</em>) – 任务ID</p></li>
+<li><p><strong>fname</strong> (<em>str</em>) – 下载文件名, 默认为job_id, 不包含后缀</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.datasets.HSCDownloader.query_job">
+<span class="sig-name descname"><span class="pre">query_job</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">job_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.datasets.HSCDownloader.query_job" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.datasets.HSCDownloader.sent_request">
+<span class="sig-name descname"><span class="pre">sent_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.datasets.HSCDownloader.sent_request" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrokit.datasets.HSCDownloader.submit_job">
+<span class="sig-name descname"><span class="pre">submit_job</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_sql</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">str_sql</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">job_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.datasets.HSCDownloader.submit_job" title="Link to this definition"></a></dt>
+<dd><p>提交SQL任务, 可以选择传入SQL文件路径或SQL字符串</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path_sql</strong> (<em>str</em>) – SQL文件路径</p></li>
+<li><p><strong>str_sql</strong> (<em>str</em>) – SQL字符串</p></li>
+<li><p><strong>job_name</strong> (<em>str</em>) – 任务名称</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.datasets.download_hsc_image">
+<span class="sig-prename descclassname"><span class="pre">astrokit.datasets.</span></span><span class="sig-name descname"><span class="pre">download_hsc_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bands</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['g',</span> <span class="pre">'r',</span> <span class="pre">'i',</span> <span class="pre">'z',</span> <span class="pre">'y']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutout_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coadd'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">account</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Account_HSC'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.datasets.download_hsc_image" title="Link to this definition"></a></dt>
+<dd><p>Download HSC image cutout</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ra</strong> (<em>float</em>) – right ascension</p></li>
+<li><p><strong>dec</strong> (<em>float</em>) – declination</p></li>
+<li><p><strong>path</strong> (<em>str</em><em> or </em><em>Path</em>) – path to save the fits file</p></li>
+<li><p><strong>bands</strong> (<em>list</em>) – list of bands</p></li>
+<li><p><strong>cutout_size</strong> (<em>float</em>) – cutout size in arcsec</p></li>
+<li><p><strong>img_type</strong> (<em>str</em>) – ‘coadd’ (bkg-subtracted) or ‘coadd/bkg’ (coadd with background)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.datasets.my_HSC_account">
+<span class="sig-prename descclassname"><span class="pre">astrokit.datasets.</span></span><span class="sig-name descname"><span class="pre">my_HSC_account</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">account</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Account_HSC'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.datasets.my_HSC_account" title="Link to this definition"></a></dt>
+<dd><p>load HSC account information</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>account</strong> (<em>str</em>) – account name in config.yaml, default is ‘Account_HSC’</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="astrokit.datasets.query_NED">
+<span class="sig-prename descclassname"><span class="pre">astrokit.datasets.</span></span><span class="sig-name descname"><span class="pre">query_NED</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrokit.datasets.query_NED" title="Link to this definition"></a></dt>
+<dd><p>query NED for the object with given ra and dec</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ra</strong> (<em>float</em>) – right ascension in degree</p></li>
+<li><p><strong>dec</strong> (<em>float</em>) – declination in degree</p></li>
+<li><p><strong>sep</strong> (<em>float</em>) – search radius in arcsec. Default is 3 arcsec</p></li>
+<li><p><strong>raw</strong> (<em>bool</em>) – return the raw result from NED. Default is False</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="astrokit.ML.html" class="btn btn-neutral float-left" title="astrokit.ML package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="astrokit.extinction.html" class="btn btn-neutral float-right" title="astrokit.extinction package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Rui Zhu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
