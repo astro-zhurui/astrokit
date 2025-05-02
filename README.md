@@ -4,7 +4,7 @@
 [![PyPI Downloads](https://static.pepy.tech/badge/astrokit)](https://pepy.tech/projects/astrokit)
 [![Documentation Status](https://readthedocs.org/projects/astrokit/badge/?version=latest)](https://astrokit.readthedocs.io/en/latest/?badge=latest)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15321580.svg)](https://doi.org/10.5281/zenodo.15321580)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15321579.svg)](https://doi.org/10.5281/zenodo.15321579)
 
 
 ![logo](./logo/AstroKit.webp)
@@ -88,7 +88,7 @@ See the [LICENSE](LICENSE) file for details.
 ## 📚 Citation
 (Zenodo Software DOI)
 ```bibtex
-@software{zhu_2025_15321580,
+@software{zhu_2025_15323376,
   author       = {Zhu, Rui},
   title        = {AstroKit: A Python Package for Astronomical Data
                    Analysis
@@ -96,15 +96,9 @@ See the [LICENSE](LICENSE) file for details.
   month        = may,
   year         = 2025,
   publisher    = {Zenodo},
-  version      = {beta-0.0},
-  doi          = {10.5281/zenodo.15321580},
-  url          = {https://doi.org/10.5281/zenodo.15321580},
-  swhid        = {swh:1:dir:db15360761629c93ac723f4566e63570dfbe1d75
-                   ;origin=https://doi.org/10.5281/zenodo.15321579;vi
-                   sit=swh:1:snp:d83768d3d6f61e42e4028e488e6212d39d77
-                   0eea;anchor=swh:1:rel:54bf5502e35b15d3f73552ebb3bc
-                   00e154356c18;path=/
-                  },
+  version      = {0.1.0},
+  doi          = {10.5281/zenodo.15323376},
+  url          = {https://doi.org/10.5281/zenodo.15323376},
 }
 ```
 
