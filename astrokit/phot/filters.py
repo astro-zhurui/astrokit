@@ -4,13 +4,12 @@ Manage Filters
 @author: Rui Zhu  
 @creation time: 2024-05-14
 """
-from pathlib import Path
 import re
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from astrokit import datasets
+from astrokit import DIR_data
 
 __all__ = [
     'cal_pivot_wavelength', 
@@ -65,7 +64,7 @@ class EazyFilters:
             filter的简称到序号的映射
         """
 
-        self.DIR_EAZY_FILTERS = Path(datasets.__path__[0]) / 'eazy_filters'
+        self.DIR_EAZY_FILTERS = DIR_data / 'eazy_filters'
         self.filters_data = self._read_EAZY_filters()
         self.translate_dict = translate_dict
     
