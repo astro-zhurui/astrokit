@@ -27,8 +27,7 @@ def cal_NMAD(z_spec: np.ndarray, z_phot: np.ndarray) -> float:
     Calculate the normalized median absolute deviation (NMAD)
     """
     dz = z_spec - z_phot
-    norm_dz = dz / (1 + z_spec)
-    nmad = 1.4826 * np.median(np.abs(norm_dz))
+    nmad = 1.48 * np.median(np.abs( (dz - np.median(dz)) / (1 + z_spec) ))
     return float(nmad)
 
 def cal_bias(z_spec: np.ndarray, z_phot: np.ndarray) -> float:
