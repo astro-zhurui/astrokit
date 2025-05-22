@@ -12,8 +12,6 @@ __all__ = [
     'plot_zspec_zphot',
 ]
 
-
-
 def cal_RMSE(z_spec: np.ndarray, z_phot: np.ndarray) -> float:
     """
     Calculate the root mean square error (RMSE)
@@ -73,6 +71,7 @@ def plot_zspec_zphot(
         title=None,
         fig=None, 
         axes=None, 
+        show_colorbar_unit=True,
         return_fig=False
         ):
 
@@ -86,7 +85,7 @@ def plot_zspec_zphot(
 
     if z_range is None:
         z_range = [0, np.max([z_spec, z_phot])]
-    
+
     colors = ["#000000", "#13235d", "#e0000f", "#f7f9b9"]
     cmap = LinearSegmentedColormap.from_list(name="mycmap", colors=colors)
     if cmap1 is None:
@@ -96,11 +95,10 @@ def plot_zspec_zphot(
 
     if (fig is None) and (axes is None):
         fig, axes = plt.subplots(
-            2, 1, figsize=(5, 5), sharex=True, 
-            height_ratios=[3, 1], gridspec_kw={'hspace': 0.01}, 
-            constrained_layout=True
-            )
-
+            2, 1, figsize=(5, 6), sharex=True, 
+            height_ratios=[3, 1], gridspec_kw={'hspace': 0.03} 
+        )
+        
     ax = axes[0]
     ax.set_xlim(z_range)
     ax.set_ylim(z_range)
@@ -111,10 +109,7 @@ def plot_zspec_zphot(
     y_bin_centers = 0.5 * (yedges[:-1] + yedges[1:])
     X, Y = np.meshgrid(x_bin_centers, y_bin_centers)
     N = N.T
-    pcm = ax.pcolormesh(X, Y, N, cmap=cmap1, norm=color_norm)
-    cbar = fig.colorbar(pcm, ax=ax, orientation='vertical')
-    cbar.ax.yaxis.set_label_text('counts/pixel', fontsize=12, usetex=True)
-
+    pcm1 = ax.pcolormesh(X, Y, N, cmap=cmap1, norm=color_norm)
 
     ax = axes[1]
     ymax = np.quantile(np.abs(norm_dz), 0.99)
@@ -127,18 +122,32 @@ def plot_zspec_zphot(
     y_bin_centers = 0.5 * (yedges[:-1] + yedges[1:])
     X, Y = np.meshgrid(x_bin_centers, y_bin_centers)
     N = N.T
-    pcm = ax.pcolormesh(X, Y, N, cmap=cmap2, norm=color_norm)
-    cbar = fig.colorbar(pcm, ax=ax, orientation='vertical')
-    cbar.ax.yaxis.set_label_text('counts/pixel', fontsize=12, usetex=True)
+    pcm2 = ax.pcolormesh(X, Y, N, cmap=cmap2, norm=color_norm)
+
+    # color bar
+    pos0 = axes[0].get_position()
+    pos1 = axes[1].get_position()
+    cb_x = pos0.x1 + 0.01  # colorbar x 起点，略偏离子图右侧
+    cb_y = pos1.y0         # 与 ax2 底对齐
+    cb_width = 0.02        # colorbar 宽度（可调）
+    cb_height = pos0.y1 - pos1.y0  # 高度正好覆盖 ax1+ax2
+
+    # 创建新的 axes 用于 colorbar（或其他用途）
+    cax = fig.add_axes([cb_x, cb_y, cb_width, cb_height])
+    cbar = fig.colorbar(pcm1, cax=cax, orientation='vertical')
+    cbar.ax.tick_params(which='major', width=1.2, length=5)
+    cbar.ax.tick_params(which='minor', width=1, length=3)
+    if show_colorbar_unit:
+        cbar.ax.yaxis.set_label_text('counts/pixel', fontsize=12, usetex=True)
 
     # 刻度线设置
     for ax in axes:
         for spine in ax.spines.values():
-            spine.set_linewidth(1.5)
+            spine.set_linewidth(1.2)
         ax.minorticks_on()
-        ax.tick_params(axis='x', which='major', top=True, width=1.5, length=5, direction='in')
+        ax.tick_params(axis='x', which='major', top=True, width=1.2, length=5, direction='in')
         ax.tick_params(axis='x', which='minor', top=True, width=1, length=3, direction='in')
-        ax.tick_params(axis='y', which='major', right=True, width=1.5, length=5, direction='in')
+        ax.tick_params(axis='y', which='major', right=True, width=1.2, length=5, direction='in')
         ax.tick_params(axis='y', which='minor', right=True, width=1, length=3, direction='in')
 
     # 辅助线
@@ -162,7 +171,7 @@ def plot_zspec_zphot(
     ax = axes[0]
     text = (
         f"N = {len(dz):,}\n"
-        r"$\mu$"+f" = {bias:.6f}\n"
+        r"$\mu$"+f" = {bias:.4f}\n"
         r"$R^2$" + f" = {R2:.4f}\n"
         f"RMSE = {RMSE:.4f}\n"
         r"$\sigma_{\rm{NMAD}}$"+f" = {NMAD:.4f}\n"
