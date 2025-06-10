@@ -71,6 +71,7 @@ def plot_zspec_zphot(
         title=None,
         fig=None, 
         axes=None, 
+        show_colorbar=True, 
         show_colorbar_unit=True,
         return_fig=False
         ):
@@ -125,20 +126,21 @@ def plot_zspec_zphot(
     pcm2 = ax.pcolormesh(X, Y, N, cmap=cmap2, norm=color_norm)
 
     # color bar
-    pos0 = axes[0].get_position()
-    pos1 = axes[1].get_position()
-    cb_x = pos0.x1 + 0.01  # colorbar x 起点，略偏离子图右侧
-    cb_y = pos1.y0         # 与 ax2 底对齐
-    cb_width = 0.02        # colorbar 宽度（可调）
-    cb_height = pos0.y1 - pos1.y0  # 高度正好覆盖 ax1+ax2
+    if show_colorbar:
+        pos0 = axes[0].get_position()
+        pos1 = axes[1].get_position()
+        cb_x = pos0.x1 + 0.01  # colorbar x 起点，略偏离子图右侧
+        cb_y = pos1.y0         # 与 ax2 底对齐
+        cb_width = 0.02        # colorbar 宽度（可调）
+        cb_height = pos0.y1 - pos1.y0  # 高度正好覆盖 ax1+ax2
 
-    # 创建新的 axes 用于 colorbar（或其他用途）
-    cax = fig.add_axes([cb_x, cb_y, cb_width, cb_height])
-    cbar = fig.colorbar(pcm1, cax=cax, orientation='vertical')
-    cbar.ax.tick_params(which='major', width=1.2, length=5)
-    cbar.ax.tick_params(which='minor', width=1, length=3)
-    if show_colorbar_unit:
-        cbar.ax.yaxis.set_label_text('counts/pixel', fontsize=12, usetex=True)
+        # 创建新的 axes 用于 colorbar（或其他用途）
+        cax = fig.add_axes([cb_x, cb_y, cb_width, cb_height])
+        cbar = fig.colorbar(pcm1, cax=cax, orientation='vertical')
+        cbar.ax.tick_params(which='major', width=1.2, length=5)
+        cbar.ax.tick_params(which='minor', width=1, length=3)
+        if show_colorbar_unit:
+            cbar.ax.yaxis.set_label_text('counts/pixel', fontsize=12, usetex=True)
 
     # 刻度线设置
     for ax in axes:
