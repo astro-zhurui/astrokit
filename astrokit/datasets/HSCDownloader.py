@@ -22,28 +22,24 @@ __all__ = [
     'HSCDownloader'
 ]
 
-def my_HSC_account(account='Account_HSC'):
+def my_HSC_account(username, password):
     """
     load HSC account information
-
-    Parameters
-    ----------
-    account : str
-        account name in config.yaml, default is 'Account_HSC'
     """
     credential = {
-        'account_name': CONFIG[account]['username'], 
-        'password': CONFIG[account]['password']
+        'account_name': username, 
+        'password': password
         }
     return credential
 
 def download_hsc_image(
+        account, 
         ra, dec,
         path, 
         bands=['g', 'r', 'i', 'z', 'y'], 
         cutout_size=5, 
         img_type='coadd', 
-        account='Account_HSC'):
+        ):
     """
     Download HSC image cutout
 
@@ -86,8 +82,8 @@ def download_hsc_image(
         )
         image = downloadCutout.download(
             rect, 
-            user=my_HSC_account(account=account)['account_name'], 
-            password=my_HSC_account(account=account)['password'],
+            user=account['account_name'], 
+            password=account['password'],
         )
         # 从下载的文件中读数据
         hdul = fits.open(io.BytesIO(image[0][1]))
@@ -165,7 +161,7 @@ class HSCDownloader:
     HSC-SSP星表下载器
     """
     def __init__(self, 
-                 credential=my_HSC_account(account='Account_HSC'), 
+                 account, 
                  output_format="csv", 
                  release_version="pdr3-citus-columnar", 
                  dir_output=Path(CONFIG['PATH_DOWNLOAD']), 
@@ -189,7 +185,7 @@ class HSCDownloader:
 
         
         """
-        self.credential = credential
+        self.credential = account
         self.api_url = "https://hsc-release.mtk.nao.ac.jp/datasearch/api/catalog_jobs/"
         self.output_format = output_format
         self.release_version = release_version
