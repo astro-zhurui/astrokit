@@ -1,12 +1,13 @@
 __author__ = 'Rui Zhu'
 __email__ = 'zhurui675@gmail.com'
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 import sys
 import yaml
 from pathlib import Path
 import importlib
+from loguru import logger
 
 DIR_astrokit = Path(__file__).resolve().parent  # astrokit directory
 
@@ -121,3 +122,12 @@ def _auto_import_all(package_globals, package_name, package_file):
             package_globals.update({name: getattr(module, name) for name in names})
 
     package_globals['__all__'] = all_exports
+
+# default logger configuration
+logger.remove()
+logger.add(
+    sink=sys.stdout, level="INFO", 
+    format=("<fg #4169E1>[astrokit]</> "
+            "<fg #87CEEB>{time:YYYY-MM-DD HH:mm:ss}</> | "
+            "<level>{message}</level>")
+    )
