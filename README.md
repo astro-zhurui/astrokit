@@ -49,11 +49,6 @@ PATH_DOWNLOAD:  # Default save file path
 PATH_PROJECT_TOOL:
   - <PATH_PROJECT1>
   - <PATH_PROJECT2>
-
-# My Account and Password
-Account_HSC: 
-  username: <xxx>
-  password: <xxx>
 ```
 
 - step 3: **Enjoy it!**<br>
@@ -86,6 +81,26 @@ See the [LICENSE](LICENSE) file for details.
 
 
 ## 📚 Citation
+If you use AstroKit in your research, please consider citing it using the following BibTeX entry:
+
+([ADS](https://ui.adsabs.harvard.edu/abs/2025zndo..15321579Z/abstract))
+```bibtex
+@INPROCEEDINGS{2025zndo..15321579Z,
+       author = {{Zhu}, Rui},
+        title = "{AstroKit: A Python Package for Astronomical Data Analysis}",
+    booktitle = {Zenodo software},
+         year = 2025,
+       volume = {153},
+        month = may,
+    publisher = {Zenodo},
+          eid = {15321579},
+        pages = {15321579},
+          doi = {10.5281/zenodo.15321579},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2025zndo..15321579Z},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+```
+
 (Zenodo Software DOI)
 ```bibtex
 @software{zhu_2025_15323376,
