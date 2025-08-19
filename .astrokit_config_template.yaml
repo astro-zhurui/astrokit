@@ -17,8 +17,3 @@ PATH_DOWNLOAD:  # Default save file path
 PATH_PROJECT_TOOL:
   - <PATH_PROJECT1>
   - <PATH_PROJECT2>
-
-# My Account and Password
-Account_HSC: 
-  username: <xxx>
-  password: <xxx>
