@@ -5,23 +5,21 @@ Toolbox for save the useful functions
 @creation time: 2022-11-29
 """
 from pathlib import Path
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import subprocess
+from threading import Thread
 import psutil
+from loguru import logger
 from IPython.display import clear_output
 
 from astropy.table import Table
-from astropy.coordinates import SkyCoord
-import astropy.units as u
-
 
 __all__ = [
     "clear",
     "pandas_show_all_columns",
     "use_svg_display",
-    "run_cmd_in_terminal",
+    "run_command",
+    "run_command_in_terminal",
     "find_process_by_name",
     "value_to_KVD_string",
     "fits2df",
@@ -47,8 +45,57 @@ def use_svg_display():
     from matplotlib_inline import backend_inline
     backend_inline.set_matplotlib_formats('svg')
 
+def run_command(cmd, dir_work, print_output=True, timeout=None):
+    """
+    Run a shell command in a specific directory, printing output in real-time.
+    
+    Parameters
+    ----------
+    cmd : str
+        The command to run
+    dir_work : str
+        The directory to run the command in
+    timeout : float, optional
+        Timeout for the command in seconds, default is None
+    
+    Returns
+    -------
+    int
+        The return code of the command
+        - 0   : success
+        - 127 : command not found
+        - -1  : timeout
+    """
+    try:
+        process = subprocess.Popen(
+            cmd,
+            cwd=dir_work,
+            shell=True,                 # 通过 shell 执行
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,   # 合并 stderr，避免线程阻塞
+            text=True,
+            bufsize=1,                  # 行缓冲
+        )
 
-def run_cmd_in_terminal(cmd) -> None:
+        if print_output:
+            for line in iter(process.stdout.readline, ''):
+                if line:
+                    print(line.strip())
+
+        returncode = process.wait(timeout=timeout)
+
+        return returncode
+
+    except subprocess.TimeoutExpired:
+        logger.error(f"Time out!")
+        process.terminate()
+        return -1
+    
+    finally:
+        if process.stdout:
+            process.stdout.close()
+
+def run_command_in_terminal(cmd) -> None:
     """Run a shell command line in terminal"""
     # AppleScript脚本
     applescript = f"""
@@ -65,6 +112,7 @@ def run_cmd_in_terminal(cmd) -> None:
     # 使用subprocess执行AppleScript脚本
     subprocess.run(['osascript', '-e', applescript], check=True)
     return None
+
 
 def find_process_by_name(process_name):
     """search the process name, if this porcess is running, return True, else False"""

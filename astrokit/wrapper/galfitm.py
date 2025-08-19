@@ -4,34 +4,156 @@ A Python interface for GALFITM
 - Author: Rui Zhu
 - Date: 2025-07-08
 """
+from pathlib import Path
+from loguru import logger
+
+from astrokit.toolbox.utils import run_command
 
 class GalfitMModel:
+    """
+    定义GalfitM模型
+    """
 
     def __init__(self):
-        self.model_list = []
         self._model_idx = 0
         self.feedme = ""
 
+    def _list2CSL(self, input, add_cheb=False):
+        """将参数列表转换成逗号分隔行字符串"""
+        if isinstance(input, list):
+            input = str(input).strip('[]').replace(' ', '')
+        if add_cheb:
+            input = f"{input} cheb"
+
+        return input
+
     def _feedme_row(self, c1, c2, c3, c4):
+        """
+        将模型结构参数写入feedme格式的字符串
+
+        Parameter
+        ---------
+
+        c1 : Parameter number
+        c2 : parameter name OR value
+        c3 : the order of the Chebyshev series
+            - 0 = fixed to input value(s)
+            - 1 = fit a constant offset from the input value(s)
+            - 2 = fit a linear function of wavelength
+            - 3 = fit a quadratic function of wavelength, etc.
+        c4 : comment
+        """
         return f"{c1:>2}) {c2:<10} {c3:<10} {c4:<20}\n"
 
-    def add_psf(self, x=None, y=None, mag=None, skip_in_output=False):
+    def add_psf(
+            self, 
+            x=None, fit_x=1, 
+            y=None, fit_y=1, 
+            mag=None, fit_mag=1, 
+            skip_in_output=False
+            ):
+        """
+        PSF model
+
+        Parameter
+        ---------
+        x : position x [pixel]
+        y : position y [pixel]
+        mag : total magnitude
+        skip_in_output : Skip this model in output image?  (yes=1, no=0)
+        """
         model_name = 'psf'
-        content = f"# Component number: {self._model_idx}\n"
-        params = {
-            'x': x, 
-            'y': y, 
-            'mag': mag, 
-            'skip': 1 if skip_in_output else 0
-        }
+        content = f"\n# Component number: {self._model_idx}\n"
+
         content += self._feedme_row(
-            c1='0', c2=model_name, c3='', 
+            c1='0', 
+            c2=model_name, c3='', 
             c4="# object type"
         )
         content += self._feedme_row(
-            c1='1', c2=x
+            c1='1', c2=x, c3=fit_x, 
+            c4="# position x [pixel]"
         )
-        self.model_list.append({model_name: params})
+        content += self._feedme_row(
+            c1='2', c2=y, c3=fit_y, 
+            c4="# position y [pixel]"
+        )
+        content += self._feedme_row(
+            c1='3', c2=mag, c3=fit_mag, 
+            c4="# total magnitude"
+        )
+        content += self._feedme_row(
+            c1='z', c2=skip_in_output, c3='', 
+            c4="#  Skip this model in output image?  (yes=1, no=0)"
+        )
+        self.feedme += content
+        self._model_idx += 1
+        return None
+    
+    def add_sersic(
+            self, 
+            x='', fit_x=1, 
+            y='', fit_y=1, 
+            mag='', fit_mag=1, cheb_mag=False, 
+            re='', fit_re=1, cheb_re=False,
+            sersic_index='', fit_sersic_index=1, cheb_sersic_index=False,  
+            axis_ratio='', fit_axis_ratio=1, cheb_axis_ratio=False, 
+            PA='', fit_PA=1, cheb_PA=False, 
+            skip_in_output=False
+    ):
+        model_name = 'sersic'
+        content = f"\n# Component number: {self._model_idx}\n"
+
+        content += self._feedme_row(
+            c1=0, c2=model_name, c3='', 
+            c4="# Object type" 
+        )
+        content += self._feedme_row(
+            c1=1, 
+            c2=self._list2CSL(x), 
+            c3=self._list2CSL(fit_x), 
+            c4="# position x [pixel]"
+        )
+        content += self._feedme_row(
+            c1=2, 
+            c2=self._list2CSL(y), 
+            c3=self._list2CSL(fit_y), 
+            c4="# position y [pixel]"
+        )
+        content += self._feedme_row(
+            c1=3, 
+            c2=self._list2CSL(mag), 
+            c3=self._list2CSL(fit_mag, cheb_mag), 
+            c4="# total magnitude in each band"
+        )
+        content += self._feedme_row(
+            c1=4, 
+            c2=self._list2CSL(re), 
+            c3=self._list2CSL(fit_re, cheb_re), 
+            c4="# R_e in each band"
+        )
+        content += self._feedme_row(
+            c1=5, 
+            c2=self._list2CSL(sersic_index), 
+            c3=self._list2CSL(fit_sersic_index, cheb_sersic_index), 
+            c4="# Sersic exponent in each band", 
+        )
+        content += self._feedme_row(
+            c1=9, 
+            c2=self._list2CSL(axis_ratio), 
+            c3=self._list2CSL(fit_axis_ratio, cheb_axis_ratio), 
+            c4="# axis ratio (b/a) in each band", 
+        )
+        content += self._feedme_row(
+            c1=10, 
+            c2=self._list2CSL(PA), 
+            c3=self._list2CSL(fit_PA, cheb_PA), 
+            c4="# position angle (PA), same value in each band", 
+        )
+        content += self._feedme_row(
+            c1='z', c2=skip_in_output, c3='', 
+            c4="#  Skip this model in output image?  (yes=1, no=0)"
+        )
         self.feedme += content
         self._model_idx += 1
         return None
@@ -39,36 +161,51 @@ class GalfitMModel:
 class GalfitM:
     def __init__(
             self, 
-            path_result_img=None, 
+            dir_output, 
+            task_name, 
             path_list_input_img=[], 
             path_list_input_psf=[], 
-            path_list_input_sigma=None, 
+            path_list_input_sigma=[], 
             path_list_input_mask=[],
-            path_constraint_file=None,
-            dir_cache=None,
             output_type='optimize', 
             output_items=['input', 'model', 'residual', 'component'],
             ):
-        self.path_result_img = path_result_img
+        
+        self.dir_output = Path(dir_output)
+
+        if not self.dir_output.exists():
+            self.dir_output.mkdir(parents=True, exist_ok=True)
+
+        self.path_output_img = self.dir_output / f"{task_name}_galfitm.fits"
+        self.path_feedme = self.dir_output / f"{task_name}_galfitm.feedme"
+        self.path_constraints = self.dir_output / f"{task_name}_galfitm.constraints"
+
         self.path_list_input_img = path_list_input_img
         self.path_list_input_psf = path_list_input_psf
         self.path_list_input_sigma = path_list_input_sigma
         self.path_list_input_mask = path_list_input_mask  # Bad pixel mask
-        self.path_constraint_file = path_constraint_file
+
         self.output_type = output_type
         self.output_items = output_items
 
-        self.n_img = len(self.path_list_input_img)
+        self.feedme = None
+        self.constrains = None
 
-        if dir_cache is None:
-            self.dir_cache = path_result_img.parent / 'galfitm_cache'
-            self.dir_cache.mkdir(parents=True, exist_ok=True)
+        self.n_img = len(self.path_list_input_img)
 
         if self.path_list_input_sigma is None:
             self.path_list_input_sigma = ['none'] * self.n_img
         
         if self.path_list_input_mask is None:
             self.path_list_input_mask = ['none'] * self.n_img
+
+    def show_feedme_example(self):
+        url = "https://www.nottingham.ac.uk/astronomy/megamorph/exec/EXAMPLE.GALFITM.INPUT"
+        print(url)
+    
+    def show_constrains_example(self):
+        url = "https://www.nottingham.ac.uk/astronomy/megamorph/exec/EXAMPLE.GALFITM.CONSTRAINTS"
+        print(url)
 
     def config(
             self, 
@@ -134,7 +271,7 @@ class GalfitM:
         lst = [str(p) for p in self.band_wavelengths]
         feedme_content += f'A2) {",".join(lst)}  # Band wavelengths\n'
 
-        feedme_content += f'B) {str(self.path_result_img)}\n'
+        feedme_content += f'B) {str(self.path_output_img)}\n'
 
         lst = [str(p) for p in self.path_list_input_sigma]
         feedme_content += f'C) {",".join(lst)}\n'
@@ -147,10 +284,10 @@ class GalfitM:
         lst = [str(p) for p in self.path_list_input_mask]
         feedme_content += f'F) {",".join(lst)}  # Bad pixel mask fits\n'
 
-        if self.path_constraint_file is None:
+        if self.path_constraints is None:
             feedme_content += 'G) none  # constraints file\n'
         else:
-            feedme_content += f'G) {str(self.path_constraint_file)}  # constraints file\n'
+            feedme_content += f'G) {str(self.path_constraints)}  # constraints file\n'
 
         if self.fit_region == []:
             raise ValueError("fit_region must be set, even if it is the whole image.")
@@ -210,12 +347,41 @@ class GalfitM:
         feedme_content += '# ' + '-'*78 + '\n'
         feedme_content += '# MODEL COMPONENTS\n'
         feedme_content += '# ' + '-'*78 + '\n'
-        feedme_content += '\n'
 
-        
+        if models is None:
+            logger.warning("Must define GalfitM models!")
+        else:
+            feedme_content += models.feedme
+
         self.feedme = feedme_content
 
         """write the feedme content to the cache directory"""
-        with open(self.dir_cache / 'galfitm.feedme', 'w') as f:
+        with open(self.path_feedme, 'w') as f:
             f.write(self.feedme)
+        return None
+    
+    def add_constrains(self, component, parameter, constraint):
+        """
+        Add constraints to the constrains file
+        """
+
+        def _constraints_row(c1, c2, c3):
+            return f"{c1:^20} {c2:^20} {c3:<20}\n"
+        
+        if self.constrains is None:
+            self.constrains = _constraints_row('# component', 'parameter', 'constraint')
+        
+        self.constrains += _constraints_row(component, parameter, constraint)
+        
+        with open(self.path_constraints, 'w') as f:
+            f.write(self.constrains)
+        return None
+
+    def run(self, silent=False, timeout=None):
+        returncode = run_command(
+            f"galfitm {self.path_feedme}",
+            dir_work=self.dir_output,
+            print_output=not silent,
+            timeout=timeout
+        )
         return None

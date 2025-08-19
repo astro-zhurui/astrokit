@@ -13,7 +13,7 @@ from loguru import logger
 
 from astropy.table import Table
 
-from astrokit.toolbox import run_cmd_in_terminal
+from astrokit.toolbox import run_command_in_terminal
 from astrokit.toolbox import find_process_by_name
 from astrokit.toolbox import value_to_KVD_string
 from astrokit import CONFIG
@@ -340,7 +340,7 @@ class SExtractor:
             logger.info("running SExtractor in the terminal...")
             st = time.time()
             
-            run_cmd_in_terminal(cmd)  # run SExtractor in the terminal
+            run_command_in_terminal(cmd)  # run SExtractor in the terminal
 
             # Check if SExtractor has finished execution
             time.sleep(1)

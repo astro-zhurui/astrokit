@@ -19,7 +19,7 @@ from astropy.table import Table
 
 from astrokit import CONFIG
 from astrokit.toolbox import value_to_KVD_string
-from astrokit.toolbox import run_cmd_in_terminal
+from astrokit.toolbox import run_command_in_terminal
 from astrokit.toolbox import fnu_to_flam, flam_to_fnu, fnuErr_to_flamErr
 
 from astrokit.phot import EazyFilters
@@ -779,7 +779,7 @@ class Eazy:
         if terminal:
             if not self.silence:
                 logger.info("Launch EAZY to the terminal.")
-            run_cmd_in_terminal(cmd)
+            run_command_in_terminal(cmd)
         else:
             if not self.silence:
                 logger.info("running EAZY...")
