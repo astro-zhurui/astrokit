@@ -6,8 +6,13 @@ A Python interface for GALFITM
 """
 from pathlib import Path
 from loguru import logger
+import time
+import os
 
-from astrokit.toolbox.utils import run_command
+from astrokit.toolbox.utils import run_command, run_command_in_terminal
+from astrokit.toolbox.utils import sec_to_hms
+
+__all__ = ['GalfitM', 'GalfitMModel']
 
 class GalfitMModel:
     """
@@ -43,13 +48,54 @@ class GalfitMModel:
             - 3 = fit a quadratic function of wavelength, etc.
         c4 : comment
         """
-        return f"{c1:>2}) {c2:<10} {c3:<10} {c4:<20}\n"
+        return f"{c1:>2}) {c2:<20} {c3:<20} {c4:<20}\n"
+    
+    def add_sky(
+            self, 
+            background='', fit_background=1, cheb_background=False,
+            sky_grad_x='', fit_sky_grad_x=1, cheb_sky_grad_x=False,
+            sky_grad_y='', fit_sky_grad_y=1, cheb_sky_grad_y=False, 
+            skip_in_output=False
+    ):
+        model_name = 'sky'
+        self._model_idx += 1
+        content = f"\n# Component number: {self._model_idx}\n"
+
+        content += self._feedme_row(
+            c1='0', 
+            c2=model_name, c3='', 
+            c4="# object type"
+        )
+        content += self._feedme_row(
+            c1='1', 
+            c2=self._list2CSL(background), 
+            c3=self._list2CSL(fit_background, add_cheb=cheb_background), 
+            c4="# sky background [ADU counts]"
+        )
+        content += self._feedme_row(
+            c1='2', 
+            c2=self._list2CSL(sky_grad_x), 
+            c3=self._list2CSL(fit_sky_grad_x, add_cheb=cheb_sky_grad_x), 
+            c4="# dsky/dx (sky gradient in x)"
+        )
+        content += self._feedme_row(
+            c1='3', 
+            c2=self._list2CSL(sky_grad_y), 
+            c3=self._list2CSL(fit_sky_grad_y, add_cheb=cheb_sky_grad_y), 
+            c4="# dsky/dy (sky gradient in y) "
+        )
+        content += self._feedme_row(
+            c1='z', c2=skip_in_output, c3='', 
+            c4="#  Skip this model in output image?  (yes=1, no=0)"
+        )
+        self.feedme += content
+        return None
 
     def add_psf(
             self, 
-            x=None, fit_x=1, 
-            y=None, fit_y=1, 
-            mag=None, fit_mag=1, 
+            x='', fit_x=1, cheb_x=False,
+            y='', fit_y=1, cheb_y=False,
+            mag='', fit_mag=1, cheb_mag=False,
             skip_in_output=False
             ):
         """
@@ -63,6 +109,7 @@ class GalfitMModel:
         skip_in_output : Skip this model in output image?  (yes=1, no=0)
         """
         model_name = 'psf'
+        self._model_idx += 1
         content = f"\n# Component number: {self._model_idx}\n"
 
         content += self._feedme_row(
@@ -71,15 +118,21 @@ class GalfitMModel:
             c4="# object type"
         )
         content += self._feedme_row(
-            c1='1', c2=x, c3=fit_x, 
+            c1='1', 
+            c2=self._list2CSL(x), 
+            c3=self._list2CSL(fit_x, add_cheb=cheb_x), 
             c4="# position x [pixel]"
         )
         content += self._feedme_row(
-            c1='2', c2=y, c3=fit_y, 
+            c1='2', 
+            c2=self._list2CSL(y), 
+            c3=self._list2CSL(fit_y, add_cheb=cheb_y), 
             c4="# position y [pixel]"
         )
         content += self._feedme_row(
-            c1='3', c2=mag, c3=fit_mag, 
+            c1='3', 
+            c2=self._list2CSL(mag), 
+            c3=self._list2CSL(fit_mag, add_cheb=cheb_mag), 
             c4="# total magnitude"
         )
         content += self._feedme_row(
@@ -87,21 +140,21 @@ class GalfitMModel:
             c4="#  Skip this model in output image?  (yes=1, no=0)"
         )
         self.feedme += content
-        self._model_idx += 1
         return None
     
     def add_sersic(
             self, 
-            x='', fit_x=1, 
-            y='', fit_y=1, 
+            x='', fit_x=1, cheb_x=False,
+            y='', fit_y=1, cheb_y=False,
             mag='', fit_mag=1, cheb_mag=False, 
             re='', fit_re=1, cheb_re=False,
-            sersic_index='', fit_sersic_index=1, cheb_sersic_index=False,  
+            sersic_index='', fit_sersic_index=1, cheb_sersic_index=False,
             axis_ratio='', fit_axis_ratio=1, cheb_axis_ratio=False, 
             PA='', fit_PA=1, cheb_PA=False, 
             skip_in_output=False
     ):
         model_name = 'sersic'
+        self._model_idx += 1
         content = f"\n# Component number: {self._model_idx}\n"
 
         content += self._feedme_row(
@@ -111,13 +164,13 @@ class GalfitMModel:
         content += self._feedme_row(
             c1=1, 
             c2=self._list2CSL(x), 
-            c3=self._list2CSL(fit_x), 
+            c3=self._list2CSL(fit_x, add_cheb=cheb_x), 
             c4="# position x [pixel]"
         )
         content += self._feedme_row(
             c1=2, 
             c2=self._list2CSL(y), 
-            c3=self._list2CSL(fit_y), 
+            c3=self._list2CSL(fit_y, add_cheb=cheb_y), 
             c4="# position y [pixel]"
         )
         content += self._feedme_row(
@@ -155,7 +208,6 @@ class GalfitMModel:
             c4="#  Skip this model in output image?  (yes=1, no=0)"
         )
         self.feedme += content
-        self._model_idx += 1
         return None
 
 class GalfitM:
@@ -172,13 +224,14 @@ class GalfitM:
             ):
         
         self.dir_output = Path(dir_output)
+        self.task_name = task_name
 
         if not self.dir_output.exists():
             self.dir_output.mkdir(parents=True, exist_ok=True)
 
-        self.path_output_img = self.dir_output / f"{task_name}_galfitm.fits"
-        self.path_feedme = self.dir_output / f"{task_name}_galfitm.feedme"
-        self.path_constraints = self.dir_output / f"{task_name}_galfitm.constraints"
+        self.path_output_img = self.dir_output / f"{self.task_name}_galfitm.fits"
+        self.path_feedme = self.dir_output / f"{self.task_name}_galfitm.feedme"
+        self.path_constraints = self.dir_output / f"{self.task_name}_galfitm.constraints"
 
         self.path_list_input_img = path_list_input_img
         self.path_list_input_psf = path_list_input_psf
@@ -210,6 +263,7 @@ class GalfitM:
     def config(
             self, 
             models=None, 
+            use_constraints=False,
             band_labels=[], 
             band_wavelengths=[],
             psf_fine_sampling=2, 
@@ -242,6 +296,7 @@ class GalfitM:
    
         """
         self.models = models
+        self.use_constraints = use_constraints
         self.band_labels = band_labels
         self.band_wavelengths = band_wavelengths  # 单位须一致, 选择是任意的
         self.psf_fine_sampling = psf_fine_sampling
@@ -259,7 +314,7 @@ class GalfitM:
 
         feedme_content += '\n'
         feedme_content += '# ' + '-'*78 + '\n'
-        feedme_content += "# IMAGE and GALFIT CONTROL PARAMETER\n"
+        feedme_content += "# IMAGE and GALFITM CONTROL PARAMETER\n"
         feedme_content += '# ' + '-'*78 + '\n'
         feedme_content += '\n'
 
@@ -284,10 +339,13 @@ class GalfitM:
         lst = [str(p) for p in self.path_list_input_mask]
         feedme_content += f'F) {",".join(lst)}  # Bad pixel mask fits\n'
 
-        if self.path_constraints is None:
-            feedme_content += 'G) none  # constraints file\n'
+        if self.use_constraints:
+            if self.path_constraints.exists():
+                feedme_content += f'G) {str(self.path_constraints)}  # constraints file\n'
+            else:
+                raise ValueError(f"Constraints file {self.path_constraints} does not exist!")
         else:
-            feedme_content += f'G) {str(self.path_constraints)}  # constraints file\n'
+            feedme_content += 'G) none  # constraints file\n'
 
         if self.fit_region == []:
             raise ValueError("fit_region must be set, even if it is the whole image.")
@@ -360,28 +418,94 @@ class GalfitM:
             f.write(self.feedme)
         return None
     
+    def _constraints_row(self, c1, c2, c3):
+        return f"{c1:^20} {c2:^20} {c3:<20}\n"
+    
+    def new_constrains(self):
+        self.constrains = self._constraints_row('# component', 'parameter', 'constraint')
+    
     def add_constrains(self, component, parameter, constraint):
         """
         Add constraints to the constrains file
         """
-
-        def _constraints_row(c1, c2, c3):
-            return f"{c1:^20} {c2:^20} {c3:<20}\n"
-        
         if self.constrains is None:
-            self.constrains = _constraints_row('# component', 'parameter', 'constraint')
-        
-        self.constrains += _constraints_row(component, parameter, constraint)
-        
+            raise ValueError("Constraints not initialized. Call new_constrains() first.")
+
+        self.constrains += self._constraints_row(component, parameter, constraint)
+
         with open(self.path_constraints, 'w') as f:
             f.write(self.constrains)
         return None
 
-    def run(self, silent=False, timeout=None):
-        returncode = run_command(
-            f"galfitm {self.path_feedme}",
-            dir_work=self.dir_output,
-            print_output=not silent,
-            timeout=timeout
-        )
+    def run(self, run_in_terminal=False, silent=False, timeout=None):
+        """
+        Run GalfitM via two ways. One is running in the terminal, and the other 
+        is running in the jupyter cell. 
+
+        Parameter
+        ---------
+        run_in_terminal: bool
+            Whether to run GalfitM in the terminal (Mac) or in the Jupyter cell.
+
+        silent: bool
+            Whether to suppress output or not. Only applies when running in the 
+            Jupyter cell.
+
+        timeout: float
+            Timeout for the command in seconds. If None, no timeout is applied. 
+            Only applies when running in the Jupyter cell.
+        """
+        
+        fname_log = 'fit.log'
+        fname_cheb_orig = f'{self.task_name}_galfitm.galfit.01'
+        fname_band_orig = f'{self.task_name}_galfitm.galfit.01.band'
+
+        fname_cheb_new = f'{self.task_name}_galfitm.galfit.cheb'
+        fname_band_new = f'{self.task_name}_galfitm.galfit.band'
+        
+        delete_file_ls = [
+            fname_log, self.path_output_img.name, 
+            fname_cheb_orig, fname_band_orig, 
+            fname_cheb_new, fname_band_new
+        ]
+        for fname in delete_file_ls:
+            path = self.dir_output / fname
+            if path.exists():
+                path.unlink()
+                logger.warning(f"Deleted previous output file: {fname}")
+        
+        cmd = f"galfitm {self.path_feedme}"
+
+        if run_in_terminal:
+            if self.path_output_img.exists():
+                raise ValueError("Please delete privious results!")
+            run_command_in_terminal(cmd=f"cd {self.dir_output}; {cmd}")
+            logger.info(f"Running GALFITM in terminal...")
+            st = time.time()
+            while True:
+                if self.path_output_img.exists():
+                    break
+            logger.success(f"GalfitM Done! Cost Time: {sec_to_hms(time.time()-st)}")
+        else:
+            if not silent:
+                logger.info("GalfitM Running...")
+            st = time.time()
+            returncode = run_command(
+                cmd=cmd, 
+                dir_work=self.dir_output,
+                print_output=not silent,
+                timeout=timeout
+            )
+            if not silent:
+                logger.success(f"GalfitM Done! Cost Time: {sec_to_hms(time.time()-st)}")
+
+        def _rename_file(fname_old, fname_new):
+            path = self.dir_output / fname_old
+            while True:
+                if path.exists():
+                    os.rename(path, self.dir_output / fname_new)
+                    break
+        _rename_file(fname_cheb_orig, fname_cheb_new)
+        _rename_file(fname_band_orig, fname_band_new)
+
         return None
