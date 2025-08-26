@@ -18,6 +18,6 @@ _lazy_map = {
         'clear', 'pandas_show_all_columns', 'use_svg_display',
         'run_cmd_in_terminal', 'find_process_by_name',
         'value_to_KVD_string', 'fits2df', 'print_directory_tree',
-        'sec_to_hms',
+        'sec_to_hms', 'read_wcs'
     ],
 }

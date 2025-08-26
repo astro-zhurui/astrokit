@@ -7,11 +7,13 @@ Toolbox for save the useful functions
 from pathlib import Path
 import pandas as pd
 import subprocess
-from threading import Thread
 import psutil
 from loguru import logger
 from IPython.display import clear_output
+import warnings
 
+from astropy.wcs import WCS
+from astropy.wcs import FITSFixedWarning
 from astropy.table import Table
 
 __all__ = [
@@ -23,6 +25,7 @@ __all__ = [
     "find_process_by_name",
     "value_to_KVD_string",
     "fits2df",
+    "read_wcs", 
     "print_directory_tree", 
     "sec_to_hms"
 ]
@@ -146,6 +149,16 @@ def fits2df(path_fits):
     tbl = Table.read(path_fits, character_as_bytes=False)
     df = tbl.to_pandas()
     return df
+
+def read_wcs(header):
+    """
+    构造 WCS 对象，并局部屏蔽 FITSFixedWarning。
+    其他 warning 类型仍然会正常显示。
+    """
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', FITSFixedWarning)
+        return WCS(header)
+
 
 def print_directory_tree(path, level=0, show_hidden=False, indent="", current_level=0):
     """

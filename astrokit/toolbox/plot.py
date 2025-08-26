@@ -741,7 +741,7 @@ def imshow(data, wcs=None, ax=None,
             size_vertical=scalebar_width, 
             fontproperties={'size': scalebar_text_size}
             )
-    if colorbar:
+    if colorbar and (ax is None):
         fig.colorbar(
             ScalarMappable(norm=norm, cmap=cmap), 
             ax=ax, location='right', ticks=ticks, 
