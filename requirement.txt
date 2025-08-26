@@ -26,6 +26,7 @@ pyphot
 extinction
 healpy
 scikit-learn
+scikit-image
 torch
 torchvision
 xgboost
