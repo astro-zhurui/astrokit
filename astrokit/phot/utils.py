@@ -90,9 +90,10 @@ def cutout(ra, dec, large_image_data, wcs, size=100):
     return hdu
 
 
-def source_detect(data, kernel_fwhm=3, kernel_size=21, 
-                  detect_threshold_nsigma=3, 
-                  npixels=16, show=True, 
+def source_detect(data, kernel_fwhm=3, kernel_size=9, 
+                  detect_threshold_nsigma=5, contrast=0.01, 
+                  nlevels=32, npixels=9, 
+                  show=True, cmap=None, fig_title=None,
                   vmin=None, vmax=None, 
                   return_segment_map=False):
     """
@@ -124,25 +125,26 @@ def source_detect(data, kernel_fwhm=3, kernel_size=21,
 
     Returns
     -------
-    cat : pandas.DataFrame
-        The catalog of detected sources.
-    segment_map : 2d array
-        In case of 'return_segment_map=True', the return will also include the 
-        segmentation map of the image.
+    res
     """
+    res = dict()
     # ---------- step1: make smoothing kernel and convolve with data
     kernel = make_2dgaussian_kernel(fwhm=kernel_fwhm, size=kernel_size)
     data_convolved = convolve(data, kernel)
 
     # ---------- step2: source detect and deblend
-    threshold = detect_threshold(data=data_convolved, nsigma=detect_threshold_nsigma)
+    threshold = detect_threshold(
+        data=data_convolved, 
+        nsigma=detect_threshold_nsigma
+        )
     finder = SourceFinder(
         npixels=npixels, # the minimun number of connected pixels
-        nlevels=32, # The number of multi-thresholding levels to use for deblending.
-        contrast=0.01, 
+        nlevels=nlevels, # The number of multi-thresholding levels to use for deblending.
+        contrast=contrast, 
         progress_bar=False, nproc=1
         )
     segment_map = finder(data_convolved, threshold)
+    res['segment_map'] = segment_map
 
     # ---------- step3: make catalog
     segment_cat = SourceCatalog(data=data, 
@@ -166,9 +168,7 @@ def source_detect(data, kernel_fwhm=3, kernel_size=21,
     cat = segment_cat.to_table(columns=params).to_pandas()
 
     cat['axis_ratio'] = 1 - cat['ellipticity']
-    cat.loc[cat['orientation']>=0, 'PA'] =  cat.loc[cat['orientation']>=0, 'orientation'] - 90
-    cat.loc[cat['orientation']< 0, 'PA'] =  cat.loc[cat['orientation']< 0, 'orientation'] + 90
-
+    cat['PA'] = (90.0 - cat['orientation']) % 180.0
     cat.rename(columns={"xcentroid": "x", 
                         "ycentroid": "y",
                         "semimajor_sigma": "a", 
@@ -211,13 +211,14 @@ def source_detect(data, kernel_fwhm=3, kernel_size=21,
                 cat.loc[idx, 'class'] = 'overlap'
             else:
                 cat.loc[idx, 'class'] = 'near'
-    
+    res['catalog'] = cat
+
     # ---------- step5: plot
     if show:
         fig, ax = plt.subplots(1, 3, figsize=(12, 4), constrained_layout=True)
-        import cmasher as cmr
-        import matplotlib as mpl
-        cmap = cmr.chroma
+        if cmap is None:
+            import cmasher
+            cmap = cmasher.chroma
         if vmin is None:
             vmin = np.min(data)
         if vmax is None:
@@ -239,16 +240,13 @@ def source_detect(data, kernel_fwhm=3, kernel_size=21,
                     backgroundcolor='white')
             ax_bbox = bbox.plot(ax[2])
             ax_bbox.set_color("green")
+        fig.suptitle(fig_title, fontsize=20, fontweight='bold')
+        res['fig'] = fig
     
-    if return_segment_map:
-        return cat, segment_map
-    else:
-        return cat
-    
+    return res
 
 
-def make_mask_image(segment_map, mask_labels, show=False, 
-                    fname=None, save_path="/Users/rui/Downloads"):
+def make_mask_image(segment_map, mask_labels, path_save=None, show=True):
     """
     make mask image from segment map
 
@@ -262,24 +260,23 @@ def make_mask_image(segment_map, mask_labels, show=False,
         show mask image, by default False
     fname : str, optional
         file name to save mask image, by default None
-    save_path : str, optional
-        path to save mask image, by default "/Users/rui/Downloads"
+    path_save : str, optional
+        path to save mask image
     """
     mask_img = segment_map.copy()
     mask_img.keep_labels(labels=mask_labels)
     mask_img = mask_img.data
     mask_img[mask_img!=0] = 1
 
-    if fname is not None:
+    if path_save is not None:
         hdu = fits.PrimaryHDU(mask_img)
-        path = Path(save_path) / fname
-        hdu.writeto(path, overwrite=True)
+        hdu.writeto(path_save, overwrite=True)
 
-    if show is True:
+    if show:
         fig, ax = plt.subplots(figsize=(5, 5))
         ax.imshow(mask_img, origin='lower', cmap='gray')
         ax.set_title("mask image", fontsize=15, fontweight='bold')
-    return mask_img
+    return None
 
 
 def edge_detection(data, wcs=None):
