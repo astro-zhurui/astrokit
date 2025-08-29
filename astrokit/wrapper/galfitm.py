@@ -29,6 +29,8 @@ class GalfitMModel:
             input = str(input).strip('[]').replace(' ', '')
         if add_cheb:
             input = f"{input} cheb"
+        else:
+            input = f"{input} band"
 
         return input
 
