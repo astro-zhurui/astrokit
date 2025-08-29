@@ -4,10 +4,17 @@ A Python interface for GALFITM
 - Author: Rui Zhu
 - Date: 2025-07-08
 """
+import numpy as np
 from pathlib import Path
+import matplotlib.pyplot as plt
+from matplotlib.offsetbox import AnchoredText
+import cmasher
 from loguru import logger
 import time
 import os
+
+from astropy.io import fits
+from astropy.visualization import ImageNormalize, LogStretch
 
 from astrokit.toolbox.utils import run_command, run_command_in_terminal
 from astrokit.toolbox.utils import sec_to_hms
@@ -511,3 +518,48 @@ class GalfitM:
         _rename_file(fname_band_orig, fname_band_new)
 
         return None
+    
+    def get_res(self):
+        hdul = fits.open(self.path_output_img)
+        # the final results in model extension header are same
+        return hdul['MODEL_' + self.band_labels[0]].header
+    
+    def plot(self, filter, 
+             cmap=cmasher.chroma, vmin=None, vmax=None):
+        """
+        Plot the results for a specific filter.
+        """
+        if filter not in self.band_labels:
+            raise ValueError(f"Filter {filter} not in band_labels: {self.band_labels}")
+        hdul = fits.open(self.path_output_img)
+        data_img = hdul[f'INPUT_{filter}'].data
+        data_model = hdul[f'MODEL_{filter}'].data
+        data_residual = hdul[f'RESIDUAL_{filter}'].data
+
+        fig, axes = plt.subplots(1, 3, figsize=(9, 3), constrained_layout=True)
+        vmin = np.min(data_img) if (vmin is None) else vmin
+        vmax = np.max(data_img) if (vmax is None) else vmax
+        norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=LogStretch())
+
+        axes[0].imshow(data_img, origin='lower', cmap=cmap, norm=norm)
+        axes[1].imshow(data_model, origin='lower', cmap=cmap, norm=norm)
+        axes[2].imshow(data_residual, origin='lower', cmap=cmap, norm=norm)
+            
+        def _add_anchored_text(ax, string):
+            at = AnchoredText(string, prop=dict(size=15, color='white'), pad=0.1,
+                            frameon=False, loc='upper left')
+            ax.add_artist(at)
+        _add_anchored_text(axes[0], f"{filter}")
+        _add_anchored_text(axes[1], "Model")
+        _add_anchored_text(axes[2], "Residual")
+
+        def _set_ax_style(ax):
+            for spine in ax.spines.values():
+                spine.set_linewidth(0.5)
+            ax.tick_params(axis='x', which='major', width=0.5, length=5, direction='out')
+            ax.tick_params(axis='y', which='major', width=0.5, length=5, direction='out')
+        _set_ax_style(axes[0])
+        _set_ax_style(axes[1])
+        _set_ax_style(axes[2])
+
+        return fig

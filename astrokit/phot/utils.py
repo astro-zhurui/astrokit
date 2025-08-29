@@ -94,8 +94,7 @@ def source_detect(data, kernel_fwhm=3, kernel_size=9,
                   detect_threshold_nsigma=5, contrast=0.01, 
                   nlevels=32, npixels=9, 
                   show=True, cmap=None, fig_title=None,
-                  vmin=None, vmax=None, 
-                  return_segment_map=False):
+                  vmin=None, vmax=None):
     """
     using photutils to detect sources.
     

@@ -41,7 +41,8 @@ __all__ = [
     'plot_aperture_photometry_growth_curve',
     'plot_stamps', 
     'plot_SDSS_spectrum', 
-    'imshow'
+    'imshow', 
+    'plot_orientation_arrows'
 ]
 
 # **************************************************
@@ -748,3 +749,69 @@ def imshow(data, wcs=None, ax=None,
             pad=0.05, shrink=0.83
             )
     return None
+
+def plot_orientation_arrows(
+        ax, wcs, 
+        pad=0.2, color='white', fontsize=12, loc='upper right', 
+        arrow_length=0.12, arrow_linewidth=1, 
+        arrow_headwidth=8, arrow_headlength=5
+        ):
+    """
+    绘制指向北(N)和东(E)的箭头。
+    """
+
+    # 图像尺寸
+    xlim = ax.get_xlim()
+    ylim = ax.get_ylim()
+    xspan = xlim[1] - xlim[0]
+    yspan = ylim[1] - ylim[0]
+
+    # 起点像素坐标
+    if 'lower' in loc:
+        y0 = ylim[0] + pad * yspan
+    else:
+        y0 = ylim[1] - pad * yspan
+    if 'left' in loc:
+        x0 = xlim[0] + pad * xspan
+    else:
+        x0 = xlim[1] - pad * xspan
+
+    # 箭头长度对应像素
+    arrow_pix_length = arrow_length * xspan
+
+    # 中心点对应天球坐标
+    center_world = wcs.pixel_to_world(x0, y0)
+
+    # 北方向：在像素空间向上移动 arrow_pix_length
+    north_pixel = (x0, y0 + arrow_pix_length)
+    xn, yn = wcs.world_to_pixel(wcs.pixel_to_world(*north_pixel))
+
+    # 东方向：在像素空间向右移动 arrow_pix_length
+    east_pixel = (x0 + arrow_pix_length, y0)
+    xe, ye = wcs.world_to_pixel(wcs.pixel_to_world(*east_pixel))
+
+    # 绘制北箭头
+    ax.annotate(
+        '', xy=(xn, yn), xytext=(x0, y0),
+        arrowprops=dict(
+            facecolor=color, 
+            edgecolor=color,
+            width=arrow_linewidth,
+            headwidth=arrow_headwidth, 
+            headlength=arrow_headlength)
+        )
+    ax.text(xn, yn, 'N', color=color, fontsize=fontsize,
+            ha='center', va='bottom')
+
+    # 绘制东箭头
+    ax.annotate(
+        '', xy=(xe, ye), xytext=(x0, y0),
+        arrowprops=dict(
+            facecolor=color, 
+            edgecolor=color,
+            width=arrow_linewidth, 
+            headwidth=arrow_headwidth, 
+            headlength=arrow_headlength)
+        )
+    ax.text(xe, ye, ' E', color=color, fontsize=fontsize,
+            ha='left', va='center')
