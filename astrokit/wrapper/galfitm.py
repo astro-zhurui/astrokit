@@ -30,35 +30,24 @@ class GalfitMModel:
         self._model_idx = 0
         self.feedme = ""
 
-    def _list2CSL(self, input, add_cheb=False):
-        """将参数列表转换成逗号分隔行字符串"""
-        if isinstance(input, list):
-            input = str(input).strip('[]').replace(' ', '')
-        if add_cheb:
-            input = f"{input} cheb"
+    def _feedme_row(self, param_idx, param_value, fit_options, cheb, comment):
+        if isinstance(param_value, list):
+            n_params = len(param_value)
+            param_value = str(param_value).strip('[]').replace(' ', '')
         else:
-            input = f"{input} band"
+            param_value = f"{param_value}"
 
-        return input
+        if fit_options is None:
+            fit_options = [1]*n_params
+        if isinstance(fit_options, list):
+            fit_options = str(fit_options).strip('[]').replace(' ', '')
+        else:
+            fit_options = f"{fit_options}"
+        if cheb:
+            fit_options = f"{fit_options} cheb"
 
-    def _feedme_row(self, c1, c2, c3, c4):
-        """
-        将模型结构参数写入feedme格式的字符串
+        return f"{param_idx:>2}) {param_value:<50}  {fit_options:<20}  {comment:<20}\n"
 
-        Parameter
-        ---------
-
-        c1 : Parameter number
-        c2 : parameter name OR value
-        c3 : the order of the Chebyshev series
-            - 0 = fixed to input value(s)
-            - 1 = fit a constant offset from the input value(s)
-            - 2 = fit a linear function of wavelength
-            - 3 = fit a quadratic function of wavelength, etc.
-        c4 : comment
-        """
-        return f"{c1:>2}) {c2:<20} {c3:<20} {c4:<20}\n"
-    
     def add_sky(
             self, 
             background='', fit_background=1, cheb_background=False,
@@ -70,41 +59,29 @@ class GalfitMModel:
         self._model_idx += 1
         content = f"\n# Component number: {self._model_idx}\n"
 
-        content += self._feedme_row(
-            c1='0', 
-            c2=model_name, c3='', 
-            c4="# object type"
-        )
-        content += self._feedme_row(
-            c1='1', 
-            c2=self._list2CSL(background), 
-            c3=self._list2CSL(fit_background, add_cheb=cheb_background), 
-            c4="# sky background [ADU counts]"
-        )
-        content += self._feedme_row(
-            c1='2', 
-            c2=self._list2CSL(sky_grad_x), 
-            c3=self._list2CSL(fit_sky_grad_x, add_cheb=cheb_sky_grad_x), 
-            c4="# dsky/dx (sky gradient in x)"
-        )
-        content += self._feedme_row(
-            c1='3', 
-            c2=self._list2CSL(sky_grad_y), 
-            c3=self._list2CSL(fit_sky_grad_y, add_cheb=cheb_sky_grad_y), 
-            c4="# dsky/dy (sky gradient in y) "
-        )
-        content += self._feedme_row(
-            c1='z', c2=skip_in_output, c3='', 
-            c4="#  Skip this model in output image?  (yes=1, no=0)"
-        )
+        data = [
+            ['0', model_name, '', False, "# object type"], 
+            ['1', background, fit_background, cheb_background, "# sky background [ADU counts]"],
+            ['2', sky_grad_x, fit_sky_grad_x, cheb_sky_grad_x, "# dsky/dx (sky gradient in x)"],
+            ['3', sky_grad_y, fit_sky_grad_y, cheb_sky_grad_y, "# dsky/dy (sky gradient in y)"],
+            ['z', skip_in_output, '', False, "#  Skip this model in output image?  (yes=1, no=0)"]
+        ]
+        for row in data:
+            content += self._feedme_row(
+                param_idx=row[0],
+                param_value=row[1],
+                fit_options=row[2],
+                cheb=row[3],
+                comment=row[4]
+            )
         self.feedme += content
         return None
 
     def add_psf(
             self, 
-            x='', fit_x=1, cheb_x=False,
-            y='', fit_y=1, cheb_y=False,
-            mag='', fit_mag=1, cheb_mag=False,
+            x='', fit_x=None, cheb_x=False,
+            y='', fit_y=None, cheb_y=False,
+            mag='', fit_mag=None, cheb_mag=False,
             skip_in_output=False
             ):
         """
@@ -121,101 +98,58 @@ class GalfitMModel:
         self._model_idx += 1
         content = f"\n# Component number: {self._model_idx}\n"
 
-        content += self._feedme_row(
-            c1='0', 
-            c2=model_name, c3='', 
-            c4="# object type"
-        )
-        content += self._feedme_row(
-            c1='1', 
-            c2=self._list2CSL(x), 
-            c3=self._list2CSL(fit_x, add_cheb=cheb_x), 
-            c4="# position x [pixel]"
-        )
-        content += self._feedme_row(
-            c1='2', 
-            c2=self._list2CSL(y), 
-            c3=self._list2CSL(fit_y, add_cheb=cheb_y), 
-            c4="# position y [pixel]"
-        )
-        content += self._feedme_row(
-            c1='3', 
-            c2=self._list2CSL(mag), 
-            c3=self._list2CSL(fit_mag, add_cheb=cheb_mag), 
-            c4="# total magnitude"
-        )
-        content += self._feedme_row(
-            c1='z', c2=skip_in_output, c3='', 
-            c4="#  Skip this model in output image?  (yes=1, no=0)"
-        )
+        data = [
+            ['0', model_name, '', False, "# object type"],
+            ['1', x, fit_x, cheb_x, "# position x [pixel]"],
+            ['2', y, fit_y, cheb_y, "# position y [pixel]"],
+            ['3', mag, fit_mag, cheb_mag, "# total magnitude"],
+            ['z', skip_in_output, '', False, "#  Skip this model in output image?  (yes=1, no=0)"]
+        ]
+        for row in data:
+            content += self._feedme_row(
+                param_idx=row[0],
+                param_value=row[1],
+                fit_options=row[2],
+                cheb=row[3],
+                comment=row[4]
+            )
         self.feedme += content
         return None
     
     def add_sersic(
             self, 
-            x='', fit_x=1, cheb_x=False,
-            y='', fit_y=1, cheb_y=False,
-            mag='', fit_mag=1, cheb_mag=False, 
-            re='', fit_re=1, cheb_re=False,
-            sersic_index='', fit_sersic_index=1, cheb_sersic_index=False,
-            axis_ratio='', fit_axis_ratio=1, cheb_axis_ratio=False, 
-            PA='', fit_PA=1, cheb_PA=False, 
+            x='', fit_x=None, cheb_x=False,
+            y='', fit_y=None, cheb_y=False,
+            mag='', fit_mag=None, cheb_mag=False, 
+            re='', fit_re=None, cheb_re=False,
+            sersic_index='', fit_sersic_index=None, cheb_sersic_index=False,
+            axis_ratio='', fit_axis_ratio=None, cheb_axis_ratio=False,
+            PA='', fit_PA=None, cheb_PA=False,
             skip_in_output=False
     ):
         model_name = 'sersic'
         self._model_idx += 1
         content = f"\n# Component number: {self._model_idx}\n"
 
-        content += self._feedme_row(
-            c1=0, c2=model_name, c3='', 
-            c4="# Object type" 
-        )
-        content += self._feedme_row(
-            c1=1, 
-            c2=self._list2CSL(x), 
-            c3=self._list2CSL(fit_x, add_cheb=cheb_x), 
-            c4="# position x [pixel]"
-        )
-        content += self._feedme_row(
-            c1=2, 
-            c2=self._list2CSL(y), 
-            c3=self._list2CSL(fit_y, add_cheb=cheb_y), 
-            c4="# position y [pixel]"
-        )
-        content += self._feedme_row(
-            c1=3, 
-            c2=self._list2CSL(mag), 
-            c3=self._list2CSL(fit_mag, cheb_mag), 
-            c4="# total magnitude in each band"
-        )
-        content += self._feedme_row(
-            c1=4, 
-            c2=self._list2CSL(re), 
-            c3=self._list2CSL(fit_re, cheb_re), 
-            c4="# R_e in each band"
-        )
-        content += self._feedme_row(
-            c1=5, 
-            c2=self._list2CSL(sersic_index), 
-            c3=self._list2CSL(fit_sersic_index, cheb_sersic_index), 
-            c4="# Sersic exponent in each band", 
-        )
-        content += self._feedme_row(
-            c1=9, 
-            c2=self._list2CSL(axis_ratio), 
-            c3=self._list2CSL(fit_axis_ratio, cheb_axis_ratio), 
-            c4="# axis ratio (b/a) in each band", 
-        )
-        content += self._feedme_row(
-            c1=10, 
-            c2=self._list2CSL(PA), 
-            c3=self._list2CSL(fit_PA, cheb_PA), 
-            c4="# position angle (PA), same value in each band", 
-        )
-        content += self._feedme_row(
-            c1='z', c2=skip_in_output, c3='', 
-            c4="#  Skip this model in output image?  (yes=1, no=0)"
-        )
+        data = [
+            ['0', model_name, '', False, "# Object type"],
+            ['1', x, fit_x, cheb_x, "# position x [pixel]"],
+            ['2', y, fit_y, cheb_y, "# position y [pixel]"],
+            ['3', mag, fit_mag, cheb_mag, "# total magnitude"],
+            ['4', re, fit_re, cheb_re, "# R_e [pixel]"],
+            ['5', sersic_index, fit_sersic_index, cheb_sersic_index, "# Sersic index"],
+            ['9', axis_ratio, fit_axis_ratio, cheb_axis_ratio, "# axis ratio (b/a)"],
+            ['10', PA, fit_PA, cheb_PA, "# position angle (PA)"],
+            ['z', skip_in_output, '', False, "#  Skip this model in output image?  (yes=1, no=0)"]
+        ]
+        for row in data:
+            content += self._feedme_row(
+                param_idx=row[0],
+                param_value=row[1],
+                fit_options=row[2],
+                cheb=row[3],
+                comment=row[4]
+            )
         self.feedme += content
         return None
 
@@ -230,6 +164,7 @@ class GalfitM:
             path_list_input_mask=[],
             output_type='optimize', 
             output_items=['input', 'model', 'residual', 'component'],
+            min_sigma=None
             ):
         
         self.dir_output = Path(dir_output)
@@ -254,12 +189,6 @@ class GalfitM:
         self.constrains = None
 
         self.n_img = len(self.path_list_input_img)
-
-        if self.path_list_input_sigma is None:
-            self.path_list_input_sigma = ['none'] * self.n_img
-        
-        if self.path_list_input_mask is None:
-            self.path_list_input_mask = ['none'] * self.n_img
 
     def show_feedme_example(self):
         url = "https://www.nottingham.ac.uk/astronomy/megamorph/exec/EXAMPLE.GALFITM.INPUT"
@@ -337,15 +266,25 @@ class GalfitM:
 
         feedme_content += f'B) {str(self.path_output_img)}\n'
 
-        lst = [str(p) for p in self.path_list_input_sigma]
-        feedme_content += f'C) {",".join(lst)}\n'
+        if len(self.path_list_input_sigma) == 0:
+            if self.min_sigma_factor is None:
+                lst = ['none'] * self.n_img
+                feedme_content += f'C) {",".join(lst)}\n'
+            else:
+                feedme_content += f'C) none    {self.min_sigma_factor}\n'
+        else:
+            lst = [str(p) for p in self.path_list_input_sigma]
+            feedme_content += f'C) {",".join(lst)}\n'
 
         lst = [str(p) for p in self.path_list_input_psf]
         feedme_content += f'D) {",".join(lst)}\n'
 
         feedme_content += f'E) {self.psf_fine_sampling}  # PSF fine sampling factor relative to data\n'
 
-        lst = [str(p) for p in self.path_list_input_mask]
+        if len(self.path_list_input_mask) == 0:
+            lst = ['none'] * self.n_img
+        else:
+            lst = [str(p) for p in self.path_list_input_mask]
         feedme_content += f'F) {",".join(lst)}  # Bad pixel mask fits\n'
 
         if self.use_constraints:
@@ -425,6 +364,7 @@ class GalfitM:
         """write the feedme content to the cache directory"""
         with open(self.path_feedme, 'w') as f:
             f.write(self.feedme)
+        logger.info(f"GalfitM feedme written to {self.path_feedme}")
         return None
     
     def _constraints_row(self, c1, c2, c3):
