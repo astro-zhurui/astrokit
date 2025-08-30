@@ -752,7 +752,7 @@ def imshow(data, wcs=None, ax=None,
 
 def plot_orientation_arrows(
         ax, wcs, 
-        pad=0.2, color='white', fontsize=12, loc='upper right', 
+        padx=0.2, pady=0.2, color='white', fontsize=12, loc='upper right', 
         arrow_length=0.12, arrow_linewidth=1, 
         arrow_headwidth=8, arrow_headlength=5
         ):
@@ -768,13 +768,13 @@ def plot_orientation_arrows(
 
     # 起点像素坐标
     if 'lower' in loc:
-        y0 = ylim[0] + pad * yspan
+        y0 = ylim[0] + pady * yspan
     else:
-        y0 = ylim[1] - pad * yspan
+        y0 = ylim[1] - pady * yspan
     if 'left' in loc:
-        x0 = xlim[0] + pad * xspan
+        x0 = xlim[0] + padx * xspan
     else:
-        x0 = xlim[1] - pad * xspan
+        x0 = xlim[1] - padx * xspan
 
     # 箭头长度对应像素
     arrow_pix_length = arrow_length * xspan
