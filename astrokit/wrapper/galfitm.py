@@ -222,8 +222,8 @@ class GalfitMModel:
 class GalfitM:
     def __init__(
             self, 
-            dir_output, 
-            task_name, 
+            dir_output="", 
+            task_name=None, 
             path_list_input_img=[], 
             path_list_input_psf=[], 
             path_list_input_sigma=[], 
