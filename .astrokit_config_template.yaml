@@ -9,11 +9,6 @@ PATH_SEX:  # SExtractor program file directory
 PATH_EAZY:  # EAZY program file directory
   /Users/rui/Applications/eazy-photoz
 
-# Qucik Directory
+# Quick Directory
 PATH_DOWNLOAD:  # Default save file path
   /Users/rui/Downloads
-
-# Project Tools Directory
-PATH_PROJECT_TOOL:
-  - <PATH_PROJECT1>
-  - <PATH_PROJECT2>

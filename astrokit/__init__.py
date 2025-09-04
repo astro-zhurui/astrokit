@@ -32,11 +32,6 @@ for path in [DIR_data]:
     if not path.exists():
         path.mkdir(parents=True, exist_ok=True)
 
-# Add Project Tools' Path
-for path in CONFIG['PATH_PROJECT_TOOL']:
-    if Path(path).exists():
-        sys.path.append(path)
-
 def set_logger_config():
     """
     Set logger configuration.
