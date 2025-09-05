@@ -4,3 +4,4 @@
 /docs/build/
 /dev/
 /demo/data/
+__pycache__/
