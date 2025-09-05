@@ -17,6 +17,7 @@ from astropy.wcs import FITSFixedWarning
 from astropy.table import Table
 
 __all__ = [
+    "show_device_info", 
     "clear",
     "pandas_show_all_columns",
     "use_svg_display",
@@ -29,6 +30,42 @@ __all__ = [
     "print_directory_tree", 
     "sec_to_hms"
 ]
+
+def show_device_info():
+    """
+    显示当前设备信息
+    """
+    import socket
+    import psutil
+    import GPUtil
+
+    hostname = socket.gethostname()
+    n_cpu = psutil.cpu_count(logical=True)
+    try:
+        gpus = GPUtil.getGPUs()
+    except ValueError:
+        gpus = None
+
+    print(f"==> [Device Name] {hostname}")
+    print(f"==> [CPU Info] {n_cpu} logical cores")
+    print(f"==> [Memory Info]:")
+    print(f"    Total Memory: {psutil.virtual_memory().total / (1024 ** 3):.2f} GB")
+    print(f"    Used Memory: {psutil.virtual_memory().used / (1024 ** 3):.2f} GB")
+    print(f"    Available Memory: {psutil.virtual_memory().available / (1024 ** 3):.2f} GB")
+    print(f"    Memory Usage: {psutil.virtual_memory().percent}%")
+    if gpus is None:
+        print(f"==> [GPU Info]: No GPU found")
+    else:
+        print(f"==> [GPU Info]:")
+        for gpu in gpus:
+            print(
+                f"    GPU ID: {gpu.id}, "
+                f"Name: {gpu.name}, "
+                f"Load: {gpu.load*100:.1f}%, "
+                f"Total Memory: {gpu.memoryTotal}MB, "
+                f"Memory Used: {gpu.memoryUsed}MB"
+            )
+    return None
 
 def clear():
     clear_output()

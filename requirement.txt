@@ -30,3 +30,5 @@ scikit-image
 torch
 torchvision
 xgboost
+optuna
+seaborn

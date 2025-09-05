@@ -5,10 +5,12 @@ __version__ = '0.1.1'
 
 import sys
 import yaml
+import socket
 from pathlib import Path
 import importlib
 from loguru import logger
 
+hostname = socket.gethostname()
 DIR_astrokit = Path(__file__).resolve().parent  # astrokit directory
 
 # 加载配置文件
