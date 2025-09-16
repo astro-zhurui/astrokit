@@ -8,9 +8,11 @@ from pathlib import Path
 import pandas as pd
 import subprocess
 import psutil
+import time
 from loguru import logger
 from IPython.display import clear_output
 import warnings
+import os
 
 from astropy.wcs import WCS
 from astropy.wcs import FITSFixedWarning
@@ -28,8 +30,32 @@ __all__ = [
     "fits2df",
     "read_wcs", 
     "print_directory_tree", 
-    "sec_to_hms"
+    "sec_to_hms", 
+    "show_internet_speed"
 ]
+
+def show_internet_speed(interval=1):
+    """Display real-time internet speed for all network interfaces."""
+    try:
+        while True:
+            # 获取当前网卡统计
+            net1 = psutil.net_io_counters(pernic=True)
+            time.sleep(interval)
+            net2 = psutil.net_io_counters(pernic=True)
+
+            # 清屏
+            os.system('clear')  # Linux/macOS，Windows 用 'cls'
+
+            # 显示每个网卡速度
+            for nic in net1:
+                sent = (net2[nic].bytes_sent - net1[nic].bytes_sent) / (1024**2)
+                recv = (net2[nic].bytes_recv - net1[nic].bytes_recv) / (1024**2)
+                print(f"{nic}: Up {sent/interval:.2f} MB/s | Down {recv/interval:.2f} MB/s")
+
+            print("-" * 50)
+
+    except KeyboardInterrupt:
+        print("\nStopped by user")
 
 def show_device_info():
     """
