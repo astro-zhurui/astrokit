@@ -2,12 +2,12 @@ ipython
 ipykernel
 jupyter
 jupyterlab-execute-time
-pip_search
 pip-review
 tqdm
 loguru
 humanize
 pathos
+GPUtil
 pyyaml
 openpyxl
 KDEpy
@@ -29,6 +29,4 @@ scikit-learn
 scikit-image
 torch
 torchvision
-xgboost
-optuna
 seaborn
