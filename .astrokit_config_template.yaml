@@ -10,5 +10,7 @@ PATH_EAZY:  # EAZY program file directory
   /Users/rui/Applications/eazy-photoz
 
 # Quick Directory
-PATH_DOWNLOAD:  # Default save file path
+DIR_DOWNLOAD:  # Default save file path
   /Users/rui/Downloads
+DIR_DATA:  # Database in this equipment
+  /Users/rui/Data

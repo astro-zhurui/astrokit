@@ -27,10 +27,11 @@ else:
         CONFIG = yaml.safe_load(f)
 
 # Quick Directory
-DIR_data = DIR_astrokit / 'datasets' / 'data'  # default data directory
-DIR_download = Path(CONFIG['PATH_DOWNLOAD'])  # default download directory
+DIR_datasets = DIR_astrokit / 'datasets' / 'data'  # default data directory
+DIR_DOWNLOAD = Path(CONFIG['DIR_DOWNLOAD'])  # default download directory
+DIR_DATA = Path(CONFIG['DIR_DATA'])  # default data directory in this machine
 
-for path in [DIR_data]:
+for path in [DIR_datasets]:
     if not path.exists():
         path.mkdir(parents=True, exist_ok=True)
 

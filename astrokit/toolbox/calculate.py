@@ -20,7 +20,8 @@ __all__ = [
     'logify',
     'kde2D',
     'binned_stats',
-    'NMAD'
+    'NMAD', 
+    'cal_min_dist'
 ]
 
 
@@ -353,3 +354,62 @@ def binned_stats(x, y, bins=8):
 
 def NMAD(arr):
     return 1.4826 * np.nanmedian(np.abs(arr - np.nanmedian(arr)))
+
+def cal_min_dist(point, line_start, line_end):
+    """
+    天球上计算点到线段的最短角距离 (units: arcsecond)
+
+    Parameters
+    ----------
+    point : SkyCoord or array-like of SkyCoord
+        点的坐标
+    line_start : SkyCoord or array-like of SkyCoord
+        线段起点的坐标
+    line_end : SkyCoord or array-like of SkyCoord
+        线段终点的坐标
+
+    Returns
+    -------
+    distances : 2D array
+        distances[i, j]表示第i个点到第j条线段的最短角距离, 单位为arcsecond
+    """
+    from astropy.coordinates import SkyCoord
+
+    # --- 包装单点为数组 ---
+    if point.isscalar:
+        point = SkyCoord([point])
+    if line_start.isscalar:
+        line_start = SkyCoord([line_start])
+    if line_end.isscalar:
+        line_end = SkyCoord([line_end])
+
+    # --- 转为平面坐标（RA,Dec） ---
+    p_ra, p_dec = point.ra.degree, point.dec.degree
+    a_ra, a_dec = line_start.ra.degree, line_start.dec.degree
+    b_ra, b_dec = line_end.ra.degree, line_end.dec.degree
+
+    # --- 构建向量 ---
+    P = np.stack([p_ra, p_dec], axis=1)
+    A = np.stack([a_ra, a_dec], axis=1)
+    B = np.stack([b_ra, b_dec], axis=1)
+
+    M, N = len(P), len(A)
+
+    AB = B - A
+    AB2 = np.einsum('ij,ij->i', AB, AB)
+    AB2[AB2 == 0] = np.nan  # 防止退化线段除零
+
+    AP = P[:, None, :] - A[None, :, :]
+    AB_exp = AB[None, :, :]
+    t = np.einsum('mni,mni->mn', AP, AB_exp) / AB2[None, :]
+    t = np.clip(t, 0, 1)
+
+    Q = A[None, :, :] + t[..., None] * AB_exp
+
+    # --- 转为 SkyCoord 计算球面距离 ---
+    Q_coords = SkyCoord(ra=Q[...,0]*u.deg, dec=Q[...,1]*u.deg)
+    distances = np.zeros((M, N))
+    for i in range(M):
+        distances[i] = point[i].separation(Q_coords[i]).arcsecond
+
+    return distances
