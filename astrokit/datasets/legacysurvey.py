@@ -6,6 +6,11 @@ Tools for working with the Legacy Survey (LS) datasets.
 """
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
+from matplotlib import rcParams
+rcParams['font.family'] = 'Times New Roman'
+
 from loguru import logger
 from astropy.table import Table
 from astropy.coordinates import SkyCoord
@@ -24,7 +29,10 @@ class LegacySurvey:
         self.dir_data = DIR_DATA / 'legacysurvey'
         if not self.dir_data.exists():
             raise FileNotFoundError(f"Data directory {self.dir_data} does not exist.")
-        
+        self.dir_tractor = {
+            'dr9': self.dir_data / 'dr9_north' / 'tractor',
+            'dr10': self.dir_data / 'dr10_south' / 'tractor'
+        }
         self.bricksinfo = self._load_bricksinfo()
         
     def _load_bricksinfo(self):
@@ -56,7 +64,7 @@ class LegacySurvey:
             bricksinfo.to_parquet(path, index=False)
         return bricksinfo
     
-    def find_bricks(self, ra, dec, search_radius=60):
+    def find_bricks(self, ra, dec, search_radius=60, show=False):
         """
         Find bricks that contain or are within a certain distance from the given RA and Dec.
 
@@ -68,6 +76,8 @@ class LegacySurvey:
             Declination in degrees.
         search_radius : float
             Search radius in arcseconds.
+        show : bool
+            Whether to plot the search area and bricks.
 
         Returns:
         --------
@@ -91,4 +101,33 @@ class LegacySurvey:
         df['in_brick'] = False
         df.loc[(ra >= df['ra1']) & (ra <= df['ra2']) &
             (dec >= df['dec1']) & (dec <= df['dec2']), 'in_brick'] = True
-        return df[(df['in_brick'] == True) | (df['min_dist'] < search_radius)]
+        res = df[(df['in_brick'] == True) | (df['min_dist'] < search_radius)].copy()
+        if len(res) == 0:
+            logger.warning(f"No bricks found within {search_radius} arcsec of (RA, Dec)=({ra}, {dec})")
+        else:
+            # check if tractor file exists
+            for idx, row in res.iterrows():
+                release, brickname = row['release'], row['brickname']
+                AAA = brickname[:3]
+                path = self.dir_tractor[release] / AAA / f'tractor-{brickname}.fits'
+                res.loc[idx, 'file_is_ready'] = path.exists()
+            if show:
+                fig, ax = plt.subplots(1,1, figsize=(6,6))
+                ax.set_aspect('equal')
+                circle = Circle((ra, dec), search_radius/3600, edgecolor='r', 
+                                facecolor='none', lw=1)
+                ax.add_patch(circle)
+                ax.plot(ra, dec, 'rx')
+
+                colors = plt.cm.berlin(np.linspace(0, 1, len(res)))
+                for idx, (i, brick) in enumerate(res.iterrows()):
+                    rect_x = [brick['ra1'], brick['ra2'], brick['ra2'], brick['ra1'], brick['ra1']]
+                    rect_y = [brick['dec1'], brick['dec1'], brick['dec2'], brick['dec2'], brick['dec1']]
+                    # 在每个矩形的左上角标注砖块ID
+                    ax.text(brick['ra1'], brick['dec2'], brick['brickname'], color='k', fontsize=15, ha='left', va='top', )
+                    ax.fill(rect_x, rect_y, color=colors[idx], alpha=0.3)
+
+                ax.set_xlabel('RA [deg]', fontsize=15)
+                ax.set_ylabel('Dec [deg]', fontsize=15)
+                ax.set_title(f"Target: RA={ra:.4f}, Dec={dec:.4f}, search_radius={search_radius}'' ", fontsize=12)
+        return res
