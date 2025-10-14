@@ -41,14 +41,11 @@ PATH_SEX:  # SExtractor program file directory
 PATH_EAZY:  # EAZY program file directory
   /Users/rui/Applications/eazy-photoz
 
-# Qucik Directory
-PATH_DOWNLOAD:  # Default save file path
+# Quick Directory
+DIR_DOWNLOAD:  # Default save file path
   /Users/rui/Downloads
-
-# Project Tools Directory
-PATH_PROJECT_TOOL:
-  - <PATH_PROJECT1>
-  - <PATH_PROJECT2>
+DIR_DATA:  # local data root directory. Astrokit will search datasets in this directory
+  /Users/rui/Data
 ```
 
 - step 3: **Enjoy it!**<br>
