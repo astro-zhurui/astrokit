@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from astrokit import DIR_data
+from astrokit import DIR_DATA
 
 __all__ = [
     'cal_pivot_wavelength', 

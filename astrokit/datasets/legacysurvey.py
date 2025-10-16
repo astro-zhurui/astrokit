@@ -29,11 +29,20 @@ class LegacySurvey:
         self.dir_data = DIR_DATA / 'legacysurvey'
         if not self.dir_data.exists():
             raise FileNotFoundError(f"Data directory {self.dir_data} does not exist.")
-        self.dir_tractor = {
+        self.bricksinfo = self._load_bricksinfo()
+
+    def find_tractor_file(self, release, brickname):
+        """
+        Given a release and brickname, return the path to the corresponding tractor file.
+        """
+        dir_tractor = {
             'dr9': self.dir_data / 'dr9_north' / 'tractor',
             'dr10': self.dir_data / 'dr10_south' / 'tractor'
         }
-        self.bricksinfo = self._load_bricksinfo()
+        path = dir_tractor[release] / brickname[:3] / f'tractor-{brickname}.fits'
+        if not path.exists():
+            logger.warning(f"Tractor file {path} does not exist.")
+        return path
         
     def _load_bricksinfo(self):
         """
@@ -64,7 +73,7 @@ class LegacySurvey:
             bricksinfo.to_parquet(path, index=False)
         return bricksinfo
     
-    def find_bricks(self, ra, dec, search_radius=60, show=False):
+    def find_bricks(self, ra, dec, search_radius=60, show=False, silent=False):
         """
         Find bricks that contain or are within a certain distance from the given RA and Dec.
 
@@ -95,21 +104,18 @@ class LegacySurvey:
         dist2 = cal_min_dist(p, p2, p3)
         dist3 = cal_min_dist(p, p3, p4)
         dist4 = cal_min_dist(p, p4, p1)
-        dist = np.minimum.reduce([dist1, dist2, dist3, dist4])
 
-        df['min_dist'] = dist.min(axis=0)
+        df['min_dist'] = np.minimum.reduce([dist1, dist2, dist3, dist4])
         df['in_brick'] = False
         df.loc[(ra >= df['ra1']) & (ra <= df['ra2']) &
             (dec >= df['dec1']) & (dec <= df['dec2']), 'in_brick'] = True
         res = df[(df['in_brick'] == True) | (df['min_dist'] < search_radius)].copy()
-        if len(res) == 0:
+        if (len(res) == 0) and (not silent):
             logger.warning(f"No bricks found within {search_radius} arcsec of (RA, Dec)=({ra}, {dec})")
         else:
             # check if tractor file exists
             for idx, row in res.iterrows():
-                release, brickname = row['release'], row['brickname']
-                AAA = brickname[:3]
-                path = self.dir_tractor[release] / AAA / f'tractor-{brickname}.fits'
+                path = self.find_tractor_file(row['release'], row['brickname'])
                 res.loc[idx, 'file_is_ready'] = path.exists()
             if show:
                 fig, ax = plt.subplots(1,1, figsize=(6,6))

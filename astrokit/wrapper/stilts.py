@@ -21,14 +21,14 @@ __all__ = [
 def tcopy(
         path_input_catalog, 
         path_output_catalog, 
-        silence=False,
+        silent=False,
         ):
     st = time.time()
     path_input_catalog = Path(path_input_catalog)
     path_output_catalog = Path(path_output_catalog)
     args = f"stilts -verbose tcopy"
     args += f" in={str(path_input_catalog)} out={str(path_output_catalog)}"
-    if silence:
+    if silent:
         stdout = subprocess.PIPE
         stderr = subprocess.PIPE
     else:
@@ -42,7 +42,7 @@ def tcopy(
         universal_newlines=True, 
         shell=True, 
     )
-    if not silence:
+    if not silent:
         if process.returncode == 0 & path_output_catalog.exists():
             logger.success(f"Success! | Cost Time: {time.time()-st:.2f}s")
         else:
@@ -61,7 +61,7 @@ def tmatch2(
         join='1and2',
         n_cpu=None, 
         progress='log', 
-        silence=False,
+        silent=False,
 ):
     """
     Performs a crossmatch of two tables based on the proximity of sky positions.
@@ -112,7 +112,7 @@ def tmatch2(
         'time': progress information and some time profiling information is shown
         'profile': progress information and limited time/memory profiling information are shown
 
-    silence : bool, optional
+    silent : bool, optional
         Whether to suppress the output information. The default is False.
     """
     st = time.time()
@@ -121,7 +121,7 @@ def tmatch2(
     path_cat_output = Path(path_cat_output)
 
     if path_cat_left.exists() & path_cat_right.exists():
-        if not silence:
+        if not silent:
             logger.info(f"Start Matching '{path_cat_left.name}' and '{path_cat_right.name}' ...")
     else:
         raise FileNotFoundError(f"Input File not found!")
@@ -143,7 +143,7 @@ def tmatch2(
     else:
         args += f" runner=parallel{n_cpu}"
 
-    if silence:
+    if silent:
         stdout = subprocess.PIPE
         stderr = subprocess.PIPE
     else:
@@ -159,7 +159,7 @@ def tmatch2(
         universal_newlines=True, 
         shell=True, 
     )
-    if not silence:
+    if not silent:
         if process.returncode == 0 & path_cat_output.exists():
             logger.success(f"Success! | Cost Time: {time.time()-st:.2f}s")
         else:
@@ -177,7 +177,7 @@ def tskymatch2(
         find='best',
         join='1and2',
         n_cpu=None, 
-        silence=False,
+        silent=False,
 ):
     """
     Performs a crossmatch of two tables based on the proximity of sky positions.
@@ -217,7 +217,7 @@ def tskymatch2(
         'None': parallel smaller than 6 CPUs. # Default
         'all': parallel all CPUs.
         'n_cpu': parallel n CPUs.
-    silence : bool, optional
+    silent : bool, optional
         Whether to suppress the output information. The default is False.
     """
     st = time.time()
@@ -226,7 +226,7 @@ def tskymatch2(
     path_cat_output = Path(path_cat_output)
 
     if path_cat_left.exists() & path_cat_right.exists():
-        if not silence:
+        if not silent:
             logger.info(f"Start Matching '{path_cat_left.name}' and '{path_cat_right.name}' ...")
     else:
         raise FileNotFoundError(f"Input File not found!")
@@ -246,7 +246,7 @@ def tskymatch2(
     else:
         args += f" runner=parallel{n_cpu}"
 
-    if silence:
+    if silent:
         stdout = subprocess.PIPE
         stderr = subprocess.PIPE
     else:
@@ -262,7 +262,7 @@ def tskymatch2(
         universal_newlines=True, 
         shell=True, 
     )
-    if not silence:
+    if not silent:
         if process.returncode == 0 & path_cat_output.exists():
             logger.success(f"Success! | Cost Time: {time.time()-st:.2f}s")
         else:
@@ -281,7 +281,7 @@ def cdsskymatch(
         find='best',
         blocksize=50000, 
         timeout=None, 
-        silence=False,
+        silent=False,
         ):
     """
     Online crossmatch with VizieR tables and the SIMBAD database.
@@ -306,7 +306,7 @@ def cdsskymatch(
     st = time.time()
     path_input_catalog = Path(path_input_catalog)
 
-    if not silence:
+    if not silent:
         logger.info(f"Start Matching '{path_input_catalog.name}' from '{cds_catalog_name}' ...")
 
     args = f"stilts -verbose cdsskymatch"
@@ -324,7 +324,7 @@ def cdsskymatch(
     args += f" find={find}"
     args += f" blocksize={blocksize}"
 
-    if silence:
+    if silent:
         stdout = subprocess.PIPE
         stderr = subprocess.PIPE
     else:
@@ -341,7 +341,7 @@ def cdsskymatch(
         shell=True, 
         timeout=timeout
     )
-    if not silence:
+    if not silent:
         if process.returncode == 0 & path_output_catalog.exists():
             logger.success(f"Success! | Cost Time: {time.time()-st:.2f}s")
         else:
@@ -361,7 +361,7 @@ def tapskymatch(
         find='all', 
         sep=1.0, 
         timeout=None, 
-        silence=False,
+        silent=False,
         ):
     """
     Crossmatch of a local table with one held in a remote TAP service.
@@ -399,7 +399,7 @@ def tapskymatch(
     sr = round(sep * (1/3600), 6)
     args += f" sr={sr}"
 
-    if silence:
+    if silent:
         stdout = subprocess.PIPE
         stderr = subprocess.PIPE
     else:
@@ -416,11 +416,11 @@ def tapskymatch(
         shell=True, 
     )
     pid = process.pid
-    if not silence:
+    if not silent:
         logger.info(f"Start Matching | PID: {pid}")
     returncode = process.wait(timeout=timeout)
 
-    if not silence:
+    if not silent:
         if returncode == 0 & path_output_catalog.exists():
             logger.success(f"Success! | Cost Time: {time.time()-st:.2f}s")
         else:

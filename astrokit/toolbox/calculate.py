@@ -4,6 +4,7 @@ from scipy import integrate
 
 import astropy.units as u
 import astropy.constants as const
+from astropy.coordinates import SkyCoord
 
 import KDEpy
 from KDEpy.bw_selection import silvermans_rule
@@ -357,59 +358,73 @@ def NMAD(arr):
 
 def cal_min_dist(point, line_start, line_end):
     """
-    天球上计算点到线段的最短角距离 (units: arcsecond)
+    计算单个天球点到多条线段的最短角距离 (向量化版, 单位: arcsec)
 
     Parameters
     ----------
-    point : SkyCoord or array-like of SkyCoord
-        点的坐标
-    line_start : SkyCoord or array-like of SkyCoord
-        线段起点的坐标
-    line_end : SkyCoord or array-like of SkyCoord
-        线段终点的坐标
+    point : SkyCoord
+        单个点 (isscalar=True)
+    line_start : SkyCoord
+        线段起点，可为多条
+    line_end : SkyCoord
+        线段终点，可为多条
 
     Returns
     -------
-    distances : 2D array
-        distances[i, j]表示第i个点到第j条线段的最短角距离, 单位为arcsecond
+    distances : np.ndarray
+        shape (N,), 表示该点到每条线段的最短角距离 (arcsec)
     """
-    from astropy.coordinates import SkyCoord
-
-    # --- 包装单点为数组 ---
-    if point.isscalar:
-        point = SkyCoord([point])
+    if not point.isscalar:
+        raise ValueError("point must be a single SkyCoord")
     if line_start.isscalar:
         line_start = SkyCoord([line_start])
     if line_end.isscalar:
         line_end = SkyCoord([line_end])
 
-    # --- 转为平面坐标（RA,Dec） ---
-    p_ra, p_dec = point.ra.degree, point.dec.degree
-    a_ra, a_dec = line_start.ra.degree, line_start.dec.degree
-    b_ra, b_dec = line_end.ra.degree, line_end.dec.degree
+    # ---- 单位向量转换 ----
+    def sph_to_vec(coord):
+        ra, dec = np.deg2rad(coord.ra.deg), np.deg2rad(coord.dec.deg)
+        x = np.cos(dec) * np.cos(ra)
+        y = np.cos(dec) * np.sin(ra)
+        z = np.sin(dec)
+        return np.stack([x, y, z], axis=-1)
 
-    # --- 构建向量 ---
-    P = np.stack([p_ra, p_dec], axis=1)
-    A = np.stack([a_ra, a_dec], axis=1)
-    B = np.stack([b_ra, b_dec], axis=1)
+    P = sph_to_vec(point)[None, :]      # shape (1, 3)
+    A = sph_to_vec(line_start)          # shape (N, 3)
+    B = sph_to_vec(line_end)            # shape (N, 3)
 
-    M, N = len(P), len(A)
+    # ---- 线段所在大圆的法向量 ----
+    N = np.cross(A, B)                  # shape (N, 3)
+    N /= np.linalg.norm(N, axis=1, keepdims=True)
 
-    AB = B - A
-    AB2 = np.einsum('ij,ij->i', AB, AB)
-    AB2[AB2 == 0] = np.nan  # 防止退化线段除零
+    # ---- 点到大圆的角距 ----
+    dot_pn = np.abs(np.dot(N, P.T)).ravel()  # shape (N,)
+    delta_gc = np.arcsin(dot_pn)             # 弧度
 
-    AP = P[:, None, :] - A[None, :, :]
-    AB_exp = AB[None, :, :]
-    t = np.einsum('mni,mni->mn', AP, AB_exp) / AB2[None, :]
-    t = np.clip(t, 0, 1)
+    # ---- 球面投影点 Q (逐条线段广播) ----
+    proj = P - (N @ P.T) * N                 # shape (N, 3)
+    proj /= np.linalg.norm(proj, axis=1, keepdims=True)
+    Q = proj                                 # shape (N, 3)
 
-    Q = A[None, :, :] + t[..., None] * AB_exp
+    # ---- 各角度 ----
+    dot_aq = np.einsum('ij,ij->i', A, Q)
+    dot_qb = np.einsum('ij,ij->i', Q, B)
+    dot_ab = np.einsum('ij,ij->i', A, B)
+    ang_aq = np.arccos(np.clip(dot_aq, -1, 1))
+    ang_qb = np.arccos(np.clip(dot_qb, -1, 1))
+    ang_ab = np.arccos(np.clip(dot_ab, -1, 1))
 
-    # --- 转为 SkyCoord 计算球面距离 ---
-    Q_coords = SkyCoord(ra=Q[...,0]*u.deg, dec=Q[...,1]*u.deg)
-    distances = np.zeros((M, N))
-    for i in range(M):
-        distances[i] = point[i].separation(Q_coords[i]).arcsecond
+    # ---- 判断投影点是否在线段弧内 ----
+    on_arc = np.abs((ang_aq + ang_qb) - ang_ab) < 1e-8
 
-    return distances
+    # ---- 点到端点角距 ----
+    dot_pa = np.einsum('ij,j->i', A, P[0])
+    dot_pb = np.einsum('ij,j->i', B, P[0])
+    dist_pa = np.arccos(np.clip(dot_pa, -1, 1))
+    dist_pb = np.arccos(np.clip(dot_pb, -1, 1))
+    dist_end = np.minimum(dist_pa, dist_pb)
+
+    # ---- 选择最终距离 ----
+    dist = np.where(on_arc, delta_gc, dist_end)
+
+    return np.degrees(dist) * 3600.0  # arcsec
