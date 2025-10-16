@@ -64,7 +64,7 @@ class EazyFilters:
             filter的简称到序号的映射
         """
 
-        self.DIR_EAZY_FILTERS = DIR_data / 'eazy_filters'
+        self.DIR_EAZY_FILTERS = DIR_DATA / 'eazy_filters'
         self.filters_data = self._read_EAZY_filters()
         self.translate_dict = translate_dict
     
