@@ -28,6 +28,7 @@ __all__ = [
     "find_process_by_name",
     "value_to_KVD_string",
     "fits2df",
+    "read", 
     "read_wcs", 
     "print_directory_tree", 
     "sec_to_hms", 
@@ -212,6 +213,18 @@ def fits2df(path_fits):
     tbl = Table.read(path_fits, character_as_bytes=False)
     df = tbl.to_pandas()
     return df
+
+def read(path, no_warnings=True):
+    """
+    读取fits表格
+    """
+    if no_warnings:
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            tbl = Table.read(path, character_as_bytes=False)
+    else:
+        tbl = Table.read(path, character_as_bytes=False)
+    return tbl
 
 def read_wcs(header):
     """

@@ -16,6 +16,7 @@ __all__ = [
     "tskymatch2", 
     "cdsskymatch",
     "tapskymatch",
+    "tcat",  # https://www.star.bristol.ac.uk/mbt/stilts/sun256/tcat.html
 ]
 
 def tcopy(
@@ -270,8 +271,6 @@ def tskymatch2(
     return None
 
 
-
-
 def cdsskymatch(
         path_input_catalog, 
         path_output_catalog,
@@ -428,3 +427,83 @@ def tapskymatch(
     return None
 
 
+def tcat(path_in, path_out, stilts_flags='-verbose', ifmt='fits', multi=False, 
+         omode='out', seqcol=None, loccol=None, uloccol=None, 
+         countrows=True, silent=False):
+    """
+    Concatenate multiple table files into a single table file called `tcat` command of STILTS.
+
+    Website: https://www.star.bristol.ac.uk/mbt/stilts/sun256/tcat.html
+
+    Parameters
+    ----------
+    path_in : list of str or Path
+        List of input table file paths.
+    path_out : str or Path or None
+        Output table file path. If set to None, you can use omode parameters to control output behavior.
+    stilts_flags : str, optional
+        stilts flags, by default '-verbose'.
+    ifmt : str, optional
+        Input file format, by default 'fits'. Other options include 'csv', 'votable', etc.
+    multi : bool, optional
+        Whether to treat input files as multi-extension files, by default False. 
+        If True, each table in all extensions will be concatenated. 
+        If False, only the first table in the primary extension will be used.
+    omode : str, optional
+        Output mode, by default 'out', which will write the concatenated table to `path_out`.
+        Other options will not write to a file but give the more information:
+        - 'count': only return the number of rows in the concatenated table.
+        - 'stats': return statistics about the concatenated table.
+    seqcol : str, optional
+        Column name to use for sequencing the rows, by default None.
+    loccol : str, optional
+        Column name to use for locating the rows, by default None.
+    uloccol : str, optional
+        Column name to use for unique locating the rows, by default None.
+    countrows : bool, optional
+        Whether to count the rows in the table before starting the output, by default True.
+    silent : bool, optional
+        Whether to suppress the output messages, by default False.
+    """
+    st = time.time()
+    path_out = Path(path_out)
+    if not path_out.parent.exists():
+        path_out.parent.mkdir(parents=True, exist_ok=True)
+
+    args = f"stilts {stilts_flags} tcat"
+    for path in path_in:
+        args += f" in={path}"
+    if omode == 'out':
+        args += f" out={path_out}"
+
+    args += f" ifmt={ifmt}"
+    args += f" multi={str(multi).lower()}"
+    args += f" omode={omode}"
+    if seqcol is not None:
+        args += f" seqcol={seqcol}"
+    if loccol is not None:
+        args += f" loccol={loccol}"
+    if uloccol is not None:
+        args += f" uloccol={uloccol}"
+    args += f" countrows={str(countrows).lower()}"
+
+    if silent:
+        stdout = subprocess.PIPE
+        stderr = subprocess.PIPE
+    else:
+        stdout = None
+        stderr = None
+    process = subprocess.run(
+        args=args, 
+        cwd=path_out.parent, 
+        stdout=stdout,
+        stderr=stderr,
+        universal_newlines=True, 
+        shell=True, 
+    )
+    if not silent:
+        if process.returncode == 0 & (path_out.exists() or omode != 'out'):
+            logger.success(f"Success! | Cost Time: {time.time()-st:.2f}s")
+        else:
+            logger.error(f"Failed! | Cost Time: {time.time()-st:.2f}s")
+    return None

@@ -29,5 +29,6 @@ The first stable release (version 1.0.0) will be available soon (expected in lat
 :caption: User Guide
 
 00_installation.md
-01_datasets.md
-02_wrapper.md
+01_toolbox.md
+02_datasets.md
+03_wrapper.md
