@@ -10,6 +10,9 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
 from matplotlib import rcParams
 rcParams['font.family'] = 'Times New Roman'
+from tqdm import tqdm
+import time
+from concurrent.futures import ProcessPoolExecutor
 
 from loguru import logger
 from astropy.table import Table
@@ -18,8 +21,15 @@ import astropy.units as u
 
 from astrokit import DIR_DATA, DIR_datasets
 from astrokit.toolbox import cal_min_dist
+from astrokit.toolbox import sec_to_hms
+from astrokit.wrapper import stilts
 
 __all__ = ['LegacySurvey']
+
+def _find_bricks(i, ra_x, dec_x, search_radius, self_ref):
+    return self_ref.find_bricks(
+        ra_x[i], dec_x[i], search_radius, show=False, silent=True
+    )
 
 class LegacySurvey:
     """
@@ -140,3 +150,134 @@ class LegacySurvey:
                 ax.set_ylabel('Dec [deg]', fontsize=15)
                 ax.set_title(f"Target: RA={ra:.4f}, Dec={dec:.4f}, search_radius={search_radius}'' ", fontsize=12)
         return res
+    
+    def query_catalogs_around_source(
+        self, input_cat, output_dir, task_name, 
+        search_radius, col_ra, col_dec, max_workers=200
+        ):
+
+        """
+        Retrieve all source catalogs within search_radius around the input source 
+        coordinates from the Legacy Survey database.
+
+        NOTE: Both DR9 and DR10 are queried, respectively.
+
+        Parameters
+        ----------
+        input_cat : pd.DataFrame
+            Input source catalog containing RA and Dec columns.
+        output_dir : pathlib.Path
+            Directory to save output files.
+        task_name : str
+            Main task name for output files.
+        search_radius : float
+            Search radius in arcseconds.
+        col_ra : str
+            Column name for Right Ascension in input_cat.
+        col_dec : str
+            Column name for Declination in input_cat.
+        max_workers : int
+            Maximum number of parallel workers for querying bricks info.
+
+        Outputs
+        -------
+        1. input source catalog in FITS format: input_catalog.fits
+        2. Brickinfo for each input source: <main_output>_bricksinfo.pkl
+        3. Combined LS catalogs for relevant bricks: <main_output>_ALL_LS_DR9.fits and <main_output>_ALL_LS_DR10.fits
+        4. Final matched catalogs for all input sources: <main_output>_LS_DR9.fits and <main_output>_LS_DR10.fits
+        """
+        st_all = time.time()
+        if not output_dir.exists():
+            output_dir.mkdir(parents=True, exist_ok=True)
+
+        fname_bricksinfo = f"{task_name}_bricksinfo.pkl"
+        fname_input_catalog = f"{task_name}_input_catalog.fits"
+        path_output_bricksinfo = output_dir / fname_bricksinfo
+
+        # step1: read input source coordinates
+        if not isinstance(input_cat, pd.DataFrame):
+            raise ValueError("input_cat must be a pandas DataFrame.")
+        else:
+            df_x = input_cat.copy()
+            Table.from_pandas(df_x).write(output_dir / fname_input_catalog, overwrite=True)
+        N_x = len(df_x)
+        ra_x, dec_x = df_x[col_ra].values, df_x[col_dec].values
+
+        # step2: collect bricks info for all sources
+        if path_output_bricksinfo.exists():
+            logger.info(f"Bricks info file {path_output_bricksinfo.name} exists. Loading ...")
+            df_x = pd.read_pickle(path_output_bricksinfo)
+            logger.info("Bricks info loaded.")
+        else:
+            logger.info(f"Collecting bricks info for {N_x} sources ...")
+            bricks = []
+            with ProcessPoolExecutor(max_workers=max_workers) as executor:
+                bricks = list(
+                    tqdm(
+                        executor.map(_find_bricks, range(N_x),
+                                    [ra_x]*N_x, [dec_x]*N_x,
+                                    [search_radius]*N_x, [self]*N_x),
+                        total=N_x
+                    )
+                )
+            df_x['n_bricks'] = [len(b) for b in bricks]
+            df_x['bricks'] = [df for df in bricks]
+            df_x.to_pickle(path_output_bricksinfo)
+            logger.info(f"Bricks info saved to {path_output_bricksinfo.name}")
+
+        # step3: combine DR9 and DR10 catalogs paths for all relevant bricks
+        bricks = pd.concat(df_x['bricks'].to_list(), ignore_index=True)
+        brick_names = {
+            "dr9": set(bricks[bricks['release']=='dr9']['brickname']),
+            "dr10": set(bricks[bricks['release']=='dr10']['brickname']),
+        }
+        for release in ['dr9', 'dr10']:
+            N_bricks = len(brick_names[release])
+            if N_bricks == 0:
+                logger.warning(f"No bricks found for LS {release.upper()}. Skipping ...")
+                continue
+            logger.info(f"Combining LS {release.upper()} catalogs for {N_bricks} bricks ...")
+            st = time.time()
+            path_tractors = []
+            for brickname in brick_names[release]:
+                path_file = self.find_tractor_file(brickname=brickname, release=release, silent=True)
+                if path_file is None:
+                    logger.warning(f"Tractor file for brick {brickname} (LS {release.upper()}) not found. Skipping ...")
+                    continue
+                path_tractors.append(path_file)
+            path = output_dir / f"{task_name}_{release}_all.fits"
+            stilts.tcat(
+                path_in=path_tractors, path_out=path,
+                stilts_flags='', uloccol='from', silent=True
+            )
+            if path.exists():
+                logger.info(f"Combined LS {release.upper()} catalog saved to {path.name}")
+                logger.info(f"Combining completed in {sec_to_hms(time.time() - st)}.")
+            else:
+                raise FileNotFoundError(f"Failed to combine LS {release.upper()} catalogs!")
+
+        # step4: cross-match input sources with combined LS catalogs
+        for release in ['dr9', 'dr10']:
+            N_bricks = len(brick_names[release])
+            if N_bricks != 0:
+                path_ls_all = output_dir / f"{task_name}_{release}_all.fits"
+                path_out = output_dir / f"{task_name}_{release}.fits"
+                logger.info(f"Cross-matching {fname_input_catalog} with {path_ls_all.name} ...")
+                st = time.time()
+                stilts.tskymatch2(
+                    path_cat_left=output_dir / fname_input_catalog,
+                    path_cat_right=path_ls_all,
+                    path_cat_output=path_out,
+                    coord_name_left=(col_ra, col_dec),
+                    coord_name_right=('ra', 'dec'), 
+                    sep=search_radius, 
+                    find='all', 
+                    join='1and2', 
+                    silent=True, 
+                )
+                if path_out.exists():
+                    logger.info(f"Matched catalog saved to {path_out.name}")
+                else:
+                    raise FileNotFoundError(f"Failed to save matched catalog for LS {release.upper()}!")
+                logger.info(f"Cross-matching completed in {sec_to_hms(time.time() - st)}.")
+        logger.success(f"All Done in {sec_to_hms(time.time() - st_all)}.")
