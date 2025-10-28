@@ -13,6 +13,7 @@ rcParams['font.family'] = 'Times New Roman'
 from tqdm import tqdm
 import time
 from concurrent.futures import ProcessPoolExecutor
+from functools import partial
 
 from loguru import logger
 from astropy.table import Table
@@ -26,10 +27,26 @@ from astrokit.wrapper import stilts
 
 __all__ = ['LegacySurvey']
 
-def _find_bricks(i, ra_x, dec_x, search_radius, self_ref):
-    return self_ref.find_bricks(
-        ra_x[i], dec_x[i], search_radius, show=False, silent=True
-    )
+def _find_bricks_static(i, ra_x, dec_x, search_radius, bricksinfo):
+    df = bricksinfo.copy()
+    ra, dec = ra_x[i], dec_x[i]
+
+    p = SkyCoord(ra=ra*u.degree, dec=dec*u.degree)
+    p1 = SkyCoord(ra=df['ra1'].values*u.degree, dec=df['dec1'].values*u.degree)
+    p2 = SkyCoord(ra=df['ra2'].values*u.degree, dec=df['dec1'].values*u.degree)
+    p3 = SkyCoord(ra=df['ra2'].values*u.degree, dec=df['dec2'].values*u.degree)
+    p4 = SkyCoord(ra=df['ra1'].values*u.degree, dec=df['dec2'].values*u.degree)
+
+    dist1 = (p.separation(p1)).arcsecond
+    dist2 = (p.separation(p2)).arcsecond
+    dist3 = (p.separation(p3)).arcsecond
+    dist4 = (p.separation(p4)).arcsecond
+
+    df['min_dist'] = np.minimum.reduce([dist1, dist2, dist3, dist4])
+    df['in_brick'] = (ra >= df['ra1']) & (ra <= df['ra2']) & (dec >= df['dec1']) & (dec <= df['dec2'])
+
+    res = df[(df['in_brick']) | (df['min_dist'] < search_radius)].copy()
+    return res
 
 class LegacySurvey:
     """
@@ -153,7 +170,7 @@ class LegacySurvey:
     
     def query_catalogs_around_source(
         self, input_cat, output_dir, task_name, 
-        search_radius, col_ra, col_dec, max_workers=200
+        search_radius, col_ra, col_dec, max_workers=32
         ):
 
         """
@@ -187,8 +204,7 @@ class LegacySurvey:
         4. Final matched catalogs for all input sources: <main_output>_LS_DR9.fits and <main_output>_LS_DR10.fits
         """
         st_all = time.time()
-        if not output_dir.exists():
-            output_dir.mkdir(parents=True, exist_ok=True)
+        output_dir.mkdir(parents=True, exist_ok=True)
 
         fname_bricksinfo = f"{task_name}_bricksinfo.pkl"
         fname_input_catalog = f"{task_name}_input_catalog.fits"
@@ -210,16 +226,9 @@ class LegacySurvey:
             logger.info("Bricks info loaded.")
         else:
             logger.info(f"Collecting bricks info for {N_x} sources ...")
-            bricks = []
+            func = partial(_find_bricks_static, ra_x=ra_x, dec_x=dec_x, search_radius=search_radius, bricksinfo=self.bricksinfo)
             with ProcessPoolExecutor(max_workers=max_workers) as executor:
-                bricks = list(
-                    tqdm(
-                        executor.map(_find_bricks, range(N_x),
-                                    [ra_x]*N_x, [dec_x]*N_x,
-                                    [search_radius]*N_x, [self]*N_x),
-                        total=N_x
-                    )
-                )
+                bricks = list(tqdm(executor.map(func, range(N_x)), total=N_x))
             df_x['n_bricks'] = [len(b) for b in bricks]
             df_x['bricks'] = [df for df in bricks]
             df_x.to_pickle(path_output_bricksinfo)
