@@ -31,7 +31,7 @@ class LegacySurvey:
             raise FileNotFoundError(f"Data directory {self.dir_data} does not exist.")
         self.bricksinfo = self._load_bricksinfo()
 
-    def find_tractor_file(self, release, brickname):
+    def find_tractor_file(self, release, brickname, silent=False):
         """
         Given a release and brickname, return the path to the corresponding tractor file.
         """
@@ -40,10 +40,13 @@ class LegacySurvey:
             'dr10': self.dir_data / 'dr10_south' / 'tractor'
         }
         path = dir_tractor[release] / brickname[:3] / f'tractor-{brickname}.fits'
-        if not path.exists():
-            logger.warning(f"Tractor file {path} does not exist.")
-        return path
-        
+        if path.exists():
+            return path
+        else:
+            if not silent:
+                logger.error(f"Tractor file for brick {brickname} in release {release} not found.")
+            return None
+
     def _load_bricksinfo(self):
         """
         Create a combined bricksinfo DataFrame from DR9 and DR10 datasets.
