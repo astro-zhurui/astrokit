@@ -25,7 +25,7 @@ from astrokit.toolbox import cal_min_dist
 from astrokit.toolbox import sec_to_hms
 from astrokit.wrapper import stilts
 
-__all__ = ['LegacySurvey']
+__all__ = ['LegacySurvey', '_find_bricks_static']
 
 def _find_bricks_static(i, ra_x, dec_x, search_radius, bricksinfo):
     df = bricksinfo.copy()
@@ -37,10 +37,10 @@ def _find_bricks_static(i, ra_x, dec_x, search_radius, bricksinfo):
     p3 = SkyCoord(ra=df['ra2'].values*u.degree, dec=df['dec2'].values*u.degree)
     p4 = SkyCoord(ra=df['ra1'].values*u.degree, dec=df['dec2'].values*u.degree)
 
-    dist1 = (p.separation(p1)).arcsecond
-    dist2 = (p.separation(p2)).arcsecond
-    dist3 = (p.separation(p3)).arcsecond
-    dist4 = (p.separation(p4)).arcsecond
+    dist1 = cal_min_dist(p, p1, p2)
+    dist2 = cal_min_dist(p, p2, p3)
+    dist3 = cal_min_dist(p, p3, p4)
+    dist4 = cal_min_dist(p, p4, p1)
 
     df['min_dist'] = np.minimum.reduce([dist1, dist2, dist3, dist4])
     df['in_brick'] = (ra >= df['ra1']) & (ra <= df['ra2']) & (dec >= df['dec1']) & (dec <= df['dec2'])
@@ -123,23 +123,11 @@ class LegacySurvey:
         pd.DataFrame
             DataFrame of bricks that contain or are within the search radius from the given coordinates.
         """
-        df = self.bricksinfo.copy()
-        p = SkyCoord(ra=ra*u.degree, dec=dec*u.degree)
-        p1 = SkyCoord(ra=df['ra1'].values*u.degree, dec=df['dec1'].values*u.degree)
-        p2 = SkyCoord(ra=df['ra2'].values*u.degree, dec=df['dec1'].values*u.degree)
-        p3 = SkyCoord(ra=df['ra2'].values*u.degree, dec=df['dec2'].values*u.degree)
-        p4 = SkyCoord(ra=df['ra1'].values*u.degree, dec=df['dec2'].values*u.degree)
-
-        dist1 = cal_min_dist(p, p1, p2)
-        dist2 = cal_min_dist(p, p2, p3)
-        dist3 = cal_min_dist(p, p3, p4)
-        dist4 = cal_min_dist(p, p4, p1)
-
-        df['min_dist'] = np.minimum.reduce([dist1, dist2, dist3, dist4])
-        df['in_brick'] = False
-        df.loc[(ra >= df['ra1']) & (ra <= df['ra2']) &
-            (dec >= df['dec1']) & (dec <= df['dec2']), 'in_brick'] = True
-        res = df[(df['in_brick'] == True) | (df['min_dist'] < search_radius)].copy()
+        res = _find_bricks_static(
+            i=0, ra_x=[ra], dec_x=[dec],
+            search_radius=search_radius,
+            bricksinfo=self.bricksinfo
+        )
         if (len(res) == 0) and (not silent):
             logger.warning(f"No bricks found within {search_radius} arcsec of (RA, Dec)=({ra}, {dec})")
         else:
@@ -150,9 +138,12 @@ class LegacySurvey:
             if show:
                 fig, ax = plt.subplots(1,1, figsize=(6,6))
                 ax.set_aspect('equal')
-                circle = Circle((ra, dec), search_radius/3600, edgecolor='r', 
-                                facecolor='none', lw=1)
-                ax.add_patch(circle)
+                p = SkyCoord(ra=ra*u.degree, dec=dec*u.degree)
+                circle = p.directional_offset_by(
+                    position_angle=np.linspace(0, 360, 200)*u.degree,
+                    separation=search_radius*u.arcsec
+                )
+                ax.plot(circle.ra.degree, circle.dec.degree, 'r-', lw=1)
                 ax.plot(ra, dec, 'rx')
 
                 colors = plt.cm.berlin(np.linspace(0, 1, len(res)))
