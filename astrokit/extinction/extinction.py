@@ -10,7 +10,7 @@ import tarfile
 import extinction
 
 from astrokit.externals import sfdmap
-from astrokit import DIR_data
+from astrokit import DIR_datasets
 
 __all__ = ['ExtinctionCorrection']
 
@@ -28,7 +28,7 @@ class ExtinctionCorrection:
         Rv: float
             Galactic extinction coefficients, default is 3.1
         """
-        self.dir_dustmap = DIR_data / 'dustmaps'
+        self.dir_dustmap = DIR_datasets / 'dustmaps'
         self.dir_dustmap.mkdir(parents=True, exist_ok=True)
         self.dir_sfdmap = self.dir_dustmap / 'sfddata-master'
 

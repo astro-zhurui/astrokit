@@ -103,7 +103,7 @@ def plot_zspec_zphot(
     ax = axes[0]
     ax.set_xlim(z_range)
     ax.set_ylim(z_range)
-    ax.set_ylabel(r'$z_{\rm{phot}}$', fontsize=15, usetex=True)
+    ax.set_ylabel(r'$z_{\rm{phot}}$', fontsize=15)
 
     N, xedges, yedges = np.histogram2d(z_spec, z_phot, bins=bins1, density=False)
     x_bin_centers = 0.5 * (xedges[:-1] + xedges[1:])
@@ -115,8 +115,8 @@ def plot_zspec_zphot(
     ax = axes[1]
     ymax = np.quantile(np.abs(norm_dz), 0.99)
     ax.set_ylim(-ymax, ymax)
-    ax.set_xlabel(r'$z_{\rm{spec}}$', fontsize=15, usetex=True)
-    ax.set_ylabel(r'$\delta z_{\rm{norm}}$', fontsize=15, usetex=True)
+    ax.set_xlabel(r'$z_{\rm{spec}}$', fontsize=15)
+    ax.set_ylabel(r'$\delta z_{\rm{norm}}$', fontsize=15)
 
     N, xedges, yedges = np.histogram2d(z_spec, norm_dz, bins=bins2, density=False)
     x_bin_centers = 0.5 * (xedges[:-1] + xedges[1:])
@@ -140,7 +140,7 @@ def plot_zspec_zphot(
         cbar.ax.tick_params(which='major', width=1.2, length=5)
         cbar.ax.tick_params(which='minor', width=1, length=3)
         if show_colorbar_unit:
-            cbar.ax.yaxis.set_label_text('counts/pixel', fontsize=12, usetex=True)
+            cbar.ax.yaxis.set_label_text('counts/pixel', fontsize=12)
 
     # 刻度线设置
     for ax in axes:
@@ -177,10 +177,10 @@ def plot_zspec_zphot(
         r"$R^2$" + f" = {R2:.4f}\n"
         f"RMSE = {RMSE:.4f}\n"
         r"$\sigma_{\rm{NMAD}}$"+f" = {NMAD:.4f}\n"
-        r"$f_{\rm{c}}$"+f" = {outlier_fraction*100:.2f}" + r"\%"
+        r"$f_{\rm{c}}$"+f" = {outlier_fraction*100:.2f} %"
         )
     ax.text(0.05, 0.95, text, ha='left', va='top', 
-            transform=ax.transAxes, fontsize=12, usetex=True)
+            transform=ax.transAxes, fontsize=12)
     ax.set_title(title, fontsize=15)
 
     if return_fig:

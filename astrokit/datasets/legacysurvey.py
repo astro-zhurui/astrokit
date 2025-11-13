@@ -281,3 +281,80 @@ class LegacySurvey:
                     raise FileNotFoundError(f"Failed to save matched catalog for LS {release.upper()}!")
                 logger.info(f"Cross-matching completed in {sec_to_hms(time.time() - st)}.")
         logger.success(f"All Done in {sec_to_hms(time.time() - st_all)}.")
+
+    def extend_apflux(self, tbl, release):
+        """
+        Transform the apflux and apflux_ivar columns into individual aperture columns.
+
+        Parameters
+        ----------
+        tbl : astropy.table.Table
+            Input table with apflux and apflux_ivar columns.
+        release : str
+            Data release, either 'dr9' or 'dr10'.
+        """
+        if release == 'dr9':
+            ls_bands = ['g', 'r', 'z']
+        if release == 'dr10':
+            ls_bands = ['g', 'r', 'i', 'z']
+
+        for band in ls_bands:
+            flux_col = f'apflux_{band}'
+            flux_err_col = f'apflux_ivar_{band}'
+            for i in range(8):
+                tbl.add_column(col=[flux[i] for flux in tbl[flux_col]],
+                            name=f'apflux{i+1}_{band}')
+                tbl.add_column(col=[flux_err[i] for flux_err in tbl[flux_err_col]],
+                            name=f'apflux{i+1}_ivar_{band}')
+        for band in ['w1', 'w2', 'w3', 'w4']:
+            flux_col = f'apflux_{band}'
+            flux_err_col = f'apflux_ivar_{band}'
+            for i in range(5):
+                tbl.add_column(col=[flux[i] for flux in tbl[flux_col]],
+                            name=f'apflux{i+1}_{band}')
+                tbl.add_column(col=[flux_err[i] for flux_err in tbl[flux_err_col]],
+                            name=f'apflux{i+1}_ivar_{band}')
+        return tbl
+
+    def add_ls_id(self, df: pd.DataFrame, loc=0) -> pd.DataFrame:
+        """
+        Assign a unique Legacy Survey ID (ls_id) to each source in the DataFrame.
+
+    
+        
+        NOTE
+        ----
+        ls_id = COMBINE(release, brickid, objid)
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            必须包含 'release', 'brickid' 和 'objid' 三列。
+        loc : int
+            新增列 'ls_id' 的位置, 默认为 0 (最左侧).
+
+        Returns
+        -------
+        pd.DataFrame
+            返回一个新的 DataFrame, 增加了 'ls_id' 列。
+        """
+        if not {'release', 'brickid', 'objid'}.issubset(df.columns):
+            raise ValueError("The input DataFrame must contain 'release', 'brickid', and 'objid' columns.")
+        
+        # 转为整数类型以避免浮点误差
+        df = df.copy()
+        df['release'] = df['release'].astype(np.int64)
+        df['brickid'] = df['brickid'].astype(np.int64)
+        df['objid']   = df['objid'].astype(np.int64)
+        
+        # 生成唯一 ls_id
+        df.insert(
+            loc=loc,  # 插入位置
+            column='ls_id',  # 新列名
+            value=(
+                df['release'].astype(str)
+                + df['brickid'].astype(str)
+                + df['objid'].astype(str)
+                ).astype(int)  # 拼接并转为 int
+        )
+        return df
