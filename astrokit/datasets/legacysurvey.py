@@ -353,8 +353,10 @@ class LegacySurvey:
             column='ls_id',  # 新列名
             value=(
                 df['release'].astype(str)
+                + '_'
                 + df['brickid'].astype(str)
+                + '_'
                 + df['objid'].astype(str)
-                ).astype(int)  # 拼接并转为 int
+                )
         )
         return df

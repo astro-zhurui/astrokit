@@ -45,11 +45,12 @@ def nway_create_shifted_catalog(
     else:
         output_catalog = Path(output_catalog)
     path_script = DIR_astrokit / 'externals' / 'nway' / 'nway-create-shifted-catalogue.py'
-    cmd = (
-        f"chmod +x {str(path_script)} && "
+    cmd0 = f"chmod +x {str(path_script)}"
+    cmd1 = (
         f"{str(path_script)} --radius {radius} --shift-ra {shift_ra} --shift-dec {shift_dec} "
         f"{str(input_catalog)} {str(output_catalog)}"
     )
+    cmd = (cmd0 + " && " + cmd1)
     process = subprocess.run(
         args=cmd, 
         cwd=input_catalog.parent,
@@ -62,7 +63,7 @@ def nway_create_shifted_catalog(
     dir_cache = input_catalog.parent / "cache"
     shutil.rmtree(dir_cache)
 
-    return None
+    return cmd1
 
 class Nway:
     def __init__(
