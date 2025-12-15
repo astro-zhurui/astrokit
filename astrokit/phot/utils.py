@@ -85,8 +85,9 @@ def check_header(header, keywords=["EXPTIME", "GAIN", "NCOMBINE", "BUNIT"]):
 
 def cutout(ra, dec, large_image_data, wcs, size=100):
     position = wcs.world_to_pixel_values(ra, dec)
-    cutout_obj = Cutout2D(data=large_image_data, position=position, size=size, copy=True)
-    hdu = fits.PrimaryHDU(data=cutout_obj.data)
+    cutout_obj = Cutout2D(data=large_image_data, position=position, wcs=wcs, 
+                          size=size, copy=True)
+    hdu = fits.PrimaryHDU(data=cutout_obj.data, header=cutout_obj.wcs.to_header())
     return hdu
 
 
