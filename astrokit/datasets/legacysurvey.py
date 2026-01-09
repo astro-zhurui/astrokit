@@ -102,6 +102,15 @@ class LegacySurvey:
             bricksinfo = pd.concat([df_dr9, df_dr10], ignore_index=True)
             bricksinfo.to_parquet(path, index=False)
         return bricksinfo
+
+    def find_brickname(self, ra, dec):
+        """
+        Given RA and Dec, return a list of (release, brickname) tuples for bricks containing the coordinates.
+        """
+        df = self.bricksinfo
+        m = (df["ra1"].values <= ra) & (ra <= df["ra2"].values) & \
+            (df["dec1"].values <= dec) & (dec <= df["dec2"].values)
+        return df[m].set_index("release")["brickname"].to_dict()
     
     def find_bricks(self, ra, dec, search_radius=60, show=False, silent=False):
         """
