@@ -16,6 +16,7 @@ from concurrent.futures import ProcessPoolExecutor
 from functools import partial
 
 from loguru import logger
+import fitsio
 from astropy.table import Table
 from astropy.coordinates import SkyCoord
 import astropy.units as u
@@ -73,6 +74,39 @@ class LegacySurvey:
             if not silent:
                 logger.error(f"Tractor file for brick {brickname} in release {release} not found.")
             return None
+
+    def load_tractor_catalog(self, brickname, release, columns=None) -> pd.DataFrame:
+        """
+        Read the tractor catalog for a given brickname and release from DIR_DATA.
+
+        NOTE:
+        -----
+        The multi-parameter columns are split into separate columns with suffixes _1, _2, etc.
+        !!! 1-based indexing is used for the suffixes.
+        
+        Parameters:
+        -----------
+        brickname : str
+            The name of the brick (e.g., '0001p000').
+        release : str
+            The data release ('dr9' or 'dr10').
+        columns : list, optional
+            List of columns to read from the tractor catalog. If None, all columns are read.
+        """
+        path = self.find_tractor_file(release=release, brickname=brickname, silent=False)
+        arr = fitsio.read(path, ext=1, columns=columns)
+        arr = arr.astype(arr.dtype.newbyteorder("="), copy=False)
+
+        data = {}
+        for name in arr.dtype.names:
+            if arr[name].ndim == 1:
+                data[name] = arr[name]
+            else:
+                n_params = arr[name].shape[1]
+                for i in range(n_params):
+                    data[f'{name}_{i+1}'] = arr[name][:, i]
+        return pd.DataFrame(data)
+
 
     def _load_bricksinfo(self):
         """
@@ -290,40 +324,6 @@ class LegacySurvey:
                     raise FileNotFoundError(f"Failed to save matched catalog for LS {release.upper()}!")
                 logger.info(f"Cross-matching completed in {sec_to_hms(time.time() - st)}.")
         logger.success(f"All Done in {sec_to_hms(time.time() - st_all)}.")
-
-    def extend_apflux(self, tbl, release):
-        """
-        Transform the apflux and apflux_ivar columns into individual aperture columns.
-
-        Parameters
-        ----------
-        tbl : astropy.table.Table
-            Input table with apflux and apflux_ivar columns.
-        release : str
-            Data release, either 'dr9' or 'dr10'.
-        """
-        if release == 'dr9':
-            ls_bands = ['g', 'r', 'z']
-        if release == 'dr10':
-            ls_bands = ['g', 'r', 'i', 'z']
-
-        for band in ls_bands:
-            flux_col = f'apflux_{band}'
-            flux_err_col = f'apflux_ivar_{band}'
-            for i in range(8):
-                tbl.add_column(col=[flux[i] for flux in tbl[flux_col]],
-                            name=f'apflux{i+1}_{band}')
-                tbl.add_column(col=[flux_err[i] for flux_err in tbl[flux_err_col]],
-                            name=f'apflux{i+1}_ivar_{band}')
-        for band in ['w1', 'w2', 'w3', 'w4']:
-            flux_col = f'apflux_{band}'
-            flux_err_col = f'apflux_ivar_{band}'
-            for i in range(5):
-                tbl.add_column(col=[flux[i] for flux in tbl[flux_col]],
-                            name=f'apflux{i+1}_{band}')
-                tbl.add_column(col=[flux_err[i] for flux_err in tbl[flux_err_col]],
-                            name=f'apflux{i+1}_ivar_{band}')
-        return tbl
 
     def add_ls_id(self, df: pd.DataFrame, loc=0) -> pd.DataFrame:
         """
