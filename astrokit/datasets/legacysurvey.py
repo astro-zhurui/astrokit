@@ -232,10 +232,10 @@ class LegacySurvey:
 
         Outputs
         -------
-        1. input source catalog in FITS format: input_catalog.fits
-        2. Brickinfo for each input source: <main_output>_bricksinfo.pkl
-        3. Combined LS catalogs for relevant bricks: <main_output>_ALL_LS_DR9.fits and <main_output>_ALL_LS_DR10.fits
-        4. Final matched catalogs for all input sources: <main_output>_LS_DR9.fits and <main_output>_LS_DR10.fits
+        1. input source catalog in FITS format: <task_name>_input_catalog.fits
+        2. Brickinfo for each input source: <task_name>_bricksinfo.pkl
+        3. Combined LS catalogs for relevant bricks: <task_name>_dr9_all.fits and <task_name>_dr10_all.fits
+        4. Final matched catalogs for all input sources: <task_name>_dr9.fits and <task_name>_dr10.fits
         """
         st_all = time.time()
         output_dir.mkdir(parents=True, exist_ok=True)
