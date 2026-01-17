@@ -138,6 +138,14 @@ class Nway:
         if priors is not None:
             for prior in priors:
                 cmd += f"--mag {prior[0]}:{prior[1]} {prior[2]} "
+                prior_fname = prior[2]
+                if prior_fname == 'updated_prior_grid.txt':
+                    path = dir_work / prior_fname
+                    if not path.exists():
+                        shutil.copy(
+                            DIR_astrokit / 'datasets' / 'data' / 'nway_config' / prior_fname,
+                            dir_work / prior_fname
+                        )
         if mag_radius is not None:
             cmd += f"--mag-radius {mag_radius} "
         if mag_exclud_radius is not None:
