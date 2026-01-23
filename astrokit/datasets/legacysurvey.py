@@ -5,6 +5,8 @@ Tools for working with the Legacy Survey (LS) datasets.
 @Date: 2025-10-10
 """
 import numpy as np
+from typing import Sequence, Union
+ArrayLike = Union[np.ndarray, Sequence[int]]
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
@@ -325,47 +327,27 @@ class LegacySurvey:
                 logger.info(f"Cross-matching completed in {sec_to_hms(time.time() - st)}.")
         logger.success(f"All Done in {sec_to_hms(time.time() - st_all)}.")
 
-    def add_ls_id(self, df: pd.DataFrame, loc=0) -> pd.DataFrame:
+    def make_ls_id(self, release: ArrayLike, brickid: ArrayLike, objid: ArrayLike) -> np.ndarray:
         """
-        Assign a unique Legacy Survey ID (ls_id) to each source in the DataFrame.
-
-    
-        
-        NOTE
-        ----
-        ls_id = COMBINE(release, brickid, objid)
-
-        Parameters
-        ----------
-        df : pd.DataFrame
-            必须包含 'release', 'brickid' 和 'objid' 三列。
-        loc : int
-            新增列 'ls_id' 的位置, 默认为 0 (最左侧).
-
-        Returns
-        -------
-        pd.DataFrame
-            返回一个新的 DataFrame, 增加了 'ls_id' 列。
+        Make the Unique Legacy Survey Identifier for given release, brickid, and objid.
+        The format is: "{release}_{brickid}_{objid}"
         """
-        if not {'release', 'brickid', 'objid'}.issubset(df.columns):
-            raise ValueError("The input DataFrame must contain 'release', 'brickid', and 'objid' columns.")
-        
-        # 转为整数类型以避免浮点误差
-        df = df.copy()
-        df['release'] = df['release'].astype(np.int64)
-        df['brickid'] = df['brickid'].astype(np.int64)
-        df['objid']   = df['objid'].astype(np.int64)
-        
-        # 生成唯一 ls_id
-        df.insert(
-            loc=loc,  # 插入位置
-            column='ls_id',  # 新列名
-            value=(
-                df['release'].astype(str)
-                + '_'
-                + df['brickid'].astype(str)
-                + '_'
-                + df['objid'].astype(str)
-                )
-        )
-        return df
+
+        r = np.asarray(release, dtype=np.int64)
+        b = np.asarray(brickid, dtype=np.int64)
+        o = np.asarray(objid,   dtype=np.int64)
+
+        if r.ndim != 1 or b.ndim != 1 or o.ndim != 1:
+            raise ValueError("release/brickid/objid must be 1D arrays.")
+        if not (r.size == b.size == o.size):
+            raise ValueError("release/brickid/objid must have the same length.")
+
+        r = r.astype(str)
+        b = b.astype(str)
+        o = o.astype(str)
+
+        out = np.char.add(r, "_")
+        out = np.char.add(out, b)
+        out = np.char.add(out, "_")
+        out = np.char.add(out, o)
+        return out

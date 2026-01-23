@@ -32,7 +32,8 @@ __all__ = [
     "read_wcs", 
     "print_directory_tree", 
     "sec_to_hms", 
-    "show_internet_speed"
+    "show_internet_speed", 
+    "replace_list_items"
 ]
 
 def show_internet_speed(interval=1):
@@ -302,3 +303,23 @@ def sec_to_hms(seconds, str_format=True):
             return f"{h:.0f} h, {m:.0f} min, {s:.2f} s"
     else:
         return h, m, s
+
+def replace_list_items(columns: dict, ls: list):
+    """
+    Replace items in a list based on a mapping dictionary.
+
+    Parameters
+    ----------
+    columns : dict
+        A dictionary mapping old items to new items.
+    ls : list
+        The list in which to replace items.
+
+    Returns
+    -------
+    list
+        The modified list with items replaced.
+    """
+    for key, value in columns.items():
+        ls = [value if x == key else x for x in ls]
+    return ls
