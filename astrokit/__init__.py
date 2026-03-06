@@ -28,8 +28,8 @@ else:
 
 # Quick Directory
 DIR_datasets = DIR_astrokit / 'datasets' / 'data'  # default data directory
-DIR_DOWNLOAD = Path(CONFIG['DIR_DOWNLOAD'])  # default download directory
-DIR_DATA = Path(CONFIG['DIR_DATA'])  # default data directory in this machine
+# DIR_DOWNLOAD = Path(CONFIG['DIR_DOWNLOAD'])  # default download directory
+# DIR_DATA = Path(CONFIG['DIR_DATA'])  # default data directory in this machine
 
 for path in [DIR_datasets]:
     if not path.exists():
