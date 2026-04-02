@@ -23,7 +23,7 @@ from astropy.table import Table
 from astropy.coordinates import SkyCoord
 import astropy.units as u
 
-from astrokit import DIR_DATA, DIR_datasets
+from astrokit import DIR_datasets
 from astrokit.toolbox import cal_min_dist
 from astrokit.toolbox import sec_to_hms
 from astrokit.wrapper import stilts
@@ -55,8 +55,8 @@ class LegacySurvey:
     """
     A class to handle Legacy Survey datasets.
     """
-    def __init__(self):
-        self.dir_data = DIR_DATA / 'legacysurvey'
+    def __init__(self, dir_data):
+        self.dir_data = dir_data / 'legacysurvey'
         if not self.dir_data.exists():
             raise FileNotFoundError(f"Data directory {self.dir_data} does not exist.")
         self.bricksinfo = self._load_bricksinfo()
@@ -123,11 +123,11 @@ class LegacySurvey:
         else:
             logger.info(f"Making bricksinfo to {path}")
             bricksinfo_dr9 = Table.read(
-                DIR_DATA / 'legacysurvey' / 'dr9_north' / 'survey-bricks-dr9-north.fits.gz',
+                self.dir_data / 'dr9_north' / 'survey-bricks-dr9-north.fits.gz',
                 character_as_bytes=False
             )
             bricksinfo_dr10 = Table.read(
-                DIR_DATA / 'legacysurvey' / 'dr10_south' / 'survey-bricks-dr10-south.fits.gz',
+                self.dir_data / 'dr10_south' / 'survey-bricks-dr10-south.fits.gz',
                 character_as_bytes=False
             )
             cols = ['brickname', 'ra', 'dec', 'ra1', 'ra2', 'dec1', 'dec2']

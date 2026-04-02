@@ -37,7 +37,7 @@ class HSCRetriever:
                  account, 
                  output_format="csv.gz", 
                  release_version="pdr3", 
-                 dir_output=Path(CONFIG['DIR_DOWNLOAD']), 
+                 dir_output=None, 
                  email=False,
                  silent=False):
         """
