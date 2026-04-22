@@ -16,7 +16,7 @@ from tqdm import tqdm
 import time
 from concurrent.futures import ProcessPoolExecutor
 from functools import partial
-
+import requests
 from loguru import logger
 import fitsio
 from astropy.table import Table
@@ -351,3 +351,36 @@ class LegacySurvey:
         out = np.char.add(out, "_")
         out = np.char.add(out, o)
         return out
+    
+
+    def download_image(self, release, brickname, band, dir_output, silent=False):
+        """
+        release: str, 'dr9' or 'dr10'
+        band: g, r, i, z, W1, W2, W3, W4
+        """
+        fname_fz = f"legacysurvey-{brickname}-image-{band}.fits.fz"
+
+        if release == 'dr10':
+            url_coadd = "https://portal.nersc.gov/cfs/cosmo/data/legacysurvey/dr10/south/coadd"
+        if release == 'dr9':
+            url_coadd = "https://portal.nersc.gov/cfs/cosmo/data/legacysurvey/dr9/north/coadd"
+        url = f"{url_coadd}/{brickname[:3]}/{brickname}/{fname_fz}"
+
+        fname_output = f"{brickname}-{band}.fits.fz"
+        path_output = dir_output / fname_output
+        if not path_output.exists():
+            timeout = 60  # seconds
+            try:
+                with requests.get(url, stream=True, timeout=timeout) as r:
+                    r.raise_for_status()
+                    with open(path_output, "wb") as f:
+                        for chunk in r.iter_content(chunk_size=1024 * 1024):
+                            if chunk:
+                                f.write(chunk)
+                if not silent:
+                    logger.success(f"legacysurvey image: {brickname} ({band}) | DONE")
+            except Exception as e:
+                logger.error(f"legacysurvey image: {brickname} ({band}) | ERROR | {e}")
+        else:
+            logger.info(f"legacysurvey image: {brickname} ({band}) | EXISTS")
+        return None
