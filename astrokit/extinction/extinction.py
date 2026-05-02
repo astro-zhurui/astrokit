@@ -151,12 +151,12 @@ class ExtinctionCorrection:
         waves = waves[order]
         response = response[order]
         weights = response / waves
-        denominator = np.trapz(weights, waves)
+        denominator = np.trapezoid(weights, waves)
         if denominator <= 0:
             raise ValueError("response must have positive integrated throughput")
 
         a_lambda = self.cal_extinction_coeff(waves)
-        numerator = np.trapz(weights * 10 ** (-0.4 * a_lambda), waves)
+        numerator = np.trapezoid(weights * 10 ** (-0.4 * a_lambda), waves)
         if numerator <= 0:
             raise ValueError("attenuated response has non-positive integral")
 

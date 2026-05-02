@@ -10,12 +10,13 @@ import numpy as np
 import subprocess
 import psutil
 import time
-from astropy.io import fits
 from loguru import logger
 from IPython.display import clear_output
 import warnings
 import os
+import matplotlib as mpl
 
+from astropy.io import fits
 from astropy.wcs import WCS
 from astropy.wcs import FITSFixedWarning
 from astropy.table import Table, MaskedColumn
