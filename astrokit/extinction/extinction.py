@@ -1,98 +1,185 @@
 """
-消光改正
+Extinction correction utilities.
 
 @ Author: Rui Zhu
 @ Date: 2025-04-09
 """
+import tarfile
+
+import extinction
 import numpy as np
 import requests
-import tarfile
-import extinction
 
-from astrokit.externals import sfdmap
 from astrokit import DIR_datasets
+from astrokit.externals import sfdmap
 
-__all__ = ['ExtinctionCorrection']
+__all__ = ["ExtinctionCorrection"]
+
 
 class ExtinctionCorrection:
     def __init__(self, scaling=0.86, Rv=3.1):
         """
-        消光改正模块
+        Correct Galactic extinction with SFD maps and the FM07 curve.
 
         Parameters
         ----------
-        scaling: float
-            SFD Dust Map的缩放因子, 默认值为0.86. 
-            see: https://iopscience.iop.org/article/10.1088/0004-637X/725/1/1175
-        
-        Rv: float
-            Galactic extinction coefficients, default is 3.1
+        scaling : float, optional
+            Scale factor applied to the SFD E(B-V) map. The default 0.86
+            follows the Schlafly & Finkbeiner (2011) recalibration of SFD98.
+        Rv : float, optional
+            Total-to-selective extinction ratio used as A_V/E(B-V). The
+            default 3.1 matches the FM07 Milky Way average curve.
         """
-        self.dir_dustmap = DIR_datasets / 'dustmaps'
+        self.dir_dustmap = DIR_datasets / "dustmaps"
         self.dir_dustmap.mkdir(parents=True, exist_ok=True)
-        self.dir_sfdmap = self.dir_dustmap / 'sfddata-master'
+        self.dir_sfdmap = self.dir_dustmap / "sfddata-master"
 
         if not self.dir_sfdmap.exists():
             self.download_sfdmap()
 
         self.scaling = scaling
         self.Rv = Rv
+        self.sfd = sfdmap.SFDMap(mapdir=self.dir_sfdmap, scaling=self.scaling)
 
-    def download_sfdmap(self):
-        # 下载文件
+    def download_sfdmap(self, timeout=60):
+        """Download and extract the SFD dust maps if they are not available."""
         url = "https://github.com/kbarbary/sfddata/archive/master.tar.gz"
-
         path_sfdmaps_gz = self.dir_dustmap / "master.tar.gz"
 
         print(f"==> Downloading from {url}")
-        response = requests.get(url)
-        with open(path_sfdmaps_gz, "wb") as f:
-            f.write(response.content)
-        response = requests.get(url)
+        response = requests.get(url, timeout=timeout)
+        response.raise_for_status()
 
-        # 保存下载的文件
         print(f"==> Saving to {path_sfdmaps_gz}")
         with open(path_sfdmaps_gz, "wb") as f:
             f.write(response.content)
 
-        # 解压tar.gz文件
         print(f"==> Extracting {path_sfdmaps_gz}")
-        with tarfile.open(self.dir_dustmap / "master.tar.gz", "r:gz") as tar:
-            tar.extractall(path=self.dir_dustmap, filter="tar")  # 解压到sfddata文件夹
-        
-        # 删除tar.gz文件
+        with tarfile.open(path_sfdmaps_gz, "r:gz") as tar:
+            tar.extractall(path=self.dir_dustmap, filter="tar")
+
         print(f"==> Removing {path_sfdmaps_gz}")
         path_sfdmaps_gz.unlink()
-        print(f"==> SFD maps downloaded!")
+        print("==> SFD maps downloaded!")
 
         return None
 
     def cal_ebv(self, ra, dec):
-        sfd = sfdmap.SFDMap(mapdir=self.dir_sfdmap, scaling=self.scaling)
-        ebv = sfd.ebv(ra, dec, frame='icrs', unit='degree')
-        return ebv
-    
+        """
+        Calculate SFD E(B-V) at ICRS coordinates.
+
+        Parameters
+        ----------
+        ra, dec : float or array-like
+            ICRS coordinates in degrees.
+        """
+        return self.sfd.ebv(ra, dec, frame="icrs", unit="degree")
+
+    def cal_extinction_coeff(self, filter_waves):
+        """
+        Calculate monochromatic FM07 coefficients A_lambda / E(B-V).
+
+        Parameters
+        ----------
+        filter_waves : float or array-like
+            Wavelengths in Angstrom.
+
+        Returns
+        -------
+        ndarray
+            Extinction coefficients evaluated at the input wavelengths.
+        """
+        waves = np.atleast_1d(np.asarray(filter_waves, dtype=float))
+        if np.any(~np.isfinite(waves)) or np.any(waves <= 0):
+            raise ValueError("filter_waves must contain finite positive wavelengths")
+
+        return extinction.fm07(waves, self.Rv)
+
     def cal_extinction(self, ra, dec, filter_waves):
         """
-        基于SFD Dust Maps和Fitzpatrick & Massa (2007)的消光曲线
+        Calculate A_lambda from SFD E(B-V) and FM07 coefficients.
 
-        Parameters  
+        Parameters
         ----------
-        ra: np.ndarray
-            ra list in ICRS, unit: degree
-        dec: np.ndarray
-            dec list in ICRS, unit: degree
-        filter_waves: list
-            filter central wavelengths, unit: Angstrom
+        ra : float or array-like
+            ICRS right ascension in degrees.
+        dec : float or array-like
+            ICRS declination in degrees.
+        filter_waves : float or array-like
+            Filter central wavelengths in Angstrom.
+
+        Returns
+        -------
+        list
+            Each element is A_lambda for one input wavelength. This preserves
+            the historical API.
         """
-        # 计算V-band extinction
-        Av = self.cal_ebv(ra, dec) * self.Rv
+        ebv = np.atleast_1d(self.cal_ebv(ra, dec))
+        coeff = self.cal_extinction_coeff(filter_waves)
+        Ax = ebv.reshape(-1, 1) * coeff.reshape(1, -1)
+        return [Ax[:, i] for i in range(Ax.shape[1])]
 
-        # 从extinction模块中的的extinction cure得到A_x = Av * coeff
-        coeff = extinction.fm07(np.array(filter_waves), 1.0)  # fm07固定Rv=3.1
-        Ax = Av.reshape(-1, 1) * coeff
+    def cal_bandpass_coeff(self, waves, response):
+        """
+        Calculate broadband extinction coefficient A_band / E(B-V).
 
-        output = []
-        for i in range(len(filter_waves)):
-            output.append(Ax[:, i])
+        The integration assumes an AB-system source with flat f_nu, so the
+        effective weights are response / wavelength.
+
+        Parameters
+        ----------
+        waves : array-like
+            Wavelength grid in Angstrom.
+        response : array-like
+            Dimensionless filter throughput sampled on ``waves``.
+        """
+        waves = np.asarray(waves, dtype=float)
+        response = np.asarray(response, dtype=float)
+
+        if waves.shape != response.shape:
+            raise ValueError("waves and response must have the same shape")
+        if waves.ndim != 1:
+            raise ValueError("waves and response must be one-dimensional")
+        if len(waves) < 2:
+            raise ValueError("waves and response must contain at least two samples")
+        if np.any(~np.isfinite(waves)) or np.any(waves <= 0):
+            raise ValueError("waves must contain finite positive values")
+        if np.any(~np.isfinite(response)) or np.any(response < 0):
+            raise ValueError("response must contain finite non-negative values")
+
+        order = np.argsort(waves)
+        waves = waves[order]
+        response = response[order]
+        weights = response / waves
+        denominator = np.trapz(weights, waves)
+        if denominator <= 0:
+            raise ValueError("response must have positive integrated throughput")
+
+        a_lambda = self.cal_extinction_coeff(waves)
+        numerator = np.trapz(weights * 10 ** (-0.4 * a_lambda), waves)
+        if numerator <= 0:
+            raise ValueError("attenuated response has non-positive integral")
+
+        return -2.5 * np.log10(numerator / denominator)
+
+    def cal_bandpass_extinction(self, ra, dec, bandpasses):
+        """
+        Calculate broadband extinction for multiple filters.
+
+        Parameters
+        ----------
+        ra, dec : float or array-like
+            ICRS coordinates in degrees.
+        bandpasses : dict
+            Mapping ``name -> (waves, response)``.
+
+        Returns
+        -------
+        dict
+            Mapping ``name -> A_band`` arrays, one array per filter.
+        """
+        ebv = np.atleast_1d(self.cal_ebv(ra, dec))
+        output = {}
+        for name, (waves, response) in bandpasses.items():
+            output[name] = ebv * self.cal_bandpass_coeff(waves, response)
         return output

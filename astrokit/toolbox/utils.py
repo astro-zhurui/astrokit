@@ -6,9 +6,11 @@ Toolbox for save the useful functions
 """
 from pathlib import Path
 import pandas as pd
+import numpy as np
 import subprocess
 import psutil
 import time
+from astropy.io import fits
 from loguru import logger
 from IPython.display import clear_output
 import warnings
@@ -16,9 +18,10 @@ import os
 
 from astropy.wcs import WCS
 from astropy.wcs import FITSFixedWarning
-from astropy.table import Table
+from astropy.table import Table, MaskedColumn
 
 __all__ = [
+    "set_mpl_style",
     "show_device_info", 
     "clear",
     "pandas_show_all_columns",
@@ -35,6 +38,59 @@ __all__ = [
     "show_internet_speed", 
     "replace_list_items"
 ]
+def set_mpl_style(
+    fontsize=16,
+    title_size=18,
+    label_size=18,
+    tick_size=16,
+    legend_size=14,
+    font="Times New Roman",
+    use_tex=False,
+):
+    """
+    Set matplotlib style for publication-quality plots.
+
+    Parameters
+    ----------
+    fontsize : int
+        Base font size.
+    title_size : int
+        Axes title size.
+    label_size : int
+        Axes label size.
+    tick_size : int
+        Tick label size.
+    legend_size : int
+        Legend font size.
+    font : str
+        Font family.
+    use_tex : bool
+        Whether to use LaTeX rendering.
+    """
+
+    mpl.rcParams.update({
+        # Font
+        "font.family": font,
+        "mathtext.fontset": "stix",
+        "font.size": fontsize,
+
+        # Axes
+        "axes.titlesize": title_size,
+        "axes.labelsize": label_size,
+
+        # Ticks
+        "xtick.labelsize": tick_size,
+        "ytick.labelsize": tick_size,
+
+        # Legend
+        "legend.fontsize": legend_size,
+
+        # Important!
+        "axes.unicode_minus": False,
+
+        # Optional LaTeX
+        "text.usetex": use_tex,
+    })
 
 def show_internet_speed(interval=1):
     """Display real-time internet speed for all network interfaces."""
@@ -206,7 +262,6 @@ def value_to_KVD_string(value) -> str|None:
 
     return string
 
-
 def fits2df(path_fits):
     """
     读取fits中的table, 并转换成pandas的DataFrame
@@ -215,16 +270,75 @@ def fits2df(path_fits):
     df = tbl.to_pandas()
     return df
 
-def read(path, no_warnings=True):
+def read(path, n_rows=None, columns=None, fill=False):
     """
-    读取fits表格
+    Read rows from a large FITS binary table using memory mapping.
+
+    Parameters
+    ----------
+    path : str or pathlib.Path
+        Path to the FITS file.
+    n_rows : int or None, optional
+        Number of rows to read from the beginning of the table. If None,
+        all rows are read.
+    columns : sequence of str, str, or None, optional
+        Column names to include in the returned table. If None, all columns
+        are included.
+    fill : bool, optional
+        If True, requested columns that are not present in the FITS table are
+        included as fully masked columns. If False, missing requested columns
+        raise KeyError.
+
+    Returns
+    -------
+    astropy.table.Table
+        Table containing the requested rows and columns. Non-logical columns
+        are backed by memory-mapped arrays when possible; FITS logical columns
+        are converted from T/F bytes to boolean arrays.
+
+    Raises
+    ------
+    ValueError
+        If n_rows is negative or larger than the number of rows in the table.
+    KeyError
+        If fill is False and any requested column name is not present in the
+        FITS table.
     """
-    if no_warnings:
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore')
-            tbl = Table.read(path, character_as_bytes=False)
-    else:
-        tbl = Table.read(path, character_as_bytes=False)
+    path = Path(path)
+    with fits.open(path, memmap=True) as hdul:
+        hdu = hdul[1]
+        total_rows = hdu.header["NAXIS2"]
+        if n_rows is None:
+            n_rows = total_rows
+        elif not 0 <= n_rows <= total_rows:
+            raise ValueError(f"n_rows must be between 0 and {total_rows}, got {n_rows}")
+
+        column_names = list(hdu.columns.names if columns is None else np.atleast_1d(columns))
+        missing = sorted(set(column_names) - set(hdu.columns.names))
+        if missing and not fill:
+            raise KeyError(f"Unknown column(s): {missing}")
+
+        data_offset = hdu.fileinfo()["datLoc"]
+        row_dtype = hdu.columns.dtype.newbyteorder(">")
+        rows = np.memmap(path, mode="r", dtype=row_dtype, offset=data_offset, shape=(n_rows,))
+        column_by_name = {column.name: column for column in hdu.columns}
+        table_data = {}
+
+        for name in column_names:
+            column = column_by_name.get(name)
+            if column is None:
+                table_data[name] = MaskedColumn(
+                    data=np.empty(n_rows, dtype=float),
+                    mask=np.ones(n_rows, dtype=bool),
+                    name=name,
+                )
+            elif str(column.format).endswith("L"):
+                table_data[name] = rows[name] == ord("T")
+            else:
+                table_data[name] = rows[name]
+
+        tbl = Table(table_data, copy=False)
+
     return tbl
 
 def read_wcs(header):

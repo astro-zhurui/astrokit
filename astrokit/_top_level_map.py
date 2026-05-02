@@ -15,7 +15,9 @@ _lazy_map = {
         'plot_stamps', 'plot_SDSS_spectrum', 'imshow',
     ],
     'toolbox.utils': [
-        'show_device_info', 'show_internet_speed', 
+        'show_device_info', 
+        'show_internet_speed', 
+        'set_mpl_style', 
         'clear', 'pandas_show_all_columns', 'use_svg_display',
         'run_cmd_in_terminal', 'find_process_by_name',
         'value_to_KVD_string', 'fits2df', 'read', 'print_directory_tree',
