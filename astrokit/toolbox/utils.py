@@ -293,9 +293,10 @@ def read(path, n_rows=None, columns=None, fill=False):
     Returns
     -------
     astropy.table.Table
-        Table containing the requested rows and columns. Non-logical columns
-        are backed by memory-mapped arrays when possible; FITS logical columns
-        are converted from T/F bytes to boolean arrays.
+        Table containing the requested rows and columns. Numeric columns are
+        backed by memory-mapped arrays when possible; FITS logical columns are
+        converted from T/F bytes to boolean arrays, and FITS character columns
+        are decoded to unicode strings with trailing FITS padding removed.
 
     Raises
     ------
@@ -305,6 +306,19 @@ def read(path, n_rows=None, columns=None, fill=False):
         If fill is False and any requested column name is not present in the
         FITS table.
     """
+    def _decode_fits_text(values):
+        if values.dtype.kind == "U":
+            return np.char.rstrip(values)
+
+        if values.dtype.kind == "S":
+            try:
+                decoded = np.char.decode(values, "ascii")
+            except UnicodeDecodeError:
+                decoded = np.char.decode(values, "utf-8")
+            return np.char.rstrip(decoded)
+
+        return values
+
     path = Path(path)
     with fits.open(path, memmap=True) as hdul:
         hdu = hdul[1]
@@ -335,6 +349,8 @@ def read(path, n_rows=None, columns=None, fill=False):
                 )
             elif str(column.format).endswith("L"):
                 table_data[name] = rows[name] == ord("T")
+            elif rows.dtype[name].kind in {"S", "U"} or str(column.format).endswith("A"):
+                table_data[name] = _decode_fits_text(rows[name])
             else:
                 table_data[name] = rows[name]
 
