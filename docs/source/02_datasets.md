@@ -87,9 +87,9 @@ the search circle, and the overlapping bricks.
 ### Find Bricks Around Many Positions
 
 For a large source list, use `find_bricks_from_list()`. This method first uses a
-KD-tree on the sphere to select candidate bricks and then performs an exact
-circle-brick overlap check. It is much faster than looping over
-`find_bricks()` source by source.
+KD-tree on the sphere to select candidate bricks and then performs a fast local
+plane circle-brick overlap check. It is much faster than looping over
+`find_bricks()` source by source and is intended for arcmin-scale search radii.
 
 ```python
 bricks = legacysurvey.find_bricks_from_list(

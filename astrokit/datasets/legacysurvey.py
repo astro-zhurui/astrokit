@@ -83,6 +83,35 @@ def _ra_in_interval(ra, ra1, ra2):
     normal = ra1 <= ra2
     return np.where(normal, (ra1 <= ra) & (ra <= ra2), (ra >= ra1) | (ra <= ra2))
 
+def _angular_delta_deg(angle, origin):
+    return (np.asarray(angle, dtype=float) - origin + 180.0) % 360.0 - 180.0
+
+def _prepare_brick_geometry(bricksinfo):
+    ra_center = bricksinfo['ra'].values.astype(float) % 360.0
+    dec_center = bricksinfo['dec'].values.astype(float)
+    ra1 = bricksinfo['ra1'].values.astype(float)
+    ra2 = bricksinfo['ra2'].values.astype(float)
+    dec1 = bricksinfo['dec1'].values.astype(float)
+    dec2 = bricksinfo['dec2'].values.astype(float)
+
+    half_width = np.maximum(
+        np.abs(_angular_delta_deg(ra1, ra_center)),
+        np.abs(_angular_delta_deg(ra2, ra_center)),
+    )
+    half_height = np.maximum(np.abs(dec1 - dec_center), np.abs(dec2 - dec_center))
+    return {
+        'ra_center': ra_center,
+        'dec_center': dec_center,
+        'half_width': half_width,
+        'half_height': half_height,
+    }
+
+def _max_brick_half_diagonal_arcsec_fast(brick_geometry):
+    dec_abs_min = np.maximum(np.abs(brick_geometry['dec_center']) - brick_geometry['half_height'], 0.0)
+    dra = brick_geometry['half_width'] * np.cos(np.deg2rad(dec_abs_min))
+    ddec = brick_geometry['half_height']
+    return np.sqrt(dra*dra + ddec*ddec).max() * 3600.0 + 1.0
+
 def _max_brick_half_diagonal_arcsec(bricksinfo):
     center = SkyCoord(
         ra=bricksinfo['ra'].values*u.degree,
@@ -120,10 +149,25 @@ def _filter_candidate_bricks(ra, dec, candidate_idx, search_radius, bricksinfo):
     )
     return idx[in_brick | (min_dist <= search_radius)]
 
+def _filter_candidate_bricks_fast(ra, dec, candidate_idx, search_radius, brick_geometry):
+    if len(candidate_idx) == 0:
+        return np.array([], dtype=int)
+
+    idx = np.asarray(candidate_idx, dtype=int)
+    ra_delta = _angular_delta_deg(ra, brick_geometry['ra_center'][idx])
+    dec_delta = dec - brick_geometry['dec_center'][idx]
+
+    outside_ra = np.maximum(np.abs(ra_delta) - brick_geometry['half_width'][idx], 0.0)
+    outside_dec = np.maximum(np.abs(dec_delta) - brick_geometry['half_height'][idx], 0.0)
+    cos_dec = np.cos(np.deg2rad(dec))
+    dist_arcsec = np.sqrt((outside_ra * cos_dec)**2 + outside_dec**2) * 3600.0
+
+    return idx[dist_arcsec <= search_radius]
+
 def _filter_candidate_bricks_chunk(args):
-    ra, dec, candidate_lists, search_radius, bricksinfo = args
+    ra, dec, candidate_lists, search_radius, brick_geometry = args
     return [
-        _filter_candidate_bricks(ra_i, dec_i, candidate_idx, search_radius, bricksinfo)
+        _filter_candidate_bricks_fast(ra_i, dec_i, candidate_idx, search_radius, brick_geometry)
         for ra_i, dec_i, candidate_idx in zip(ra, dec, candidate_lists)
     ]
 
@@ -303,6 +347,8 @@ class LegacySurvey:
 
         The returned table has the same columns as ``self.bricksinfo`` and is
         de-duplicated, so each overlapping brick appears only once.
+        Candidate bricks are selected on the sphere with a KD-tree, then filtered
+        with a fast local-plane circle-rectangle overlap approximation.
 
         Parameters
         ----------
@@ -351,10 +397,11 @@ class LegacySurvey:
             return (res, per_source) if return_per_source else res
 
         bricksinfo = self.bricksinfo.reset_index(drop=True)
+        brick_geometry = _prepare_brick_geometry(bricksinfo)
         brick_vectors = _radec_to_unit_vector(bricksinfo['ra'].values, bricksinfo['dec'].values)
         tree = cKDTree(brick_vectors)
 
-        max_half_diagonal = _max_brick_half_diagonal_arcsec(bricksinfo)
+        max_half_diagonal = _max_brick_half_diagonal_arcsec_fast(brick_geometry)
         query_radius_rad = np.deg2rad((radius_arcsec + max_half_diagonal) / 3600.0)
         query_radius_chord = 2.0 * np.sin(query_radius_rad / 2.0)
 
@@ -372,7 +419,7 @@ class LegacySurvey:
                 dec_valid[start:end],
                 candidate_lists[start:end],
                 radius_arcsec,
-                bricksinfo,
+                brick_geometry,
             ))
 
         if max_workers is None or max_workers <= 1 or len(chunks) == 1:
