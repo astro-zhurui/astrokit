@@ -23,7 +23,6 @@ from astropy.table import Table
 from astropy.coordinates import SkyCoord
 import astropy.units as u
 
-from astrokit import DIR_datasets
 from astrokit.toolbox import cal_min_dist
 from astrokit.toolbox import sec_to_hms
 from astrokit.wrapper import stilts
@@ -55,10 +54,18 @@ class LegacySurvey:
     """
     A class to handle Legacy Survey datasets.
     """
-    def __init__(self, dir_data):
-        self.dir_data = dir_data / 'legacysurvey'
-        if not self.dir_data.exists():
-            raise FileNotFoundError(f"Data directory {self.dir_data} does not exist.")
+    def __init__(self, dir_legacysurvey):
+        """
+        Parameters:
+        -----------
+        dir_legacysurvey : pathlib.Path
+            Directory containing the Legacy Survey data, organized as follows:
+            - dr9_north/survey-bricks-dr9-north.fits.gz
+            - dr10_south/survey-bricks-dr10-south.fits.gz
+            - dr9_north/tractor/000/tractor-0001p000.fits
+            - dr10_south/tractor/000/tractor-0001p000.fits
+        """
+        self.dir_data = dir_legacysurvey
         self.bricksinfo = self._load_bricksinfo()
 
     def find_tractor_file(self, release, brickname, silent=False):
@@ -114,10 +121,7 @@ class LegacySurvey:
         """
         Create a combined bricksinfo DataFrame from DR9 and DR10 datasets.
         """
-        fname = 'legacysurvey_bricksinfo.parquet'
-        dir_save = DIR_datasets / 'legacysurvey'
-        dir_save.mkdir(parents=True, exist_ok=True)
-        path = dir_save / fname
+        path = self.dir_data / 'legacysurvey_bricksinfo.parquet'
         if path.exists():
             bricksinfo = pd.read_parquet(path)
         else:
