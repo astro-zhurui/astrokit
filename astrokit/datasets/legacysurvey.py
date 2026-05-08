@@ -15,6 +15,7 @@ rcParams['font.family'] = 'Times New Roman'
 from tqdm import tqdm
 import time
 from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 import requests
 from loguru import logger
@@ -22,6 +23,7 @@ import fitsio
 from astropy.table import Table
 from astropy.coordinates import SkyCoord
 import astropy.units as u
+from scipy.spatial import cKDTree
 
 from astrokit.toolbox import cal_min_dist
 from astrokit.toolbox import sec_to_hms
@@ -49,6 +51,80 @@ def _find_bricks_static(i, ra_x, dec_x, search_radius, bricksinfo):
 
     res = df[(df['in_brick']) | (df['min_dist'] < search_radius)].copy()
     return res
+
+def _search_radius_to_arcsec(search_radius):
+    """
+    Convert a search radius to arcsec.
+
+    Numeric values keep the historical LegacySurvey convention: arcsec.
+    Astropy quantities and strings such as "5 arcmin" are also accepted.
+    """
+    if isinstance(search_radius, u.Quantity):
+        return float(search_radius.to_value(u.arcsec))
+    if isinstance(search_radius, str):
+        return float(u.Quantity(search_radius).to_value(u.arcsec))
+    return float(search_radius)
+
+def _radec_to_unit_vector(ra, dec):
+    ra_rad = np.deg2rad(np.asarray(ra, dtype=float) % 360.0)
+    dec_rad = np.deg2rad(np.asarray(dec, dtype=float))
+    cos_dec = np.cos(dec_rad)
+    return np.column_stack((
+        cos_dec * np.cos(ra_rad),
+        cos_dec * np.sin(ra_rad),
+        np.sin(dec_rad),
+    ))
+
+def _ra_in_interval(ra, ra1, ra2):
+    ra = ra % 360.0
+    ra1 = np.asarray(ra1, dtype=float) % 360.0
+    ra2 = np.asarray(ra2, dtype=float) % 360.0
+    normal = ra1 <= ra2
+    return np.where(normal, (ra1 <= ra) & (ra <= ra2), (ra >= ra1) | (ra <= ra2))
+
+def _max_brick_half_diagonal_arcsec(bricksinfo):
+    center = SkyCoord(
+        ra=bricksinfo['ra'].values*u.degree,
+        dec=bricksinfo['dec'].values*u.degree,
+    )
+    corners = [
+        SkyCoord(ra=bricksinfo['ra1'].values*u.degree, dec=bricksinfo['dec1'].values*u.degree),
+        SkyCoord(ra=bricksinfo['ra2'].values*u.degree, dec=bricksinfo['dec1'].values*u.degree),
+        SkyCoord(ra=bricksinfo['ra2'].values*u.degree, dec=bricksinfo['dec2'].values*u.degree),
+        SkyCoord(ra=bricksinfo['ra1'].values*u.degree, dec=bricksinfo['dec2'].values*u.degree),
+    ]
+    return max(center.separation(corner).arcsec.max() for corner in corners)
+
+def _filter_candidate_bricks(ra, dec, candidate_idx, search_radius, bricksinfo):
+    if len(candidate_idx) == 0:
+        return np.array([], dtype=int)
+
+    idx = np.asarray(candidate_idx, dtype=int)
+    df = bricksinfo.iloc[idx]
+    p = SkyCoord(ra=ra*u.degree, dec=dec*u.degree)
+    p1 = SkyCoord(ra=df['ra1'].values*u.degree, dec=df['dec1'].values*u.degree)
+    p2 = SkyCoord(ra=df['ra2'].values*u.degree, dec=df['dec1'].values*u.degree)
+    p3 = SkyCoord(ra=df['ra2'].values*u.degree, dec=df['dec2'].values*u.degree)
+    p4 = SkyCoord(ra=df['ra1'].values*u.degree, dec=df['dec2'].values*u.degree)
+
+    dist1 = cal_min_dist(p, p1, p2)
+    dist2 = cal_min_dist(p, p2, p3)
+    dist3 = cal_min_dist(p, p3, p4)
+    dist4 = cal_min_dist(p, p4, p1)
+    min_dist = np.minimum.reduce([dist1, dist2, dist3, dist4])
+
+    in_brick = (
+        _ra_in_interval(ra, df['ra1'].values, df['ra2'].values)
+        & (df['dec1'].values <= dec) & (dec <= df['dec2'].values)
+    )
+    return idx[in_brick | (min_dist <= search_radius)]
+
+def _filter_candidate_bricks_chunk(args):
+    ra, dec, candidate_lists, search_radius, bricksinfo = args
+    return [
+        _filter_candidate_bricks(ra_i, dec_i, candidate_idx, search_radius, bricksinfo)
+        for ra_i, dec_i, candidate_idx in zip(ra, dec, candidate_lists)
+    ]
 
 class LegacySurvey:
     """
@@ -207,6 +283,130 @@ class LegacySurvey:
                 ax.set_xlabel('RA [deg]', fontsize=15)
                 ax.set_ylabel('Dec [deg]', fontsize=15)
                 ax.set_title(f"Target: RA={ra:.4f}, Dec={dec:.4f}, search_radius={search_radius}'' ", fontsize=12)
+        return res
+
+    def find_bricks_from_list(
+        self,
+        ra,
+        dec,
+        search_radius=60,
+        max_workers=1,
+        chunksize=10000,
+        return_per_source=False,
+        check_files=False,
+        show_progress=True,
+    ):
+        """
+        Find all Legacy Survey bricks overlapping circles around a list of sky positions.
+
+        The returned table has the same columns as ``self.bricksinfo`` and is
+        de-duplicated, so each overlapping brick appears only once.
+
+        Parameters
+        ----------
+        ra, dec : array-like
+            Source coordinates in degrees.
+        search_radius : float, str, or astropy.units.Quantity
+            Search radius. Numeric values are interpreted as arcsec for
+            consistency with ``find_bricks``. Strings such as ``"5 arcmin"``
+            and astropy quantities are also accepted.
+        max_workers : int
+            Number of parallel workers used for exact candidate filtering.
+            ``1`` disables parallel execution.
+        chunksize : int
+            Number of sources per parallel task.
+        return_per_source : bool
+            If True, also return a list of brick row indices for each input
+            source. Indices are positional row indices in ``self.bricksinfo``.
+        check_files : bool
+            If True, add a ``file_is_ready`` column indicating whether the
+            local tractor file exists.
+        show_progress : bool
+            If True, show a progress bar for the exact filtering step.
+
+        Returns
+        -------
+        pd.DataFrame or tuple
+            ``bricks`` if ``return_per_source=False``; otherwise
+            ``(bricks, per_source_brick_indices)``.
+        """
+        radius_arcsec = _search_radius_to_arcsec(search_radius)
+        if radius_arcsec < 0:
+            raise ValueError("search_radius must be non-negative.")
+
+        ra = np.asarray(ra, dtype=float)
+        dec = np.asarray(dec, dtype=float)
+        if ra.ndim != 1 or dec.ndim != 1:
+            raise ValueError("ra and dec must be 1D arrays.")
+        if ra.size != dec.size:
+            raise ValueError("ra and dec must have the same length.")
+
+        n_sources = ra.size
+        per_source = [np.array([], dtype=int) for _ in range(n_sources)]
+        valid = np.isfinite(ra) & np.isfinite(dec)
+        if not np.any(valid):
+            res = self.bricksinfo.iloc[[]].copy()
+            return (res, per_source) if return_per_source else res
+
+        bricksinfo = self.bricksinfo.reset_index(drop=True)
+        brick_vectors = _radec_to_unit_vector(bricksinfo['ra'].values, bricksinfo['dec'].values)
+        tree = cKDTree(brick_vectors)
+
+        max_half_diagonal = _max_brick_half_diagonal_arcsec(bricksinfo)
+        query_radius_rad = np.deg2rad((radius_arcsec + max_half_diagonal) / 3600.0)
+        query_radius_chord = 2.0 * np.sin(query_radius_rad / 2.0)
+
+        valid_idx = np.flatnonzero(valid)
+        ra_valid = ra[valid]
+        dec_valid = dec[valid]
+        source_vectors = _radec_to_unit_vector(ra_valid, dec_valid)
+        candidate_lists = tree.query_ball_point(source_vectors, query_radius_chord)
+
+        chunks = []
+        for start in range(0, len(ra_valid), chunksize):
+            end = min(start + chunksize, len(ra_valid))
+            chunks.append((
+                ra_valid[start:end],
+                dec_valid[start:end],
+                candidate_lists[start:end],
+                radius_arcsec,
+                bricksinfo,
+            ))
+
+        if max_workers is None or max_workers <= 1 or len(chunks) == 1:
+            iterator = chunks
+            if show_progress:
+                iterator = tqdm(iterator, total=len(chunks), desc="Filtering bricks")
+            chunk_results = [_filter_candidate_bricks_chunk(chunk) for chunk in iterator]
+        else:
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                iterator = executor.map(_filter_candidate_bricks_chunk, chunks)
+                if show_progress:
+                    iterator = tqdm(iterator, total=len(chunks), desc="Filtering bricks")
+                chunk_results = list(iterator)
+
+        filtered = [idx for chunk in chunk_results for idx in chunk]
+        for source_idx, brick_idx in zip(valid_idx, filtered):
+            per_source[source_idx] = brick_idx
+
+        nonempty = [idx for idx in filtered if len(idx) > 0]
+        if nonempty:
+            unique_idx = np.unique(np.concatenate(nonempty))
+            res = bricksinfo.iloc[unique_idx].copy().reset_index(drop=True)
+        else:
+            res = bricksinfo.iloc[[]].copy()
+
+        if check_files and len(res) > 0:
+            res['file_is_ready'] = [
+                (path is not None) and path.exists()
+                for path in (
+                    self.find_tractor_file(row['release'], row['brickname'], silent=True)
+                    for _, row in res.iterrows()
+                )
+            ]
+
+        if return_per_source:
+            return res, per_source
         return res
     
     def query_catalogs_around_source(
