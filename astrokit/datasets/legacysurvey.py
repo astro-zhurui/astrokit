@@ -464,6 +464,7 @@ class LegacySurvey:
                         f"$r={radius_arcsec:.0f}$ arcsec",
                         fontsize=12
                     )
+                    plt.show()
         return res
 
     def find_bricks_from_list(
