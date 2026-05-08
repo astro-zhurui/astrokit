@@ -136,6 +136,7 @@ class LegacySurvey:
             df_dr9.insert(0, 'release', 'dr9')
             df_dr10.insert(0, 'release', 'dr10')
             bricksinfo = pd.concat([df_dr9, df_dr10], ignore_index=True)
+            bricksinfo.insert(1, 'AAA', bricksinfo['brickname'].str[:3])
             bricksinfo.to_parquet(path, index=False)
         return bricksinfo
 
