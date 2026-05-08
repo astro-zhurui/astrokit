@@ -9,7 +9,8 @@ from typing import Sequence, Union
 ArrayLike = Union[np.ndarray, Sequence[int]]
 import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.patches import Circle
+from matplotlib.patches import Patch
+from matplotlib.lines import Line2D
 from matplotlib import rcParams
 rcParams['font.family'] = 'Times New Roman'
 from tqdm import tqdm
@@ -171,6 +172,95 @@ def _filter_candidate_bricks_chunk(args):
         for ra_i, dec_i, candidate_idx in zip(ra, dec, candidate_lists)
     ]
 
+def _unwrap_ra_for_plot(ra_values, ra_center):
+    return ra_center + _angular_delta_deg(ra_values, ra_center)
+
+def _auto_figure_size(x_span, y_span, min_size=5.0, max_size=9.0):
+    if not np.isfinite(x_span) or not np.isfinite(y_span) or x_span <= 0 or y_span <= 0:
+        return (6.0, 6.0)
+    ratio = np.clip(x_span / y_span, 0.6, 1.8)
+    base = 6.0 if max(x_span, y_span) < 1.0 else 7.0
+    if ratio >= 1:
+        return (min(max_size, base*ratio), max(min_size, base))
+    return (max(min_size, base), min(max_size, base/ratio))
+
+def _plot_bricks(ax, bricks, ra_center):
+    release_style = {
+        'dr9': {
+            'edgecolor': '0.15',
+            'facecolor': '0.65',
+            'hatch': '///',
+            'linestyle': '-',
+            'label': 'DR9',
+        },
+        'dr10': {
+            'edgecolor': '0.15',
+            'facecolor': '0.85',
+            'hatch': '\\\\\\',
+            'linestyle': '--',
+            'label': 'DR10',
+        },
+    }
+    default_style = {
+        'edgecolor': '0.25',
+        'facecolor': '0.25',
+        'hatch': '',
+        'linestyle': '-',
+        'label': 'Other',
+    }
+
+    grouped = bricks.groupby(['brickname', 'ra1', 'ra2', 'dec1', 'dec2'], sort=False)
+    text_items = []
+    for _, group in grouped:
+        brick = group.iloc[0]
+        x = _unwrap_ra_for_plot(
+            np.array([brick['ra1'], brick['ra2'], brick['ra2'], brick['ra1'], brick['ra1']]),
+            ra_center
+        )
+        y = np.array([brick['dec1'], brick['dec1'], brick['dec2'], brick['dec2'], brick['dec1']])
+        releases = group['release'].astype(str).tolist()
+        for offset, (_, row) in enumerate(group.iterrows()):
+            style = release_style.get(str(row['release']), default_style)
+            ax.fill(
+                x, y,
+                facecolor=style['facecolor'],
+                edgecolor=style['edgecolor'],
+                alpha=0.18,
+                linewidth=1.2,
+                linestyle=style['linestyle'],
+                hatch=style['hatch'],
+                zorder=2 + offset,
+            )
+        label = f"{brick['brickname']} ({'/'.join(releases)})" if len(releases) > 1 else brick['brickname']
+        text_items.append((x.min(), y.max(), label))
+
+    for i, (x, y, label) in enumerate(text_items):
+        ax.text(
+            x,
+            y,
+            label,
+            color='0.1',
+            fontsize=8.5,
+            ha='left',
+            va='top',
+            zorder=12,
+        )
+
+    handles = [
+        Patch(
+            facecolor=style['facecolor'],
+            edgecolor=style['edgecolor'],
+            hatch=style['hatch'],
+            alpha=0.18,
+            linewidth=1.2,
+            linestyle=style['linestyle'],
+            label=style['label'],
+        )
+        for release, style in release_style.items()
+        if release in set(bricks['release'].astype(str))
+    ]
+    return handles
+
 class LegacySurvey:
     """
     A class to handle Legacy Survey datasets.
@@ -305,30 +395,75 @@ class LegacySurvey:
         else:
             # check if tractor file exists
             for idx, row in res.iterrows():
-                path = self.find_tractor_file(row['release'], row['brickname'])
+                path = self.find_tractor_file(row['release'], row['brickname'], silent=True)
                 res.loc[idx, 'file_is_ready'] = (path is not None) and path.exists()
             if show:
-                fig, ax = plt.subplots(1,1, figsize=(6,6))
-                ax.set_aspect('equal')
-                p = SkyCoord(ra=ra*u.degree, dec=dec*u.degree)
-                circle = p.directional_offset_by(
-                    position_angle=np.linspace(0, 360, 200)*u.degree,
-                    separation=radius_arcsec*u.arcsec
-                )
-                ax.plot(circle.ra.degree, circle.dec.degree, 'r-', lw=1)
-                ax.plot(ra, dec, 'rx')
+                with plt.rc_context({
+                    'font.family': 'serif',
+                    'font.serif': ['Times New Roman', 'Times', 'DejaVu Serif'],
+                    'mathtext.fontset': 'stix',
+                    'axes.linewidth': 1.0,
+                    'xtick.direction': 'in',
+                    'ytick.direction': 'in',
+                    'xtick.top': True,
+                    'ytick.right': True,
+                    'xtick.major.size': 5,
+                    'ytick.major.size': 5,
+                    'xtick.minor.size': 3,
+                    'ytick.minor.size': 3,
+                }):
+                    p = SkyCoord(ra=ra*u.degree, dec=dec*u.degree)
+                    circle = p.directional_offset_by(
+                        position_angle=np.linspace(0, 360, 200)*u.degree,
+                        separation=radius_arcsec*u.arcsec
+                    )
+                    circle_ra = _unwrap_ra_for_plot(circle.ra.degree, ra)
+                    circle_dec = circle.dec.degree
+                    target_ra = _unwrap_ra_for_plot(ra, ra)
 
-                colors = plt.cm.berlin(np.linspace(0, 1, len(res)))
-                for idx, (i, brick) in enumerate(res.iterrows()):
-                    rect_x = [brick['ra1'], brick['ra2'], brick['ra2'], brick['ra1'], brick['ra1']]
-                    rect_y = [brick['dec1'], brick['dec1'], brick['dec2'], brick['dec2'], brick['dec1']]
-                    # 在每个矩形的左上角标注砖块ID
-                    ax.text(brick['ra1'], brick['dec2'], brick['brickname'], color='k', fontsize=15, ha='left', va='top', )
-                    ax.fill(rect_x, rect_y, color=colors[idx], alpha=0.3)
+                    brick_ra_values = np.r_[res['ra1'].values, res['ra2'].values]
+                    brick_dec_values = np.r_[res['dec1'].values, res['dec2'].values]
+                    brick_ra_plot = _unwrap_ra_for_plot(brick_ra_values, ra)
+                    x_values = np.r_[circle_ra, target_ra, brick_ra_plot]
+                    y_values = np.r_[circle_dec, dec, brick_dec_values]
+                    x_span = np.nanmax(x_values) - np.nanmin(x_values)
+                    y_span = np.nanmax(y_values) - np.nanmin(y_values)
+                    pad = max(radius_arcsec / 3600.0 * 0.35, x_span, y_span) * 0.10
+                    pad = max(pad, radius_arcsec / 3600.0 * 0.20, 0.015)
 
-                ax.set_xlabel('RA [deg]', fontsize=15)
-                ax.set_ylabel('Dec [deg]', fontsize=15)
-                ax.set_title(f"Target: RA={ra:.4f}, Dec={dec:.4f}, search_radius={radius_arcsec}'' ", fontsize=12)
+                    fig, ax = plt.subplots(1, 1, figsize=_auto_figure_size(x_span + 2*pad, y_span + 2*pad))
+                    ax.set_aspect('equal', adjustable='box')
+                    brick_handles = _plot_bricks(ax, res, ra)
+
+                    ax.plot(circle_ra, circle_dec, color='0.05', lw=1.4, zorder=20)
+                    ax.plot(target_ra, dec, marker='x', color='0.05', ms=8, mew=1.8, linestyle='None', zorder=25)
+                    target_handles = [
+                        Line2D([], [], color='0.05', lw=1.4, label='Search radius'),
+                        Line2D([], [], marker='x', color='0.05', linestyle='None', ms=7, mew=1.8, label='Target'),
+                    ]
+                    fig.subplots_adjust(right=0.78)
+                    ax.legend(
+                        handles=brick_handles + target_handles,
+                        loc='center left',
+                        bbox_to_anchor=(1.02, 0.5),
+                        frameon=False,
+                        fontsize=9,
+                        borderaxespad=0.0,
+                        handlelength=2.2,
+                    )
+
+                    ax.set_xlim(np.nanmin(x_values) - pad, np.nanmax(x_values) + pad)
+                    ax.set_ylim(np.nanmin(y_values) - pad, np.nanmax(y_values) + pad)
+                    ax.minorticks_on()
+                    ax.grid(alpha=0.12, lw=0.5)
+
+                    ax.set_xlabel('RA [deg]', fontsize=13)
+                    ax.set_ylabel('Dec [deg]', fontsize=13)
+                    ax.set_title(
+                        f"RA={ra:.4f}, Dec={dec:.4f}, "
+                        f"$r={radius_arcsec:.0f}$ arcsec",
+                        fontsize=12
+                    )
         return res
 
     def find_bricks_from_list(
