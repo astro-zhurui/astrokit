@@ -32,6 +32,7 @@ from astrokit.wrapper import stilts
 __all__ = ['LegacySurvey', '_find_bricks_static']
 
 def _find_bricks_static(i, ra_x, dec_x, search_radius, bricksinfo):
+    search_radius = _search_radius_to_arcsec(search_radius)
     df = bricksinfo.copy()
     ra, dec = ra_x[i], dec_x[i]
 
@@ -249,25 +250,26 @@ class LegacySurvey:
         pd.DataFrame
             DataFrame of bricks that contain or are within the search radius from the given coordinates.
         """
+        radius_arcsec = _search_radius_to_arcsec(search_radius)
         res = _find_bricks_static(
             i=0, ra_x=[ra], dec_x=[dec],
-            search_radius=search_radius,
+            search_radius=radius_arcsec,
             bricksinfo=self.bricksinfo
         )
         if (len(res) == 0) and (not silent):
-            logger.warning(f"No bricks found within {search_radius} arcsec of (RA, Dec)=({ra}, {dec})")
+            logger.warning(f"No bricks found within {radius_arcsec} arcsec of (RA, Dec)=({ra}, {dec})")
         else:
             # check if tractor file exists
             for idx, row in res.iterrows():
                 path = self.find_tractor_file(row['release'], row['brickname'])
-                res.loc[idx, 'file_is_ready'] = path.exists()
+                res.loc[idx, 'file_is_ready'] = (path is not None) and path.exists()
             if show:
                 fig, ax = plt.subplots(1,1, figsize=(6,6))
                 ax.set_aspect('equal')
                 p = SkyCoord(ra=ra*u.degree, dec=dec*u.degree)
                 circle = p.directional_offset_by(
                     position_angle=np.linspace(0, 360, 200)*u.degree,
-                    separation=search_radius*u.arcsec
+                    separation=radius_arcsec*u.arcsec
                 )
                 ax.plot(circle.ra.degree, circle.dec.degree, 'r-', lw=1)
                 ax.plot(ra, dec, 'rx')
@@ -282,7 +284,7 @@ class LegacySurvey:
 
                 ax.set_xlabel('RA [deg]', fontsize=15)
                 ax.set_ylabel('Dec [deg]', fontsize=15)
-                ax.set_title(f"Target: RA={ra:.4f}, Dec={dec:.4f}, search_radius={search_radius}'' ", fontsize=12)
+                ax.set_title(f"Target: RA={ra:.4f}, Dec={dec:.4f}, search_radius={radius_arcsec}'' ", fontsize=12)
         return res
 
     def find_bricks_from_list(
