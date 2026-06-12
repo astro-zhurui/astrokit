@@ -271,7 +271,7 @@ def fits2df(path_fits):
     df = tbl.to_pandas()
     return df
 
-def read(path, n_rows=None, columns=None, fill=False):
+def read(path, n_rows=None, columns=None, hdu_name=None, fill=False):
     """
     Read rows from a large FITS binary table using memory mapping.
 
@@ -321,7 +321,10 @@ def read(path, n_rows=None, columns=None, fill=False):
 
     path = Path(path)
     with fits.open(path, memmap=True) as hdul:
-        hdu = hdul[1]
+        if hdu_name is not None:
+            hdu = hdul[hdu_name]
+        else:
+            hdu = hdul[1]
         total_rows = hdu.header["NAXIS2"]
         if n_rows is None:
             n_rows = total_rows
