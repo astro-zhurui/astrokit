@@ -29,3 +29,6 @@ license = { file = "LICENSE" }
 [project.urls]
 "Homepage" = "https://github.com/astro-zhurui/astrokit"
 "Bug Tracker" = "https://github.com/astro-zhurui/astrokit/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["astrokit"]

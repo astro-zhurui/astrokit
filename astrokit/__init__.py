@@ -54,6 +54,7 @@ __all__ = [
     'observation',
     'phot', 
     'photoz', 
+    'simqso',
     'spec', 
     'toolbox',
     'wrapper'
