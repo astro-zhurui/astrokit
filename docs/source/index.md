@@ -32,3 +32,4 @@ The first stable release (version 1.0.0) will be available soon (expected in lat
 01_toolbox.md
 02_datasets.md
 03_wrapper.md
+04_simqso.md

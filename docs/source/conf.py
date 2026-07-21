@@ -13,6 +13,9 @@ release = '0.1.0'  # 项目版本号 (建议符合 PEP 440)
 # -- General configuration ----------------------------------------
 extensions = [
     'myst_parser',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
+    'sphinx.ext.napoleon',
 ]
 
 templates_path = ['_templates']
@@ -24,6 +27,12 @@ myst_enable_extensions = [
     "linkify",           # 自动链接 http
 ]
 myst_heading_anchors = 3   # h1~h3 标题自动生成锚点 (方便链接跳转)
+
+# -- API documentation --------------------------------------------
+autodoc_member_order = 'bysource'
+autosummary_generate = False
+napoleon_google_docstring = True
+napoleon_numpy_docstring = True
 
 # -- HTML output --------------------------------------------------
 html_theme = 'sphinx_rtd_theme'
