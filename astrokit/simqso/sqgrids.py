@@ -1314,9 +1314,9 @@ def generateBEffEmissionLines(M1450,**kwargs):
         x2 = np.random.random(len(M_i))
         x3 = np.random.random(len(M_i))
     #
-    useLines = ~np.in1d(lineCatalog['name'],excludeLines)
+    useLines = ~np.isin(lineCatalog['name'],excludeLines)
     if onlyLines is not None:
-        useLines &= np.in1d(lineCatalog['name'],onlyLines)
+        useLines &= np.isin(lineCatalog['name'],onlyLines)
     if minEw is not None:
         logEw = np.polyval(lineCatalog['logEW'][:,1].T,-25)
         useLines &= logEw > np.log10(minEw)
