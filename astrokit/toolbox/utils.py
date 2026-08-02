@@ -271,7 +271,7 @@ def fits2df(path_fits):
     df = tbl.to_pandas()
     return df
 
-def read(path, n_rows=None, columns=None, hdu_name=None, fill=False):
+def read(path, n_rows=None, columns=None, hdu_name=None, fill=False, show_time=False):
     """
     Read rows from a large FITS binary table using memory mapping.
 
@@ -289,6 +289,8 @@ def read(path, n_rows=None, columns=None, hdu_name=None, fill=False):
         If True, requested columns that are not present in the FITS table are
         included as fully masked columns. If False, missing requested columns
         raise KeyError.
+    show_time : bool, optional
+        If True, print the elapsed read time after finishing. Default is False.
 
     Returns
     -------
@@ -319,6 +321,7 @@ def read(path, n_rows=None, columns=None, hdu_name=None, fill=False):
 
         return values
 
+    st = time.time()
     path = Path(path)
     with fits.open(path, memmap=True) as hdul:
         if hdu_name is not None:
@@ -358,6 +361,9 @@ def read(path, n_rows=None, columns=None, hdu_name=None, fill=False):
                 table_data[name] = rows[name]
 
         tbl = Table(table_data, copy=False)
+
+    if show_time:
+        print(f"Read {path.name}: {sec_to_hms(time.time() - st)}")
 
     return tbl
 
