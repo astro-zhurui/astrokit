@@ -19,6 +19,7 @@ scipy
 matplotlib
 cmasher
 astropy
+fitsio
 astroquery
 photutils
 specutils

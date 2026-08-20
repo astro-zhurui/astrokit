@@ -1,10 +1,11 @@
 """
-Tools for working with the Legacy Survey (LS) datasets.
+Tools for working with the Legacy Survey (LS10) datasets.
 
 @Author: Rui Zhu
 @Date: 2025-10-10
 """
 import numpy as np
+from pathlib import Path
 from typing import Sequence, Union
 ArrayLike = Union[np.ndarray, Sequence[int]]
 import pandas as pd
@@ -276,7 +277,7 @@ class LegacySurvey:
             - dr9_north/tractor/000/tractor-0001p000.fits
             - dr10_south/tractor/000/tractor-0001p000.fits
         """
-        self.dir_data = dir_legacysurvey
+        self.dir_data = Path(dir_legacysurvey)
         self.bricksinfo = self._load_bricksinfo()
 
     def find_tractor_file(self, release, brickname, silent=False):
