@@ -31,7 +31,7 @@ from astrokit.toolbox import cal_min_dist
 from astrokit.toolbox import sec_to_hms
 from astrokit.wrapper import stilts
 
-__all__ = ['LegacySurvey', '_find_bricks_static']
+__all__ = ['LegacySurvey']
 
 def _find_bricks_static(i, ra_x, dec_x, search_radius, bricksinfo):
     search_radius = _search_radius_to_arcsec(search_radius)
@@ -78,13 +78,6 @@ def _radec_to_unit_vector(ra, dec):
         np.sin(dec_rad),
     ))
 
-def _ra_in_interval(ra, ra1, ra2):
-    ra = ra % 360.0
-    ra1 = np.asarray(ra1, dtype=float) % 360.0
-    ra2 = np.asarray(ra2, dtype=float) % 360.0
-    normal = ra1 <= ra2
-    return np.where(normal, (ra1 <= ra) & (ra <= ra2), (ra >= ra1) | (ra <= ra2))
-
 def _angular_delta_deg(angle, origin):
     return (np.asarray(angle, dtype=float) - origin + 180.0) % 360.0 - 180.0
 
@@ -113,43 +106,6 @@ def _max_brick_half_diagonal_arcsec_fast(brick_geometry):
     dra = brick_geometry['half_width'] * np.cos(np.deg2rad(dec_abs_min))
     ddec = brick_geometry['half_height']
     return np.sqrt(dra*dra + ddec*ddec).max() * 3600.0 + 1.0
-
-def _max_brick_half_diagonal_arcsec(bricksinfo):
-    center = SkyCoord(
-        ra=bricksinfo['ra'].values*u.degree,
-        dec=bricksinfo['dec'].values*u.degree,
-    )
-    corners = [
-        SkyCoord(ra=bricksinfo['ra1'].values*u.degree, dec=bricksinfo['dec1'].values*u.degree),
-        SkyCoord(ra=bricksinfo['ra2'].values*u.degree, dec=bricksinfo['dec1'].values*u.degree),
-        SkyCoord(ra=bricksinfo['ra2'].values*u.degree, dec=bricksinfo['dec2'].values*u.degree),
-        SkyCoord(ra=bricksinfo['ra1'].values*u.degree, dec=bricksinfo['dec2'].values*u.degree),
-    ]
-    return max(center.separation(corner).arcsec.max() for corner in corners)
-
-def _filter_candidate_bricks(ra, dec, candidate_idx, search_radius, bricksinfo):
-    if len(candidate_idx) == 0:
-        return np.array([], dtype=int)
-
-    idx = np.asarray(candidate_idx, dtype=int)
-    df = bricksinfo.iloc[idx]
-    p = SkyCoord(ra=ra*u.degree, dec=dec*u.degree)
-    p1 = SkyCoord(ra=df['ra1'].values*u.degree, dec=df['dec1'].values*u.degree)
-    p2 = SkyCoord(ra=df['ra2'].values*u.degree, dec=df['dec1'].values*u.degree)
-    p3 = SkyCoord(ra=df['ra2'].values*u.degree, dec=df['dec2'].values*u.degree)
-    p4 = SkyCoord(ra=df['ra1'].values*u.degree, dec=df['dec2'].values*u.degree)
-
-    dist1 = cal_min_dist(p, p1, p2)
-    dist2 = cal_min_dist(p, p2, p3)
-    dist3 = cal_min_dist(p, p3, p4)
-    dist4 = cal_min_dist(p, p4, p1)
-    min_dist = np.minimum.reduce([dist1, dist2, dist3, dist4])
-
-    in_brick = (
-        _ra_in_interval(ra, df['ra1'].values, df['ra2'].values)
-        & (df['dec1'].values <= dec) & (dec <= df['dec2'].values)
-    )
-    return idx[in_brick | (min_dist <= search_radius)]
 
 def _filter_candidate_bricks_fast(ra, dec, candidate_idx, search_radius, brick_geometry):
     if len(candidate_idx) == 0:
@@ -280,6 +236,33 @@ class LegacySurvey:
         self.dir_data = Path(dir_legacysurvey)
         self.bricksinfo = self._load_bricksinfo()
 
+    def _load_bricksinfo(self):
+        """
+        Create a combined bricksinfo DataFrame from DR9 and DR10 datasets.
+        """
+        path = self.dir_data / 'legacysurvey_bricksinfo.parquet'
+        if path.exists():
+            bricksinfo = pd.read_parquet(path)
+        else:
+            logger.info(f"Making bricksinfo to {path}")
+            bricksinfo_dr9 = Table.read(
+                self.dir_data / 'dr9_north' / 'survey-bricks-dr9-north.fits.gz',
+                character_as_bytes=False
+            )
+            bricksinfo_dr10 = Table.read(
+                self.dir_data / 'dr10_south' / 'survey-bricks-dr10-south.fits.gz',
+                character_as_bytes=False
+            )
+            cols = ['brickname', 'ra', 'dec', 'ra1', 'ra2', 'dec1', 'dec2']
+            df_dr9 = bricksinfo_dr9[cols].to_pandas()
+            df_dr10 = bricksinfo_dr10[cols].to_pandas()
+            df_dr9.insert(0, 'release', 'dr9')
+            df_dr10.insert(0, 'release', 'dr10')
+            bricksinfo = pd.concat([df_dr9, df_dr10], ignore_index=True)
+            bricksinfo.insert(1, 'AAA', bricksinfo['brickname'].str[:3])
+            bricksinfo.to_parquet(path, index=False)
+        return bricksinfo
+
     def find_tractor_file(self, release, brickname, silent=False):
         """
         Given a release and brickname, return the path to the corresponding tractor file.
@@ -328,33 +311,6 @@ class LegacySurvey:
                     data[f'{name}_{i+1}'] = arr[name][:, i]
         return pd.DataFrame(data)
 
-
-    def _load_bricksinfo(self):
-        """
-        Create a combined bricksinfo DataFrame from DR9 and DR10 datasets.
-        """
-        path = self.dir_data / 'legacysurvey_bricksinfo.parquet'
-        if path.exists():
-            bricksinfo = pd.read_parquet(path)
-        else:
-            logger.info(f"Making bricksinfo to {path}")
-            bricksinfo_dr9 = Table.read(
-                self.dir_data / 'dr9_north' / 'survey-bricks-dr9-north.fits.gz',
-                character_as_bytes=False
-            )
-            bricksinfo_dr10 = Table.read(
-                self.dir_data / 'dr10_south' / 'survey-bricks-dr10-south.fits.gz',
-                character_as_bytes=False
-            )
-            cols = ['brickname', 'ra', 'dec', 'ra1', 'ra2', 'dec1', 'dec2']
-            df_dr9 = bricksinfo_dr9[cols].to_pandas()
-            df_dr10 = bricksinfo_dr10[cols].to_pandas()
-            df_dr9.insert(0, 'release', 'dr9')
-            df_dr10.insert(0, 'release', 'dr10')
-            bricksinfo = pd.concat([df_dr9, df_dr10], ignore_index=True)
-            bricksinfo.insert(1, 'AAA', bricksinfo['brickname'].str[:3])
-            bricksinfo.to_parquet(path, index=False)
-        return bricksinfo
 
     def find_brickname(self, ra, dec):
         """
