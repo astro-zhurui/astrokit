@@ -1,0 +1,16 @@
+
+  AVEROIN_MOD.list : includes 62 SEDs fron CE_NEW that have been  
+  tuned in MIR (Lbd<4.5um) based on VVDS-CFHTLS-SWIRE(3.6-4.5um) photometry
+  and with VVDS-spectra.
+  They have been used for GALEX+CFHTLS+SWIRE sample (Arnouts et al., 07)
+
+    Setup for LePhare parameters :
+
+    EXTINC_LAW  : SMC_prevot.dat
+    EB_V        :   0.0,0.05,0.1,0.15,0.2,0.3
+    MOD_EXTINC  :   38,62
+
+
+
+
+  

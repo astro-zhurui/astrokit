@@ -1,0 +1,8 @@
+#########################################################################
+#          RIEKE & ALONSO-HERRERO  FIR template                         #
+#                                                                       #
+#    * 11 SEDs for individual Galaxies     : RIEKE_GAL.list             #
+#    * 14 SEDs for averaged LIR templates  : RIEKE.list                 #
+#         NO  stellar component subtracted                              #
+#    * converted in  lbda [A]  and  flux in erg/s/cm^2/A                #
+#########################################################################

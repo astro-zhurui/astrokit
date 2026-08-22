@@ -1,0 +1,15 @@
+#########################################################################
+#          CHARY & ELBAZ  FIR templates   -> CHARY_ELBAZ.list           #
+#                                                                       #
+#    * 105 templates with different IR Luminosity                       #
+#           Stellar component has been subtracted                       #
+#                                                                       #
+#    * 1366 elements of lambda from 1000 A < lambda < 3 10^9 A          #
+#                                                                       #
+#    * Original units are  nu Lnu  expressed in  Lo [erg .s-1]          #
+#    * They have been converted in flux as                              #
+#            Flbda[erg/s/cm2/A] = nuLnu/lbda * fac                      #
+#            where  fac= Lo/(4.pi.D^2)  with  D=10pc                    #
+#        Lsol=3.826e33[erg/s]  ,   pc=3.086e18[cm]                      #
+#        fac= Lsol/(4*3.141593*100*pc**2)= 3.197004226e-07	        #
+#########################################################################

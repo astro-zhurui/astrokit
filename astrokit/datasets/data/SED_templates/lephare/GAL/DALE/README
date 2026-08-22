@@ -1,0 +1,14 @@
+#########################################################################
+#          DALE and HELOU  FIR templates   -> DALE.list                 #
+#                                                                       #
+#    *  64 templates with different IR Luminosity                       #
+#           Stellar component has been subtracted                       #
+#                                                                       #
+#    * 193  elements of lambda from 4000 A < lambda < 1.1 10^7 A        #
+#                                                                       #
+#    * They have been converted in flux as                              #
+#            Flbda[erg/s/cm2/A] = nuLnu/lbda * fac                      #
+#            where  fac= Lo/(4.pi.D^2)  with  D=10pc                    #
+#        Lsol=3.826e33[erg/s]  ,   pc=3.086e18[cm]                      #
+#        fac= Lsol/(4*3.141593*100*pc**2)= 3.197004226e-07	        #
+#########################################################################

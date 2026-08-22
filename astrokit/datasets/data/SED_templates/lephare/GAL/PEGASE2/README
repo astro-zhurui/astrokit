@@ -1,0 +1,102 @@
+#########################################################################
+#                PEGASE2 templates   -> PEGASE2_MODxx.list              #
+#                    (FIOC & Rocca-Volmerange et al., 1997)             #
+#                web : http://www2.iap.fr/users/fioc/PEGASE.html        #
+#                                                                       #
+#    *  8  SEDs for different Hubble types with                         #
+#        104 AGEs  (ages.dat)                                           #
+#        1221 elements of lambda from 91.A < lambda < 1600000 A         #
+#           --> keyword :  GAL_WMAX  3300                               #
+#        61 emission lines                                              #
+#                                                                       #
+#    * variation of the SF history for the various types (/tau)         #
+#                   IMF         : Rana & Basu   / Scalo86               #
+#                   SNII ejecta : model B                               #
+#                   SFR law sfr(t): -1-  1/p2 Mgas(t)^p1 , p1=1         #
+#                                   -2-  p2/p1 . exp(-t/p1)             #
+#                   Infall   (tc)   f(t)=1/tc.exp(-t/tc)                #
+#                   stellar wind (twind)                                #
+#                   the age of observations (Age)                       #
+#                   the evolving stellar metalicity                     #
+#                   extinction type : Average and 57deg inclination     #
+#           --> No need to add extinction  keyword : EB_V  0            #
+#    * Hubble type associated :                                         #
+#         HT	prefix_spectra						#
+#	  Ell	spectra1						#
+#	  S0	spectra2						#
+#	  Sa	spectra3						#
+#	  Sb	spectra4						#
+#	  Sbc	spectra5						#
+#	  Sc	spectra6						#
+#	  Sd	spectra7						#
+#	  Im	spectra8						#
+#########################################################################
+# 
+# SFR (1) , with  evolving stellar metalicity : PEGASE2_MOD.list
+#-----------------------------------------------------------------------#    
+ IMF	tc	p2	twind	ext-law		Name	
+       (Myr)   (Myr)    (Myr)
+#-----------------------------------------------------------------------#   
+ RB	100	100	3000	spheroid	spectra1_RB_B_SW_aver.sed
+ RB	100	500	5000	spheroid	spectra2_RB_B_SW_aver.sed
+ RB	500	1500	  -	disk-average	spectra3_RB_B_SW_aver.sed
+ RB	1000	2500	  -	disk-average	spectra4_RB_B_SW_aver.sed
+ RB	1000	5000	  -	disk-average	spectra5_RB_B_SW_aver.sed
+ RB	2000	10000	  -	disk-average	spectra6_RB_B_SW_aver.sed
+ RB	2000	20000	  -	disk-average	spectra7_RB_B_SW_aver.sed
+ RB	5000	20000	  -	disk-average	spectra8_RB_B_SW_aver.sed
+#-----------------------------------------------------------------------#
+# SFR (1) , with solar metalicity  :  PEGASE2_MOD2.list
+#-----------------------------------------------------------------------#   
+ IMF	tc	p2	twind	ext-law		Name	
+#-----------------------------------------------------------------------#
+ RB	100	100	3000	spheroid	spectra1_RB_B_SW_aver_zo.sed
+ RB	100	500	5000	spheroid	spectra2_RB_B_SW_aver_zo.sed
+ RB	500	1500	  -	disk-average	spectra3_RB_B_SW_aver_zo.sed
+ RB	1000	2500	  -	disk-average	spectra4_RB_B_SW_aver_zo.sed
+ RB	1000	5000	  -	disk-average	spectra5_RB_B_SW_aver_zo.sed
+ RB	2000	10000	  -	disk-average	spectra6_RB_B_SW_aver_zo.sed
+ RB	2000	20000	  -	disk-average	spectra7_RB_B_SW_aver_zo.sed
+ RB	5000	20000	  -	disk-average	spectra8_RB_B_SW_aver_zo.sed
+#-----------------------------------------------------------------------#
+# SFR (2) , No infall , with  evolving stellar metalicity : PEGASE2_MOD3.list
+#-----------------------------------------------------------------------#   
+ IMF	tc	p1	twind	ext-law		Name	
+#-----------------------------------------------------------------------#   
+RB      0	burst     -	spheroid	spectra1_burst.sed
+RB	0	100	  -	spheroid	spectra2_exp_0.1gy.sed
+RB	0	300	  -	spheroid	spectra2_exp_0.3gy.sed	
+RB	0	1000	  -	spheroid	spectra2_exp_1gy.sed
+RB	0	1500	  -	spheroid	spectra2_exp_1.5gy.sed
+RB	0	2000	  -	disk-average	spectra2_exp_2.0gy.sed
+RB	0	3000	  -	disk-average	spectra2_exp_3.0gy.sed
+RB	0	5000	  -	disk-average	spectra2_exp_5.0gy.sed
+RB	0	7500	  -	disk-average	spectra2_exp_7.5gy.sed
+RB	0	10000	  -	disk-average	spectra2_exp_10.0gy.sed
+RB	0	15000	  -	disk-average	spectra2_exp_15.0gy.sed
+RB	0	20000	  -	disk-average	spectra2_exp_20.0gy.sed
+RB	0	30000	  -	disk-average	spectra2_exp_30.0gy.sed
+RB	0	const	  -	disk-average	spectra3_const.sed
+#-----------------------------------------------------------------------#
+# SFR (2) , No infall , with  solar metalicity : PEGASE2_MOD4.list
+#-----------------------------------------------------------------------#   
+ IMF	tc	p1	twind	ext-law		Name	
+#-----------------------------------------------------------------------#   
+SC86	0	burst	  -	no		burst_sc86_zo.sed
+SC86	0	100	  -	no		tau_0.1gyr_sc86_zo.sed
+SC86	0	300	  -	no		tau_0.3gyr_sc86_zo.sed
+SC86	0	500	  -	no		tau_0.5gyr_sc86_zo.sed
+SC86	0	700	  -	no		tau_0.7gyr_sc86_zo.sed
+SC86	0	1000	  -	no		tau_1.0gyr_sc86_zo.sed
+SC86	0	2000	  -	no		tau_2.0gyr_sc86_zo.sed
+SC86	0	3000	  -	no		tau_3.0gyr_sc86_zo.sed
+SC86	0	5000	  -	no		tau_5.0gyr_sc86_zo.sed
+SC86	0	7000	  -	no		tau_7.0gyr_sc86_zo.sed
+SC86	0	9000	  -	no		tau_9.0gyr_sc86_zo.sed
+SC86	0	10000	  -	no		tau_10.0gyr_sc86_zo.sed
+SC86	0	15000	  -	no		tau_15.0gyr_sc86_zo.sed
+SC86	0	20000	  -	no		tau_20.0gyr_sc86_zo.sed
+SC86	0	const	  -	no		const_sc86_zo.sed
+#-----------------------------------------------------------------------#   
+
+

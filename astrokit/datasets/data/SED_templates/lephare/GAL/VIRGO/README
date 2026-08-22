@@ -1,0 +1,14 @@
+#########################################################################
+# 		 	 VIRGO templates -> VIRGO_MOD.list 	 	#
+#		      (Boselli et al., AA 2002)  			#
+#      									#
+#    * 10 SEDs based on FUV to Radio observation of Virgo cluster	#
+#          and fitted by BC00 models					#
+#									#
+#    * columns #1 : lambda						#
+#              #2 : averaged observed flux				#
+#              #3 : averaged dust corrected flux (see Boselli et al.)	#
+#									#
+#    *  1209 elements of lambda from 100 A < lambda < 100000 A		#
+#									#
+#########################################################################

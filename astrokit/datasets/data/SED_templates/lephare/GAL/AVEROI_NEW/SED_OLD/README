@@ -1,0 +1,47 @@
+#201205
+
+Interpole les templates de Steph.
+
+El_cww_new.sed
+Sbc_cww_new.sed
+Scd_cww_new.sed
+Im_cww_new.sed
+SB1_total2_new.sed
+SB2_total2_new.sed
+
+#################################################
+#################################################
+TEMPLATE NORMAUX
+#################################################
+#################################################
+
+#Je resample chaque template pour avoir les meme longeur d'onde :
+#faire liste.dat
+
+\./re_sample
+Ca ma cree les fichiers .resample
+Maintenant, je verifie qu'il soit bien resample avec 
+macro read test_sample.sm
+test_sample  El_cww_new.sed	  900 50000
+test_sample  Sbc_cww_new.sed	  900 50000
+test_sample  Scd_cww_new.sed	  900 50000
+test_sample  Im_cww_new.sed	  900 50000
+test_sample  SB1_total2_new.sed   900 50000
+test_sample  SB2_total2_new.sed   900 50000
+
+
+#Je veux interpoler entre ces templates.
+#faire la liste  liste_resample.dat
+
+!\rm CEORI_MOD.list
+!./interpolate > CE_MOD.list
+
+Je veux verifier l'interpolation entre deux CWW :
+macro read test_inter.sm
+test_inter  El_cww_new.sed.resample Sbc_cww_new.sed.resample
+test_inter  Sbc_cww_new.sed.resample Scd_cww_new.sed.resample
+test_inter  Scd_cww_new.sed.resample Im_cww_new.sed.resample
+test_inter  Im_cww_new.sed.resample SB1_total2_new.sed.resample
+test_inter  SB1_total2_new.sed.resample SB2_total2_new.sed.resample
+
+=> Liste de sortie CE_MOD.list

@@ -1,8 +1,2 @@
-/astrokit/datasets/data/legacysurvey
 /astrokit/datasets/data/dustmaps/
-/astrokit/datasets/data/SED_templates/
-/dist/
-/docs/build/
-/dev/
-/demo/data/
 __pycache__/

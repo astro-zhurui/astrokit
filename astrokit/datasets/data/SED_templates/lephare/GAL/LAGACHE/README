@@ -1,0 +1,11 @@
+#########################################################################
+#          LAGACHE & DOLE FIR templates   -> LAGACHE.list               #
+#                                                                       #
+#    * 46 templates with different IR Luminosity                        #
+#           LAGACHE_SB.list / LAGACHE_COLD.list                         #
+#          stellar component subtracted                                 #
+#    * 5614  elements of lambda from 3600 A < lambda < 1 10^8 A         #
+#            reduce the sampling for short and long wavelengths         #
+#    * Original Units are  lbda [m];  Lnu  [W]                          #
+#    * converted in  lbda [A]  and  flux in erg/s/cm^2/A                #
+#########################################################################
