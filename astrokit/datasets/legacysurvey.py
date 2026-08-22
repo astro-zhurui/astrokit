@@ -4,6 +4,7 @@ Tools for working with the Legacy Survey (LS10) datasets.
 @Author: Rui Zhu
 @Date: 2025-10-10
 """
+import os
 import numpy as np
 from pathlib import Path
 from typing import Sequence, Union
@@ -16,9 +17,7 @@ from matplotlib import rcParams
 rcParams['font.family'] = 'Times New Roman'
 from tqdm import tqdm
 import time
-from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import ThreadPoolExecutor
-from functools import partial
 import requests
 from loguru import logger
 import fitsio
@@ -29,7 +28,7 @@ from scipy.spatial import cKDTree
 
 from astrokit.toolbox import cal_min_dist
 from astrokit.toolbox import sec_to_hms
-from astrokit.wrapper import stilts
+from astrokit.toolbox.match import fast_match
 
 __all__ = ['LegacySurvey']
 
@@ -430,9 +429,7 @@ class LegacySurvey:
         dec,
         search_radius=60,
         max_workers=1,
-        chunksize=10000,
-        return_per_source=False,
-        check_files=False,
+        check_file_exists=False,
         show_progress=True,
     ):
         """
@@ -454,12 +451,7 @@ class LegacySurvey:
         max_workers : int
             Number of parallel workers used for exact candidate filtering.
             ``1`` disables parallel execution.
-        chunksize : int
-            Number of sources per parallel task.
-        return_per_source : bool
-            If True, also return a list of brick row indices for each input
-            source. Indices are positional row indices in ``self.bricksinfo``.
-        check_files : bool
+        check_file_exists : bool
             If True, add a ``file_is_ready`` column indicating whether the
             local tractor file exists.
         show_progress : bool
@@ -467,9 +459,8 @@ class LegacySurvey:
 
         Returns
         -------
-        pd.DataFrame or tuple
-            ``bricks`` if ``return_per_source=False``; otherwise
-            ``(bricks, per_source_brick_indices)``.
+        pd.DataFrame
+            De-duplicated bricks overlapping at least one input search region.
         """
         radius_arcsec = _search_radius_to_arcsec(search_radius)
         if radius_arcsec < 0:
@@ -482,12 +473,9 @@ class LegacySurvey:
         if ra.size != dec.size:
             raise ValueError("ra and dec must have the same length.")
 
-        n_sources = ra.size
-        per_source = [np.array([], dtype=int) for _ in range(n_sources)]
         valid = np.isfinite(ra) & np.isfinite(dec)
         if not np.any(valid):
-            res = self.bricksinfo.iloc[[]].copy()
-            return (res, per_source) if return_per_source else res
+            return self.bricksinfo.iloc[[]].copy()
 
         bricksinfo = self.bricksinfo.reset_index(drop=True)
         brick_geometry = _prepare_brick_geometry(bricksinfo)
@@ -498,15 +486,22 @@ class LegacySurvey:
         query_radius_rad = np.deg2rad((radius_arcsec + max_half_diagonal) / 3600.0)
         query_radius_chord = 2.0 * np.sin(query_radius_rad / 2.0)
 
-        valid_idx = np.flatnonzero(valid)
         ra_valid = ra[valid]
         dec_valid = dec[valid]
         source_vectors = _radec_to_unit_vector(ra_valid, dec_valid)
         candidate_lists = tree.query_ball_point(source_vectors, query_radius_chord)
 
+        n_valid = len(ra_valid)
+        workers = 1 if (max_workers is None or max_workers <= 1) else int(max_workers)
+        if workers <= 1:
+            chunksize = min(10000, n_valid)
+        else:
+            target_chunks = workers * 4
+            chunksize = max(500, min(20000, (n_valid + target_chunks - 1) // target_chunks))
+
         chunks = []
-        for start in range(0, len(ra_valid), chunksize):
-            end = min(start + chunksize, len(ra_valid))
+        for start in range(0, n_valid, chunksize):
+            end = min(start + chunksize, n_valid)
             chunks.append((
                 ra_valid[start:end],
                 dec_valid[start:end],
@@ -528,9 +523,6 @@ class LegacySurvey:
                 chunk_results = list(iterator)
 
         filtered = [idx for chunk in chunk_results for idx in chunk]
-        for source_idx, brick_idx in zip(valid_idx, filtered):
-            per_source[source_idx] = brick_idx
-
         nonempty = [idx for idx in filtered if len(idx) > 0]
         if nonempty:
             unique_idx = np.unique(np.concatenate(nonempty))
@@ -538,7 +530,7 @@ class LegacySurvey:
         else:
             res = bricksinfo.iloc[[]].copy()
 
-        if check_files and len(res) > 0:
+        if check_file_exists and len(res) > 0:
             res['file_is_ready'] = [
                 (path is not None) and path.exists()
                 for path in (
@@ -547,132 +539,172 @@ class LegacySurvey:
                 )
             ]
 
-        if return_per_source:
-            return res, per_source
         return res
     
-    def query_catalogs_around_source(
-        self, input_cat, output_dir, task_name, 
-        search_radius, col_ra, col_dec, max_workers=32
-        ):
+    def _match_one_brick(self, release, brickname, ra, dec, ids, radius_arcsec, match_workers):
+        path = self.find_tractor_file(release=release, brickname=brickname, silent=True)
+        if path is None:
+            logger.warning(f"Tractor file not found: {release}-{brickname}. Skipping ...")
+            return None
 
+        try:
+            tractor = self.load_tractor_catalog(brickname, release)
+        except Exception as exc:
+            logger.warning(f"Failed to read {release}-{brickname}: {exc}. Skipping ...")
+            return None
+        if tractor.empty:
+            return None
+
+        tractor.insert(
+            0,
+            'ls_id',
+            self.make_ls_id(tractor['release'], tractor['brickid'], tractor['objid']),
+        )
+        pairs = fast_match(
+            ra, dec,
+            tractor['ra'].to_numpy(), tractor['dec'].to_numpy(),
+            radius_arcsec=radius_arcsec,
+            id_1=ids,
+            id_2=tractor['ls_id'].to_numpy(),
+            mode='all',
+            workers=match_workers,
+        )
+        if pairs.empty:
+            return None
+
+        matched = tractor.set_index('ls_id').loc[pairs['id_2']].reset_index()
+        matched.insert(0, 'id', np.asarray(pairs['id_1']))
+        matched.insert(1, 'sep', np.asarray(pairs['sep']))
+        return matched
+
+    def collect_matches(
+        self,
+        ra,
+        dec,
+        search_radius=60,
+        id=None,
+        max_workers=None,
+        show_progress=True,
+    ):
         """
-        Retrieve all source catalogs within search_radius around the input source 
-        coordinates from the Legacy Survey database.
+        Collect all Legacy Survey tractor sources within ``search_radius`` of
+        the input coordinates.
 
-        NOTE: Both DR9 and DR10 are queried, respectively.
+        Bricks are selected with ``find_bricks_from_list``. Each brick catalog
+        is loaded, assigned ``ls_id``, and cross-matched with ``fast_match``
+        (``mode='all'``). DR9 and DR10 are matched separately.
 
         Parameters
         ----------
-        input_cat : pd.DataFrame
-            Input source catalog containing RA and Dec columns.
-        output_dir : pathlib.Path
-            Directory to save output files.
-        task_name : str
-            Main task name for output files.
-        search_radius : float
-            Search radius in arcseconds.
-        col_ra : str
-            Column name for Right Ascension in input_cat.
-        col_dec : str
-            Column name for Declination in input_cat.
-        max_workers : int
-            Maximum number of parallel workers for querying bricks info.
+        ra, dec : array-like
+            Source coordinates in degrees.
+        search_radius : float, str, or astropy.units.Quantity
+            Matching radius. Numeric values are interpreted as arcsec.
+        id : array-like or None
+            Optional source identifiers. If omitted, positional indices
+            ``0 .. N-1`` are used and stored in the output ``id`` column.
+        max_workers : int or None
+            Number of threads used to process bricks. ``None`` uses all CPU
+            cores. ``1`` disables brick-level parallelism.
+        show_progress : bool
+            If True, show progress bars.
 
-        Outputs
+        Returns
         -------
-        1. input source catalog in FITS format: <task_name>_input_catalog.fits
-        2. Brickinfo for each input source: <task_name>_bricksinfo.pkl
-        3. Combined LS catalogs for relevant bricks: <task_name>_dr9_all.fits and <task_name>_dr10_all.fits
-        4. Final matched catalogs for all input sources: <task_name>_dr9.fits and <task_name>_dr10.fits
+        dict
+            ``{'dr9': DataFrame, 'dr10': DataFrame}``. Each table contains the
+            input ``id``, matching ``sep`` (arcsec), ``ls_id``, and the tractor
+            columns of every matched Legacy Survey source.
         """
         st_all = time.time()
-        output_dir.mkdir(parents=True, exist_ok=True)
+        radius_arcsec = _search_radius_to_arcsec(search_radius)
+        if radius_arcsec <= 0:
+            raise ValueError("search_radius must be positive.")
 
-        fname_bricksinfo = f"{task_name}_bricksinfo.pkl"
-        fname_input_catalog = f"{task_name}_input_catalog.fits"
-        path_output_bricksinfo = output_dir / fname_bricksinfo
+        ra = np.asarray(ra, dtype=float)
+        dec = np.asarray(dec, dtype=float)
+        if ra.ndim != 1 or dec.ndim != 1:
+            raise ValueError("ra and dec must be 1D arrays.")
+        if ra.size != dec.size:
+            raise ValueError("ra and dec must have the same length.")
 
-        # step1: read input source coordinates
-        if not isinstance(input_cat, pd.DataFrame):
-            raise ValueError("input_cat must be a pandas DataFrame.")
+        n_sources = ra.size
+        if id is None:
+            ids = np.arange(n_sources, dtype=np.intp)
         else:
-            df_x = input_cat.copy()
-            Table.from_pandas(df_x).write(output_dir / fname_input_catalog, overwrite=True)
-        N_x = len(df_x)
-        ra_x, dec_x = df_x[col_ra].values, df_x[col_dec].values
+            ids = np.asarray(id)
+            if ids.ndim != 1:
+                raise ValueError("id must be a 1D array.")
+            if ids.shape[0] != n_sources:
+                raise ValueError("id must have the same length as ra and dec.")
 
-        # step2: collect bricks info for all sources
-        if path_output_bricksinfo.exists():
-            logger.info(f"Bricks info file {path_output_bricksinfo.name} exists. Loading ...")
-            df_x = pd.read_pickle(path_output_bricksinfo)
-            logger.info("Bricks info loaded.")
-        else:
-            logger.info(f"Collecting bricks info for {N_x} sources ...")
-            func = partial(_find_bricks_static, ra_x=ra_x, dec_x=dec_x, search_radius=search_radius, bricksinfo=self.bricksinfo)
-            with ProcessPoolExecutor(max_workers=max_workers) as executor:
-                bricks = list(tqdm(executor.map(func, range(N_x)), total=N_x))
-            df_x['n_bricks'] = [len(b) for b in bricks]
-            df_x['bricks'] = [df for df in bricks]
-            df_x.to_pickle(path_output_bricksinfo)
-            logger.info(f"Bricks info saved to {path_output_bricksinfo.name}")
+        n_cpu = os.cpu_count() or 1
+        workers = n_cpu if max_workers is None else int(max_workers)
+        if workers < 1:
+            raise ValueError("max_workers must be >= 1.")
+        match_workers = 1 if workers > 1 else -1
 
-        # step3: combine DR9 and DR10 catalogs paths for all relevant bricks
-        bricks = pd.concat(df_x['bricks'].to_list(), ignore_index=True)
-        brick_names = {
-            "dr9": set(bricks[bricks['release']=='dr9']['brickname']),
-            "dr10": set(bricks[bricks['release']=='dr10']['brickname']),
-        }
-        for release in ['dr9', 'dr10']:
-            N_bricks = len(brick_names[release])
-            if N_bricks == 0:
-                logger.warning(f"No bricks found for LS {release.upper()}. Skipping ...")
+        logger.info(
+            f"Collecting LS matches for {n_sources:,} sources "
+            f"within {radius_arcsec:g} arcsec ..."
+        )
+        bricks = self.find_bricks_from_list(
+            ra=ra,
+            dec=dec,
+            search_radius=radius_arcsec,
+            max_workers=workers,
+            show_progress=show_progress,
+        )
+        n_dr9 = int((bricks['release'] == 'dr9').sum()) if len(bricks) else 0
+        n_dr10 = int((bricks['release'] == 'dr10').sum()) if len(bricks) else 0
+        logger.info(f"Found {len(bricks):,} overlapping bricks (DR9={n_dr9:,}, DR10={n_dr10:,}).")
+
+        empty = pd.DataFrame(columns=['id', 'sep', 'ls_id'])
+        results = {'dr9': empty.copy(), 'dr10': empty.copy()}
+
+        for release in ('dr9', 'dr10'):
+            bricks_rel = bricks[bricks['release'] == release] if len(bricks) else bricks
+            n_bricks = len(bricks_rel)
+            if n_bricks == 0:
+                logger.warning(f"No bricks found for LS {release.upper()}.")
                 continue
-            logger.info(f"Combining LS {release.upper()} catalogs for {N_bricks} bricks ...")
-            st = time.time()
-            path_tractors = []
-            for brickname in brick_names[release]:
-                path_file = self.find_tractor_file(brickname=brickname, release=release, silent=True)
-                if path_file is None:
-                    logger.warning(f"Tractor file for brick {brickname} (LS {release.upper()}) not found. Skipping ...")
-                    continue
-                path_tractors.append(path_file)
-            path = output_dir / f"{task_name}_{release}_all.fits"
-            stilts.tcat(
-                path_in=path_tractors, path_out=path,
-                stilts_flags='', uloccol='from', silent=True
-            )
-            if path.exists():
-                logger.info(f"Combined LS {release.upper()} catalog saved to {path.name}")
-                logger.info(f"Combining completed in {sec_to_hms(time.time() - st)}.")
-            else:
-                raise FileNotFoundError(f"Failed to combine LS {release.upper()} catalogs!")
 
-        # step4: cross-match input sources with combined LS catalogs
-        for release in ['dr9', 'dr10']:
-            N_bricks = len(brick_names[release])
-            if N_bricks != 0:
-                path_ls_all = output_dir / f"{task_name}_{release}_all.fits"
-                path_out = output_dir / f"{task_name}_{release}.fits"
-                logger.info(f"Cross-matching {fname_input_catalog} with {path_ls_all.name} ...")
-                st = time.time()
-                stilts.tskymatch2(
-                    path_cat_left=output_dir / fname_input_catalog,
-                    path_cat_right=path_ls_all,
-                    path_cat_output=path_out,
-                    coord_name_left=(col_ra, col_dec),
-                    coord_name_right=('ra', 'dec'), 
-                    sep=search_radius, 
-                    find='all', 
-                    join='1and2', 
-                    silent=True, 
+            logger.info(f"Matching LS {release.upper()} catalogs from {n_bricks:,} bricks ...")
+            bricknames = bricks_rel['brickname'].tolist()
+            n_workers = max(1, min(workers, n_bricks))
+
+            def _job(brickname, _release=release):
+                return self._match_one_brick(
+                    _release, brickname, ra, dec, ids, radius_arcsec, match_workers
                 )
-                if path_out.exists():
-                    logger.info(f"Matched catalog saved to {path_out.name}")
-                else:
-                    raise FileNotFoundError(f"Failed to save matched catalog for LS {release.upper()}!")
-                logger.info(f"Cross-matching completed in {sec_to_hms(time.time() - st)}.")
-        logger.success(f"All Done in {sec_to_hms(time.time() - st_all)}.")
+
+            matched_frames = []
+            if n_workers <= 1:
+                iterator = bricknames
+                if show_progress:
+                    iterator = tqdm(iterator, total=n_bricks, desc=f"Matching {release.upper()}")
+                for brickname in iterator:
+                    matched = _job(brickname)
+                    if matched is not None:
+                        matched_frames.append(matched)
+            else:
+                with ThreadPoolExecutor(max_workers=n_workers) as executor:
+                    iterator = executor.map(_job, bricknames)
+                    if show_progress:
+                        iterator = tqdm(iterator, total=n_bricks, desc=f"Matching {release.upper()}")
+                    for matched in iterator:
+                        if matched is not None:
+                            matched_frames.append(matched)
+
+            if matched_frames:
+                results[release] = pd.concat(matched_frames, ignore_index=True)
+            logger.info(
+                f"LS {release.upper()}: {len(results[release]):,} matched rows "
+                f"from {n_bricks:,} bricks."
+            )
+
+        logger.success(f"Collecting matches finished in {sec_to_hms(time.time() - st_all)}.")
+        return results
 
     def make_ls_id(self, release: ArrayLike, brickid: ArrayLike, objid: ArrayLike) -> np.ndarray:
         """

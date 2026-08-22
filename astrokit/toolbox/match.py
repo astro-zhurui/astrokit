@@ -5,10 +5,137 @@ import time
 from loguru import logger
 from astropy.coordinates import SkyCoord
 from astropy import units as u
+from scipy.spatial import cKDTree
 
 __all__ = [
-    'MatchCatalog'
+    'fast_match', 'MatchCatalog'
 ]
+
+def fast_match(
+    ra_1,
+    dec_1,
+    ra_2,
+    dec_2,
+    radius_arcsec=1.0,
+    *,
+    id_1=None,
+    id_2=None,
+    mode='nearest',
+    workers=-1,
+):
+    """
+    Fast fixed-radius spherical crossmatch.
+
+    Parameters
+    ----------
+    ra_1, dec_1, ra_2, dec_2 : array-like
+        Coordinates in degrees.
+    radius_arcsec : float
+        Matching radius in arcseconds.
+    id_1, id_2 : array-like or None
+        Optional object identifiers. If omitted, positional indices
+        ``0 .. N-1`` are used.
+    mode : {'nearest', 'all', 'best'}
+        ``nearest``: one nearest neighbour per source in catalogue 1.
+        ``all``: every pair within the radius.
+        ``best``: greedy one-to-one pairs ranked by separation.
+    workers : int
+        Number of workers for SciPy's KD-tree query. ``-1`` uses all cores.
+
+    Returns
+    -------
+    pd.DataFrame
+        Columns: ``id_1``, ``ra_1``, ``dec_1``, ``id_2``, ``ra_2``, ``dec_2``,
+        ``sep`` (arcsec).
+    """
+    columns = ['id_1', 'ra_1', 'dec_1', 'id_2', 'ra_2', 'dec_2', 'sep']
+    if mode not in {'all', 'nearest', 'best'}:
+        raise ValueError("mode must be one of: 'all', 'nearest', 'best'")
+    if not np.isfinite(radius_arcsec) or radius_arcsec <= 0:
+        raise ValueError('radius_arcsec must be a positive finite number')
+
+    def _as_coord(values, label):
+        arr = np.asarray(values, dtype=float)
+        if arr.ndim != 1:
+            raise ValueError(f'{label} must be a 1D array')
+        if not np.all(np.isfinite(arr)):
+            raise ValueError(f'{label} must be finite')
+        return arr
+
+    def _as_id(values, n, label):
+        if values is None:
+            return np.arange(n, dtype=np.intp)
+        arr = np.asarray(values)
+        if arr.ndim != 1:
+            raise ValueError(f'{label} must be a 1D array')
+        if arr.shape[0] != n:
+            raise ValueError(f'{label} must have length {n}')
+        return arr
+
+    def to_unit_vectors(ra, dec):
+        ra_rad = np.deg2rad(ra)
+        dec_rad = np.deg2rad(dec)
+        cos_dec = np.cos(dec_rad)
+        return np.column_stack((
+            cos_dec * np.cos(ra_rad),
+            cos_dec * np.sin(ra_rad),
+            np.sin(dec_rad),
+        ))
+
+    ra_values_1 = _as_coord(ra_1, 'ra_1')
+    dec_values_1 = _as_coord(dec_1, 'dec_1')
+    ra_values_2 = _as_coord(ra_2, 'ra_2')
+    dec_values_2 = _as_coord(dec_2, 'dec_2')
+    if ra_values_1.shape[0] != dec_values_1.shape[0]:
+        raise ValueError('ra_1 and dec_1 must have the same length')
+    if ra_values_2.shape[0] != dec_values_2.shape[0]:
+        raise ValueError('ra_2 and dec_2 must have the same length')
+    if np.any((dec_values_1 < -90) | (dec_values_1 > 90)):
+        raise ValueError('dec_1 must lie in [-90, 90] degrees')
+    if np.any((dec_values_2 < -90) | (dec_values_2 > 90)):
+        raise ValueError('dec_2 must lie in [-90, 90] degrees')
+
+    n_1 = ra_values_1.shape[0]
+    n_2 = ra_values_2.shape[0]
+    ids_1 = _as_id(id_1, n_1, 'id_1')
+    ids_2 = _as_id(id_2, n_2, 'id_2')
+    if n_1 == 0 or n_2 == 0:
+        return pd.DataFrame(columns=columns)
+
+    xyz_1 = to_unit_vectors(ra_values_1, dec_values_1)
+    xyz_2 = to_unit_vectors(ra_values_2, dec_values_2)
+    radius_chord = 2 * np.sin(np.deg2rad(radius_arcsec / 3600) / 2)
+    tree = cKDTree(xyz_2, compact_nodes=True, balanced_tree=True)
+    if mode == 'nearest':
+        _, idx_2 = tree.query(xyz_1, k=1, distance_upper_bound=radius_chord, workers=workers)
+        idx_1 = np.flatnonzero(idx_2 < n_2)
+        idx_2 = idx_2[idx_1].astype(np.intp, copy=False)
+    else:
+        neighbours = tree.query_ball_point(xyz_1, r=radius_chord, workers=workers)
+        counts = np.fromiter((len(x) for x in neighbours), dtype=np.intp, count=len(neighbours))
+        idx_1 = np.repeat(np.arange(n_1, dtype=np.intp), counts)
+        if len(idx_1) == 0:
+            return pd.DataFrame(columns=columns)
+        idx_2 = np.concatenate(neighbours).astype(np.intp, copy=False)
+
+    chord = np.linalg.norm(xyz_1[idx_1] - xyz_2[idx_2], axis=1)
+    sep = np.rad2deg(2 * np.arcsin(np.clip(chord / 2, 0, 1))) * 3600
+    if mode == 'best':
+        order = np.lexsort((idx_2, idx_1, sep))
+        used_1, used_2 = np.zeros(n_1, bool), np.zeros(n_2, bool)
+        keep = np.zeros(len(idx_1), bool)
+        for candidate in order:
+            i, j = idx_1[candidate], idx_2[candidate]
+            if not used_1[i] and not used_2[j]:
+                keep[candidate] = True
+                used_1[i] = used_2[j] = True
+        idx_1, idx_2, sep = idx_1[keep], idx_2[keep], sep[keep]
+
+    return pd.DataFrame({
+        'id_1': ids_1[idx_1], 'ra_1': ra_values_1[idx_1], 'dec_1': dec_values_1[idx_1],
+        'id_2': ids_2[idx_2], 'ra_2': ra_values_2[idx_2], 'dec_2': dec_values_2[idx_2],
+        'sep': sep,
+    }, columns=columns)
 
 class MatchCatalog:
     """A class for matching two catalogs like TOPCAT."""

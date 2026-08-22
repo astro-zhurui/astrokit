@@ -97,7 +97,6 @@ bricks = legacysurvey.find_bricks_from_list(
     dec=source_table["dec"],
     search_radius="5 arcmin",
     max_workers=8,
-    chunksize=5000,
 )
 bricks.head()
 ```
@@ -112,31 +111,12 @@ input source search region. Duplicated bricks are removed.
 - a string such as `"5 arcmin"` or `"300 arcsec"`;
 - an `astropy.units.Quantity`, such as `5*u.arcmin`.
 
-If you also need to know which bricks belong to each input source, use
-`return_per_source=True`:
-
-```python
-bricks, bricks_per_source = legacysurvey.find_bricks_from_list(
-    ra=source_table["ra"],
-    dec=source_table["dec"],
-    search_radius="5 arcmin",
-    max_workers=8,
-    return_per_source=True,
-)
-
-bricksinfo_indexed = legacysurvey.bricksinfo.reset_index(drop=True)
-first_source_bricks = bricksinfo_indexed.iloc[bricks_per_source[0]]
-first_source_bricks[["release", "brickname"]]
-```
-
 Useful options:
 
 | Option | Description |
 | --- | --- |
-| `max_workers` | Number of parallel workers used during exact filtering. Use `1` to disable parallel execution. |
-| `chunksize` | Number of input sources in each parallel task. A value like `5000` or `10000` is usually reasonable for large catalogs. |
-| `return_per_source` | If `True`, return `(bricks, bricks_per_source)`. |
-| `check_files` | If `True`, add `file_is_ready`, indicating whether the local tractor file exists. |
+| `max_workers` | Number of parallel workers used during exact filtering. Use `1` to disable parallel execution. Filtering is automatically chunked from the source count and worker count. |
+| `check_file_exists` | If `True`, add `file_is_ready`, indicating whether the local tractor file exists. |
 | `show_progress` | If `True`, show a progress bar. |
 
 ### Locate and Read Tractor Catalogs
@@ -166,41 +146,32 @@ cat.head()
 Multi-dimensional FITS columns are expanded into separate columns with
 1-based suffixes, for example `flux_ivar_1`, `flux_ivar_2`, etc.
 
-### Query Catalogs Around a Source List
+### Collect Matches Around a Source List
 
-`query_catalogs_around_source()` is a higher-level workflow for source-list
-matching. It:
-
-1. writes the input source table to FITS;
-2. finds all relevant bricks;
-3. combines the local tractor files for DR9 and DR10 separately;
-4. cross-matches the input sources with the combined tractor catalogs using
-   STILTS.
+`collect_matches()` finds overlapping bricks, loads each local tractor catalog,
+and returns every Legacy Survey source within the search radius. DR9 and DR10
+are matched separately with `fast_match(mode="all")`. Nothing is written to disk.
 
 ```python
-from pathlib import Path
-
-legacysurvey.query_catalogs_around_source(
-    input_cat=source_table,
-    output_dir=Path("output/legacy_survey_match"),
-    task_name="my_sources",
-    search_radius=5,       # arcsec, passed to STILTS matching
-    col_ra="ra",
-    col_dec="dec",
-    max_workers=16,
+matches = legacysurvey.collect_matches(
+    ra=source_table["ra"],
+    dec=source_table["dec"],
+    search_radius="1 arcmin",
+    id=source_table["id"],
 )
+matches["dr10"].head()
 ```
 
-Expected outputs include:
+`search_radius` accepts a number (arcseconds), a string such as `"1 arcmin"`,
+or an astropy quantity. If `id` is omitted, positional indices `0 .. N-1` are
+stored in the output `id` column. By default all CPU cores are used.
 
-| Output | Description |
+The returned object is a dict of DataFrames:
+
+| Key | Description |
 | --- | --- |
-| `<task_name>_input_catalog.fits` | Input source catalog |
-| `<task_name>_bricksinfo.pkl` | Bricks found for each input source |
-| `<task_name>_dr9_all.fits`, `<task_name>_dr10_all.fits` | Combined tractor catalogs |
-| `<task_name>_dr9.fits`, `<task_name>_dr10.fits` | Final matched catalogs |
-
-This method requires STILTS to be available through `astrokit.wrapper.stilts`.
+| `dr9` | Matched DR9 tractor rows, with input `id`, `sep` (arcsec), and `ls_id` |
+| `dr10` | Matched DR10 tractor rows, with the same extra columns |
 
 ### Make Legacy Survey IDs
 
