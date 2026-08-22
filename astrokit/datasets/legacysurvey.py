@@ -5,6 +5,7 @@ Tools for working with the Legacy Survey (LS10) datasets.
 @Date: 2025-10-10
 """
 import os
+import sys
 import numpy as np
 from pathlib import Path
 from typing import Sequence, Union
@@ -217,6 +218,138 @@ def _plot_bricks(ax, bricks, ra_center):
     ]
     return handles
 
+def _tractor_file_path(dir_data, release, brickname):
+    dir_tractor = {
+        'dr9': Path(dir_data) / 'dr9_north' / 'tractor',
+        'dr10': Path(dir_data) / 'dr10_south' / 'tractor',
+    }
+    return dir_tractor[release] / brickname[:3] / f'tractor-{brickname}.fits'
+
+
+def _read_tractor_catalog(path, columns=None, rows=None) -> pd.DataFrame:
+    kwargs = {'ext': 1}
+    if columns is not None:
+        kwargs['columns'] = columns
+    if rows is not None:
+        kwargs['rows'] = np.asarray(rows, dtype=np.intp)
+    arr = fitsio.read(path, **kwargs)
+    arr = arr.astype(arr.dtype.newbyteorder("="), copy=False)
+    data = {}
+    for name in arr.dtype.names:
+        if arr[name].ndim == 1:
+            data[name] = arr[name]
+        else:
+            n_params = arr[name].shape[1]
+            for i in range(n_params):
+                data[f'{name}_{i+1}'] = arr[name][:, i]
+    return pd.DataFrame(data)
+
+
+def _make_ls_id_values(release, brickid, objid) -> np.ndarray:
+    r = np.asarray(release, dtype=np.int64)
+    b = np.asarray(brickid, dtype=np.int64)
+    o = np.asarray(objid, dtype=np.int64)
+    if r.ndim != 1 or b.ndim != 1 or o.ndim != 1:
+        raise ValueError("release/brickid/objid must be 1D arrays.")
+    if not (r.size == b.size == o.size):
+        raise ValueError("release/brickid/objid must have the same length.")
+    out = np.char.add(r.astype(str), "_")
+    out = np.char.add(out, b.astype(str))
+    out = np.char.add(out, "_")
+    return np.char.add(out, o.astype(str))
+
+
+def _source_indices_for_bricks(bricks, ra, dec, radius_arcsec):
+    """Return, for each brick row, source indices whose search circle may overlap it."""
+    n_bricks = len(bricks)
+    if n_bricks == 0 or len(ra) == 0:
+        return [np.array([], dtype=int) for _ in range(n_bricks)]
+
+    source_tree = cKDTree(_radec_to_unit_vector(ra, dec))
+    geom = _prepare_brick_geometry(bricks)
+    dec_abs_min = np.maximum(np.abs(geom['dec_center']) - geom['half_height'], 0.0)
+    dra = geom['half_width'] * np.cos(np.deg2rad(dec_abs_min))
+    ddec = geom['half_height']
+    half_diag_arcsec = np.sqrt(dra * dra + ddec * ddec) * 3600.0 + 1.0
+    query_radius_rad = np.deg2rad((radius_arcsec + half_diag_arcsec) / 3600.0)
+    query_radius_chord = 2.0 * np.sin(query_radius_rad / 2.0)
+    brick_vectors = _radec_to_unit_vector(geom['ra_center'], geom['dec_center'])
+    candidate_lists = source_tree.query_ball_point(brick_vectors, query_radius_chord)
+
+    out = []
+    for i, candidate_idx in enumerate(candidate_lists):
+        if len(candidate_idx) == 0:
+            out.append(np.array([], dtype=int))
+            continue
+        idx = np.asarray(candidate_idx, dtype=int)
+        ra_delta = _angular_delta_deg(ra[idx], geom['ra_center'][i])
+        dec_delta = dec[idx] - geom['dec_center'][i]
+        outside_ra = np.maximum(np.abs(ra_delta) - geom['half_width'][i], 0.0)
+        outside_dec = np.maximum(np.abs(dec_delta) - geom['half_height'][i], 0.0)
+        cos_dec = np.cos(np.deg2rad(dec[idx]))
+        dist_arcsec = np.sqrt((outside_ra * cos_dec)**2 + outside_dec**2) * 3600.0
+        out.append(idx[dist_arcsec <= (radius_arcsec + 2.0)])
+    return out
+
+
+def _progress_bar(iterable, *, total, desc, show=True, unit='brick', min_total=1):
+    if (not show) or (total < min_total):
+        return iterable
+    return tqdm(
+        iterable,
+        total=total,
+        desc=desc,
+        unit=unit,
+        file=sys.stdout,
+        dynamic_ncols=True,
+        leave=True,
+        mininterval=0.2,
+        bar_format='{desc}: {percentage:3.0f}%|{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}]',
+    )
+
+
+_TRACTOR_COORD_COLUMNS = ['release', 'brickid', 'objid', 'ra', 'dec']
+
+
+
+def _match_one_brick_task(args):
+    dir_data, release, brickname, ra, dec, ids, radius_arcsec = args
+    path = _tractor_file_path(dir_data, release, brickname)
+    if not path.exists():
+        return ('missing', release, brickname, None)
+    if len(ra) == 0:
+        return ('ok', release, brickname, None)
+    try:
+        coords = _read_tractor_catalog(path, columns=_TRACTOR_COORD_COLUMNS)
+        if coords.empty:
+            return ('ok', release, brickname, None)
+        row_id = np.arange(len(coords), dtype=np.intp)
+        pairs = fast_match(
+            ra, dec,
+            coords['ra'].to_numpy(), coords['dec'].to_numpy(),
+            radius_arcsec=radius_arcsec,
+            id_1=ids,
+            id_2=row_id,
+            mode='all',
+            workers=1,
+        )
+        if pairs.empty:
+            return ('ok', release, brickname, None)
+
+        row_idx = np.asarray(pairs['id_2'], dtype=np.intp)
+        unique_rows, inverse = np.unique(row_idx, return_inverse=True)
+        tractor = _read_tractor_catalog(path, rows=unique_rows)
+        tractor.insert(0, 'ls_id', _make_ls_id_values(
+            tractor['release'], tractor['brickid'], tractor['objid']
+        ))
+        matched = tractor.iloc[inverse].reset_index(drop=True)
+        matched.insert(0, 'id', np.asarray(pairs['id_1']))
+        matched.insert(1, 'sep', np.asarray(pairs['sep']))
+        return ('ok', release, brickname, matched)
+    except Exception as exc:
+        return ('error', release, brickname, str(exc))
+
+
 class LegacySurvey:
     """
     A class to handle Legacy Survey datasets.
@@ -266,17 +399,12 @@ class LegacySurvey:
         """
         Given a release and brickname, return the path to the corresponding tractor file.
         """
-        dir_tractor = {
-            'dr9': self.dir_data / 'dr9_north' / 'tractor',
-            'dr10': self.dir_data / 'dr10_south' / 'tractor'
-        }
-        path = dir_tractor[release] / brickname[:3] / f'tractor-{brickname}.fits'
+        path = _tractor_file_path(self.dir_data, release, brickname)
         if path.exists():
             return path
-        else:
-            if not silent:
-                logger.error(f"Tractor file for brick {brickname} in release {release} not found.")
-            return None
+        if not silent:
+            logger.error(f"Tractor file for brick {brickname} in release {release} not found.")
+        return None
 
     def load_tractor_catalog(self, brickname, release, columns=None) -> pd.DataFrame:
         """
@@ -297,18 +425,7 @@ class LegacySurvey:
             List of columns to read from the tractor catalog. If None, all columns are read.
         """
         path = self.find_tractor_file(release=release, brickname=brickname, silent=False)
-        arr = fitsio.read(path, ext=1, columns=columns)
-        arr = arr.astype(arr.dtype.newbyteorder("="), copy=False)
-
-        data = {}
-        for name in arr.dtype.names:
-            if arr[name].ndim == 1:
-                data[name] = arr[name]
-            else:
-                n_params = arr[name].shape[1]
-                for i in range(n_params):
-                    data[f'{name}_{i+1}'] = arr[name][:, i]
-        return pd.DataFrame(data)
+        return _read_tractor_catalog(path, columns=columns)
 
 
     def find_brickname(self, ra, dec):
@@ -511,15 +628,18 @@ class LegacySurvey:
             ))
 
         if max_workers is None or max_workers <= 1 or len(chunks) == 1:
-            iterator = chunks
-            if show_progress:
-                iterator = tqdm(iterator, total=len(chunks), desc="Filtering bricks")
+            iterator = _progress_bar(
+                chunks, total=len(chunks), desc="Filtering bricks",
+                show=show_progress, unit='chunk', min_total=5,
+            )
             chunk_results = [_filter_candidate_bricks_chunk(chunk) for chunk in iterator]
         else:
             with ThreadPoolExecutor(max_workers=max_workers) as executor:
-                iterator = executor.map(_filter_candidate_bricks_chunk, chunks)
-                if show_progress:
-                    iterator = tqdm(iterator, total=len(chunks), desc="Filtering bricks")
+                iterator = _progress_bar(
+                    executor.map(_filter_candidate_bricks_chunk, chunks),
+                    total=len(chunks), desc="Filtering bricks",
+                    show=show_progress, unit='chunk', min_total=5,
+                )
                 chunk_results = list(iterator)
 
         filtered = [idx for chunk in chunk_results for idx in chunk]
@@ -540,42 +660,13 @@ class LegacySurvey:
             ]
 
         return res
-    
-    def _match_one_brick(self, release, brickname, ra, dec, ids, radius_arcsec, match_workers):
-        path = self.find_tractor_file(release=release, brickname=brickname, silent=True)
-        if path is None:
-            logger.warning(f"Tractor file not found: {release}-{brickname}. Skipping ...")
-            return None
 
-        try:
-            tractor = self.load_tractor_catalog(brickname, release)
-        except Exception as exc:
-            logger.warning(f"Failed to read {release}-{brickname}: {exc}. Skipping ...")
-            return None
-        if tractor.empty:
-            return None
-
-        tractor.insert(
-            0,
-            'ls_id',
-            self.make_ls_id(tractor['release'], tractor['brickid'], tractor['objid']),
-        )
-        pairs = fast_match(
-            ra, dec,
-            tractor['ra'].to_numpy(), tractor['dec'].to_numpy(),
-            radius_arcsec=radius_arcsec,
-            id_1=ids,
-            id_2=tractor['ls_id'].to_numpy(),
-            mode='all',
-            workers=match_workers,
-        )
-        if pairs.empty:
-            return None
-
-        matched = tractor.set_index('ls_id').loc[pairs['id_2']].reset_index()
-        matched.insert(0, 'id', np.asarray(pairs['id_1']))
-        matched.insert(1, 'sep', np.asarray(pairs['sep']))
-        return matched
+    def make_ls_id(self, release: ArrayLike, brickid: ArrayLike, objid: ArrayLike) -> np.ndarray:
+        """
+        Make the Unique Legacy Survey Identifier for given release, brickid, and objid.
+        The format is: "{release}_{brickid}_{objid}"
+        """
+        return _make_ls_id_values(release, brickid, objid)
 
     def collect_matches(
         self,
@@ -590,9 +681,10 @@ class LegacySurvey:
         Collect all Legacy Survey tractor sources within ``search_radius`` of
         the input coordinates.
 
-        Bricks are selected with ``find_bricks_from_list``. Each brick catalog
-        is loaded, assigned ``ls_id``, and cross-matched with ``fast_match``
-        (``mode='all'``). DR9 and DR10 are matched separately.
+        Bricks are selected with ``find_bricks_from_list``. Each brick is then
+        matched only against nearby sources: tractor coordinates are read
+        first, and the full catalog is loaded only if there is a match.
+        DR9 and DR10 are matched separately with ``fast_match(mode='all')``.
 
         Parameters
         ----------
@@ -642,11 +734,10 @@ class LegacySurvey:
         workers = n_cpu if max_workers is None else int(max_workers)
         if workers < 1:
             raise ValueError("max_workers must be >= 1.")
-        match_workers = 1 if workers > 1 else -1
 
         logger.info(
-            f"Collecting LS matches for {n_sources:,} sources "
-            f"within {radius_arcsec:g} arcsec ..."
+            f"Collecting LS matches | {n_sources:,} sources | "
+            f"r = {radius_arcsec:g} arcsec"
         )
         bricks = self.find_bricks_from_list(
             ra=ra,
@@ -657,79 +748,99 @@ class LegacySurvey:
         )
         n_dr9 = int((bricks['release'] == 'dr9').sum()) if len(bricks) else 0
         n_dr10 = int((bricks['release'] == 'dr10').sum()) if len(bricks) else 0
-        logger.info(f"Found {len(bricks):,} overlapping bricks (DR9={n_dr9:,}, DR10={n_dr10:,}).")
+        logger.info(
+            f"Overlapping bricks | {len(bricks):,} total "
+            f"(DR9 {n_dr9:,}, DR10 {n_dr10:,})"
+        )
 
+        source_idx_per_brick = _source_indices_for_bricks(bricks, ra, dec, radius_arcsec)
         empty = pd.DataFrame(columns=['id', 'sep', 'ls_id'])
         results = {'dr9': empty.copy(), 'dr10': empty.copy()}
+        dir_data = str(self.dir_data)
 
         for release in ('dr9', 'dr10'):
-            bricks_rel = bricks[bricks['release'] == release] if len(bricks) else bricks
+            if len(bricks) == 0:
+                logger.warning(f"No bricks found for LS {release.upper()}.")
+                continue
+            rel_mask = (bricks['release'].to_numpy() == release)
+            bricks_rel = bricks.loc[rel_mask]
             n_bricks = len(bricks_rel)
             if n_bricks == 0:
                 logger.warning(f"No bricks found for LS {release.upper()}.")
                 continue
 
-            logger.info(f"Matching LS {release.upper()} catalogs from {n_bricks:,} bricks ...")
-            bricknames = bricks_rel['brickname'].tolist()
-            n_workers = max(1, min(workers, n_bricks))
+            rel_indices = np.flatnonzero(rel_mask)
+            tasks = []
+            for row, brick_i in zip(bricks_rel.itertuples(index=False), rel_indices):
+                src_idx = source_idx_per_brick[brick_i]
+                if len(src_idx) == 0:
+                    continue
+                tasks.append((
+                    dir_data,
+                    release,
+                    row.brickname,
+                    ra[src_idx],
+                    dec[src_idx],
+                    ids[src_idx],
+                    radius_arcsec,
+                ))
 
-            def _job(brickname, _release=release):
-                return self._match_one_brick(
-                    _release, brickname, ra, dec, ids, radius_arcsec, match_workers
-                )
+            if not tasks:
+                logger.info(f"{release.upper()} | no nearby sources to match")
+                continue
 
+            n_workers = max(1, min(workers, len(tasks)))
             matched_frames = []
+            n_missing = 0
+            n_error = 0
+
+            def _consume(status, rel, brickname, payload):
+                nonlocal n_missing, n_error
+                if status == 'ok':
+                    if payload is not None:
+                        matched_frames.append(payload)
+                elif status == 'missing':
+                    n_missing += 1
+                    logger.warning(f"Missing tractor | {rel}-{brickname}")
+                else:
+                    n_error += 1
+                    logger.warning(f"Failed to read | {rel}-{brickname} | {payload}")
+
             if n_workers <= 1:
-                iterator = bricknames
-                if show_progress:
-                    iterator = tqdm(iterator, total=n_bricks, desc=f"Matching {release.upper()}")
-                for brickname in iterator:
-                    matched = _job(brickname)
-                    if matched is not None:
-                        matched_frames.append(matched)
+                iterator = _progress_bar(
+                    tasks, total=len(tasks),
+                    desc=f"{release.upper()}",
+                    show=show_progress,
+                )
+                for task in iterator:
+                    _consume(*_match_one_brick_task(task))
             else:
                 with ThreadPoolExecutor(max_workers=n_workers) as executor:
-                    iterator = executor.map(_job, bricknames)
-                    if show_progress:
-                        iterator = tqdm(iterator, total=n_bricks, desc=f"Matching {release.upper()}")
-                    for matched in iterator:
-                        if matched is not None:
-                            matched_frames.append(matched)
+                    iterator = _progress_bar(
+                        executor.map(_match_one_brick_task, tasks),
+                        total=len(tasks),
+                        desc=f"{release.upper()}",
+                        show=show_progress,
+                    )
+                    for item in iterator:
+                        _consume(*item)
 
             if matched_frames:
                 results[release] = pd.concat(matched_frames, ignore_index=True)
+            extra = []
+            if n_missing:
+                extra.append(f"{n_missing:,} missing")
+            if n_error:
+                extra.append(f"{n_error:,} errors")
+            extra_txt = f" | {', '.join(extra)}" if extra else ""
             logger.info(
-                f"LS {release.upper()}: {len(results[release]):,} matched rows "
-                f"from {n_bricks:,} bricks."
+                f"{release.upper()} | {len(results[release]):,} matches "
+                f"| {n_bricks:,} bricks{extra_txt}"
             )
 
-        logger.success(f"Collecting matches finished in {sec_to_hms(time.time() - st_all)}.")
+        logger.success(f"Done | {sec_to_hms(time.time() - st_all)}")
         return results
 
-    def make_ls_id(self, release: ArrayLike, brickid: ArrayLike, objid: ArrayLike) -> np.ndarray:
-        """
-        Make the Unique Legacy Survey Identifier for given release, brickid, and objid.
-        The format is: "{release}_{brickid}_{objid}"
-        """
-
-        r = np.asarray(release, dtype=np.int64)
-        b = np.asarray(brickid, dtype=np.int64)
-        o = np.asarray(objid,   dtype=np.int64)
-
-        if r.ndim != 1 or b.ndim != 1 or o.ndim != 1:
-            raise ValueError("release/brickid/objid must be 1D arrays.")
-        if not (r.size == b.size == o.size):
-            raise ValueError("release/brickid/objid must have the same length.")
-
-        r = r.astype(str)
-        b = b.astype(str)
-        o = o.astype(str)
-
-        out = np.char.add(r, "_")
-        out = np.char.add(out, b)
-        out = np.char.add(out, "_")
-        out = np.char.add(out, o)
-        return out
     
 
     def download_image(self, release, brickname, band, dir_output, silent=False):
