@@ -1,6 +1,8 @@
 import numpy as np
+import pandas as pd
 from scipy import stats
 from scipy import integrate
+from scipy.spatial import cKDTree
 
 import astropy.units as u
 import astropy.constants as const
@@ -22,7 +24,8 @@ __all__ = [
     'kde2D',
     'binned_stats',
     'NMAD', 
-    'cal_min_dist'
+    'cal_min_dist', 
+    'find_neighbors'
 ]
 
 
@@ -428,3 +431,79 @@ def cal_min_dist(point, line_start, line_end):
     dist = np.where(on_arc, delta_gc, dist_end)
 
     return np.degrees(dist) * 3600.0  # arcsec
+
+def find_neighbors(
+    df,
+    radius,
+    id_col="EPFID",
+    ra_col="RA",
+    dec_col="DEC",
+):
+    """
+    用球面最近邻标记空间上过近的源。
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+    radius : float
+        角距离阈值，单位 arcsec。
+    id_col, ra_col, dec_col : str
+        RA/DEC 假定为度。
+
+    Returns
+    -------
+    pandas.DataFrame
+        在表末新增两列:
+        - has_close_neighbor : 阈值内存在其他源则为 True, 否则 False
+        - neighbor_id              : 若 True, 给出阈值内最近邻的 ID, 否则为 NA
+    """
+    if radius <= 0:
+        raise ValueError("radius must be positive")
+
+    out = df.copy()
+    n = len(out)
+    has_close = np.zeros(n, dtype=bool)
+    neighbor_id = np.empty(n, dtype=object)
+    neighbor_id[:] = pd.NA
+
+    if n < 2:
+        out["has_close_neighbor"] = has_close
+        out["neighbor_id"] = neighbor_id
+        return out
+
+    ra = out[ra_col].to_numpy(dtype=np.float64, copy=False)
+    dec = out[dec_col].to_numpy(dtype=np.float64, copy=False)
+    ids = out[id_col].to_numpy()
+
+    valid = np.isfinite(ra) & np.isfinite(dec) & (dec >= -90.0) & (dec <= 90.0)
+    vi = np.flatnonzero(valid)
+    if vi.size < 2:
+        out["has_close_neighbor"] = has_close
+        out["neighbor_id"] = neighbor_id
+        return out
+
+    ra_v = np.deg2rad(ra[vi])
+    dec_v = np.deg2rad(dec[vi])
+    cos_dec = np.cos(dec_v)
+    xyz = np.column_stack((cos_dec * np.cos(ra_v), cos_dec * np.sin(ra_v), np.sin(dec_v)))
+
+    # 单位球面弦长: 2 sin(θ/2)。直接比较弦长，避免每点再做反三角函数。
+    r_chord = 2.0 * np.sin(0.5 * np.deg2rad(radius / 3600.0))
+
+    tree = cKDTree(xyz, compact_nodes=True, balanced_tree=True, copy_data=False)
+    dist, idx = tree.query(xyz, k=2, workers=-1)
+
+    n_valid = vi.size
+    self = np.arange(n_valid)
+    # 坐标完全重合时，最近邻可能不是自己，不能默认用 idx[:, 1]
+    use_first = idx[:, 0] != self
+    nn_local = np.where(use_first, idx[:, 0], idx[:, 1])
+    nn_dist = np.where(use_first, dist[:, 0], dist[:, 1])
+
+    close = np.isfinite(nn_dist) & (nn_dist <= r_chord)
+    has_close[vi[close]] = True
+    neighbor_id[vi[close]] = ids[vi[nn_local[close]]]
+
+    out["has_close_neighbor"] = has_close
+    out["neighbor_id"] = neighbor_id
+    return out
