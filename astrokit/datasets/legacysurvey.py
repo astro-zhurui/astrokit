@@ -1,5 +1,5 @@
 """
-Tools for working with the Legacy Survey (LS10) datasets.
+Tools for working with the Legacy Survey datasets.
 
 @Author: Rui Zhu
 @Date: 2025-10-10
