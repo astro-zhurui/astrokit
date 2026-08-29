@@ -16,7 +16,6 @@ from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
 from matplotlib import rcParams
 rcParams['font.family'] = 'Times New Roman'
-from tqdm import tqdm
 import time
 from concurrent.futures import ThreadPoolExecutor
 import requests
@@ -293,19 +292,26 @@ def _source_indices_for_bricks(bricks, ra, dec, radius_arcsec):
 
 
 def _progress_bar(iterable, *, total, desc, show=True, unit='brick', min_total=1):
+    """Yield work items with a compact one-line interactive status."""
     if (not show) or (total < min_total):
         return iterable
-    return tqdm(
-        iterable,
-        total=total,
-        desc=desc,
-        unit=unit,
-        file=sys.stdout,
-        dynamic_ncols=True,
-        leave=True,
-        mininterval=0.2,
-        bar_format='{desc}: {percentage:3.0f}%|{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}]',
-    )
+
+    def _report():
+        start = last = time.monotonic()
+        for count, item in enumerate(iterable, start=1):
+            now = time.monotonic()
+            if count == total or now - last >= 1.0:
+                elapsed = now - start
+                rate = count / elapsed if elapsed else 0.0
+                remaining = (total - count) / rate if rate else float('inf')
+                eta = '--' if not np.isfinite(remaining) else sec_to_hms(remaining)
+                text = f"{desc}: {count:,}/{total:,} {unit}s | {rate:.2f} {unit}/s | ETA {eta}"
+                print(f"\r{text:<100}", end="", file=sys.stdout, flush=True)
+                last = now
+            yield item
+        print(file=sys.stdout, flush=True)
+
+    return _report()
 
 
 _TRACTOR_COORD_COLUMNS = ['release', 'brickid', 'objid', 'ra', 'dec']
@@ -313,7 +319,7 @@ _TRACTOR_COORD_COLUMNS = ['release', 'brickid', 'objid', 'ra', 'dec']
 
 
 def _match_one_brick_task(args):
-    dir_data, release, brickname, ra, dec, ids, radius_arcsec = args
+    dir_data, release, brickname, ra, dec, ids, radius_arcsec, collect_sources = args
     path = _tractor_file_path(dir_data, release, brickname)
     if not path.exists():
         return ('missing', release, brickname, None)
@@ -324,24 +330,28 @@ def _match_one_brick_task(args):
         if coords.empty:
             return ('ok', release, brickname, None)
         row_id = np.arange(len(coords), dtype=np.intp)
-        pairs = fast_match(
-            ra, dec,
-            coords['ra'].to_numpy(), coords['dec'].to_numpy(),
-            radius_arcsec=radius_arcsec,
-            id_1=ids,
-            id_2=row_id,
-            mode='all',
-            workers=1,
-        )
+        if collect_sources:
+            pairs = fast_match(
+                coords['ra'].to_numpy(), coords['dec'].to_numpy(), ra, dec,
+                radius_arcsec=radius_arcsec, id_1=row_id, mode='nearest', workers=1,
+            )
+        else:
+            pairs = fast_match(
+                ra, dec, coords['ra'].to_numpy(), coords['dec'].to_numpy(),
+                radius_arcsec=radius_arcsec, id_1=ids, id_2=row_id, mode='all', workers=1,
+            )
         if pairs.empty:
             return ('ok', release, brickname, None)
 
-        row_idx = np.asarray(pairs['id_2'], dtype=np.intp)
-        unique_rows, inverse = np.unique(row_idx, return_inverse=True)
+        row_idx = np.asarray(pairs['id_1' if collect_sources else 'id_2'], dtype=np.intp)
+        unique_rows = np.unique(row_idx)
         tractor = _read_tractor_catalog(path, rows=unique_rows)
         tractor.insert(0, 'ls_id', _make_ls_id_values(
             tractor['release'], tractor['brickid'], tractor['objid']
         ))
+        if collect_sources:
+            return ('ok', release, brickname, tractor)
+        inverse = np.searchsorted(unique_rows, row_idx)
         matched = tractor.iloc[inverse].reset_index(drop=True)
         matched.insert(0, 'id', np.asarray(pairs['id_1']))
         matched.insert(1, 'sep', np.asarray(pairs['sep']))
@@ -629,7 +639,7 @@ class LegacySurvey:
 
         if max_workers is None or max_workers <= 1 or len(chunks) == 1:
             iterator = _progress_bar(
-                chunks, total=len(chunks), desc="Filtering bricks",
+                chunks, total=len(chunks), desc="Assigning source batches",
                 show=show_progress, unit='chunk', min_total=5,
             )
             chunk_results = [_filter_candidate_bricks_chunk(chunk) for chunk in iterator]
@@ -637,7 +647,7 @@ class LegacySurvey:
             with ThreadPoolExecutor(max_workers=max_workers) as executor:
                 iterator = _progress_bar(
                     executor.map(_filter_candidate_bricks_chunk, chunks),
-                    total=len(chunks), desc="Filtering bricks",
+                    total=len(chunks), desc="Assigning source batches",
                     show=show_progress, unit='chunk', min_total=5,
                 )
                 chunk_results = list(iterator)
@@ -676,6 +686,8 @@ class LegacySurvey:
         id=None,
         max_workers=None,
         show_progress=True,
+        filter_primary=False,
+        quiet=False,
     ):
         """
         Collect all Legacy Survey tractor sources within ``search_radius`` of
@@ -700,6 +712,10 @@ class LegacySurvey:
             cores. ``1`` disables brick-level parallelism.
         show_progress : bool
             If True, show progress bars.
+        filter_primary : bool
+            If True, discard ``type='DUP'`` and non-primary rows, remove
+            ``id``/``sep``, and de-duplicate within each brick before retaining
+            it in memory. DR9 bricks duplicated by DR10 are skipped.
 
         Returns
         -------
@@ -735,10 +751,8 @@ class LegacySurvey:
         if workers < 1:
             raise ValueError("max_workers must be >= 1.")
 
-        logger.info(
-            f"Collecting LS matches | {n_sources:,} sources | "
-            f"r = {radius_arcsec:g} arcsec"
-        )
+        if not quiet:
+            logger.info(f"Collecting LS matches | {n_sources:,} sources | r = {radius_arcsec:g} arcsec")
         bricks = self.find_bricks_from_list(
             ra=ra,
             dec=dec,
@@ -748,10 +762,9 @@ class LegacySurvey:
         )
         n_dr9 = int((bricks['release'] == 'dr9').sum()) if len(bricks) else 0
         n_dr10 = int((bricks['release'] == 'dr10').sum()) if len(bricks) else 0
-        logger.info(
-            f"Overlapping bricks | {len(bricks):,} total "
-            f"(DR9 {n_dr9:,}, DR10 {n_dr10:,})"
-        )
+        dr10_bricks = set(bricks.loc[bricks['release'] == 'dr10', 'brickname'])
+        if not quiet:
+            logger.info(f"Overlapping bricks | {len(bricks):,} total (DR9 {n_dr9:,}, DR10 {n_dr10:,})")
 
         source_idx_per_brick = _source_indices_for_bricks(bricks, ra, dec, radius_arcsec)
         empty = pd.DataFrame(columns=['id', 'sep', 'ls_id'])
@@ -772,6 +785,8 @@ class LegacySurvey:
             rel_indices = np.flatnonzero(rel_mask)
             tasks = []
             for row, brick_i in zip(bricks_rel.itertuples(index=False), rel_indices):
+                if filter_primary and release == 'dr9' and row.brickname in dr10_bricks:
+                    continue
                 src_idx = source_idx_per_brick[brick_i]
                 if len(src_idx) == 0:
                     continue
@@ -783,6 +798,7 @@ class LegacySurvey:
                     dec[src_idx],
                     ids[src_idx],
                     radius_arcsec,
+                    filter_primary,
                 ))
 
             if not tasks:
@@ -798,6 +814,14 @@ class LegacySurvey:
                 nonlocal n_missing, n_error
                 if status == 'ok':
                     if payload is not None:
+                        if filter_primary:
+                            payload = payload.loc[
+                                (payload['type'].astype(str) != 'DUP')
+                                & payload['brick_primary'].astype(bool)
+                            ].drop(columns=['id', 'sep'], errors='ignore')
+                            payload = payload.drop_duplicates(subset=['ls_id'], keep='first')
+                            if payload.empty:
+                                return
                         matched_frames.append(payload)
                 elif status == 'missing':
                     n_missing += 1
@@ -833,12 +857,11 @@ class LegacySurvey:
             if n_error:
                 extra.append(f"{n_error:,} errors")
             extra_txt = f" | {', '.join(extra)}" if extra else ""
-            logger.info(
-                f"{release.upper()} | {len(results[release]):,} matches "
-                f"| {n_bricks:,} bricks{extra_txt}"
-            )
+            if not quiet:
+                logger.info(f"{release.upper()} | {len(results[release]):,} matches | {n_bricks:,} bricks{extra_txt}")
 
-        logger.success(f"Done | {sec_to_hms(time.time() - st_all)}")
+        if not quiet:
+            logger.success(f"Done | {sec_to_hms(time.time() - st_all)}")
         return results
 
     
