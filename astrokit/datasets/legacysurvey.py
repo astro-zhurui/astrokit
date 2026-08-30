@@ -228,7 +228,16 @@ def _tractor_file_path(dir_data, release, brickname):
 def _read_tractor_catalog(path, columns=None, rows=None) -> pd.DataFrame:
     kwargs = {'ext': 1}
     if columns is not None:
-        kwargs['columns'] = columns
+        available = set(fitsio.FITS(path)[1].get_colnames())
+        resolved = []
+        for name in dict.fromkeys(columns):
+            if name in available:
+                resolved.append(name)
+                continue
+            base, sep, suffix = name.rpartition('_')
+            if sep and suffix.isdigit() and base in available:
+                resolved.append(base)
+        kwargs['columns'] = resolved
     if rows is not None:
         kwargs['rows'] = np.asarray(rows, dtype=np.intp)
     arr = fitsio.read(path, **kwargs)
@@ -319,7 +328,7 @@ _TRACTOR_COORD_COLUMNS = ['release', 'brickid', 'objid', 'ra', 'dec']
 
 
 def _match_one_brick_task(args):
-    dir_data, release, brickname, ra, dec, ids, radius_arcsec, collect_sources = args
+    dir_data, release, brickname, ra, dec, ids, radius_arcsec, collect_sources, output_columns, load_columns = args
     path = _tractor_file_path(dir_data, release, brickname)
     if not path.exists():
         return ('missing', release, brickname, None)
@@ -345,7 +354,7 @@ def _match_one_brick_task(args):
 
         row_idx = np.asarray(pairs['id_1' if collect_sources else 'id_2'], dtype=np.intp)
         unique_rows = np.unique(row_idx)
-        tractor = _read_tractor_catalog(path, rows=unique_rows)
+        tractor = _read_tractor_catalog(path, columns=load_columns, rows=unique_rows)
         tractor.insert(0, 'ls_id', _make_ls_id_values(
             tractor['release'], tractor['brickid'], tractor['objid']
         ))
@@ -684,6 +693,7 @@ class LegacySurvey:
         dec,
         search_radius=60,
         id=None,
+        columns=None,
         max_workers=None,
         show_progress=True,
         filter_primary=False,
@@ -746,6 +756,19 @@ class LegacySurvey:
             if ids.shape[0] != n_sources:
                 raise ValueError("id must have the same length as ra and dec.")
 
+        if columns is None:
+            output_columns = None
+        else:
+            output_columns = list(dict.fromkeys(columns))
+            if any(not isinstance(name, str) for name in output_columns):
+                raise TypeError("columns must contain only strings.")
+            output_columns = [name for name in output_columns if name not in {"id", "sep", "ls_id"}]
+
+        load_columns = None if output_columns is None else list(dict.fromkeys(
+            [*output_columns, "release", "brickid", "objid", "ra", "dec"]
+            + (["type", "brick_primary"] if filter_primary else [])
+        ))
+
         n_cpu = os.cpu_count() or 1
         workers = n_cpu if max_workers is None else int(max_workers)
         if workers < 1:
@@ -799,6 +822,8 @@ class LegacySurvey:
                     ids[src_idx],
                     radius_arcsec,
                     filter_primary,
+                    output_columns,
+                    load_columns,
                 ))
 
             if not tasks:
@@ -822,6 +847,9 @@ class LegacySurvey:
                             payload = payload.drop_duplicates(subset=['ls_id'], keep='first')
                             if payload.empty:
                                 return
+                        if output_columns is not None:
+                            keep = ['ls_id'] + [name for name in output_columns if name in payload.columns]
+                            payload = payload.loc[:, keep]
                         matched_frames.append(payload)
                 elif status == 'missing':
                     n_missing += 1
