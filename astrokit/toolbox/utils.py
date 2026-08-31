@@ -37,7 +37,8 @@ __all__ = [
     "print_directory_tree", 
     "sec_to_hms", 
     "show_internet_speed", 
-    "replace_list_items"
+    "replace_list_items",
+    "get_device_name",
 ]
 def set_mpl_style(
     fontsize=16,
@@ -463,3 +464,17 @@ def replace_list_items(columns: dict, ls: list):
     for key, value in columns.items():
         ls = [value if x == key else x for x in ls]
     return ls
+
+
+def get_device_name() -> str:
+    """
+    返回当前程序运行的设备名称（主机名）。
+
+    Returns
+    -------
+    str
+        当前设备的主机名。
+    """
+    import socket
+    return socket.gethostname()
+
