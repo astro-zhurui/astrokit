@@ -49,7 +49,7 @@ The `bricksinfo` table contains one row per brick, with columns such as:
 
 | Column | Description |
 | --- | --- |
-| `release` | DR11 region, either `north` or `south` |
+| `region` | `north` or `south` |
 | `AAA` | First three characters of the brick name |
 | `brickname` | Legacy Survey brick name |
 | `ra`, `dec` | Brick center coordinate in degrees |
@@ -125,7 +125,7 @@ Use `find_tractor_file()` to locate the local tractor file for one brick:
 
 ```python
 path = legacysurvey.find_tractor_file(
-    release="south",
+    region="south",
     brickname="3375m395",
 )
 print(path)
@@ -137,7 +137,7 @@ Use `load_tractor_catalog()` to read a tractor catalog into a
 ```python
 cat = legacysurvey.load_tractor_catalog(
     brickname="3375m395",
-    release="south",
+    region="south",
     columns=["ra", "dec", "type", "flux_g", "flux_r", "flux_z"],
 )
 cat.head()
@@ -170,26 +170,8 @@ The returned object is a dict of DataFrames:
 
 | Key | Description |
 | --- | --- |
-| `north` | Matched DR11 North tractor rows, with input `id`, `sep` (arcsec), and `ls_id` |
+| `north` | Matched DR11 North tractor rows, with input `id`, `sep` (arcsec), and `ls_id_dr11` |
 | `south` | Matched DR11 South tractor rows, with the same extra columns |
-
-### Make Legacy Survey IDs
-
-`make_ls_id()` creates string identifiers from release, brickid, and objid:
-
-```python
-ls_id = legacysurvey.make_ls_id(
-    release=cat["release"],
-    brickid=cat["brickid"],
-    objid=cat["objid"],
-)
-```
-
-The output format is:
-
-```text
-<release>_<brickid>_<objid>
-```
 
 ### Download Coadd Images
 
@@ -198,7 +180,7 @@ portal:
 
 ```python
 legacysurvey.download_image(
-    release="south",
+    region="south",
     brickname="3375m395",
     band="r",
     dir_output=Path("images"),
