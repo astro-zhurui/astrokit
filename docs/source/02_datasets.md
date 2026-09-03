@@ -6,22 +6,21 @@ This module provides several python classes to deal with large datasets includin
 ## LegacySurvey
 
 `LegacySurvey` provides utilities for working with local DESI Legacy Imaging Surveys
-data, especially DR9 North and DR10 South tractor catalogs. It helps you locate
-bricks, read local tractor files, collect catalogs around a source list, and
-download coadd images.
+DR11 North and South tractor catalogs. It helps you locate bricks, read local
+tractor files, collect catalogs around a source list, and download coadd images.
 
 ### Data Preparation
 
-Download the Legacy Survey data from https://www.legacysurvey.org and organize
+Download the Legacy Survey DR11 data from https://www.legacysurvey.org and organize
 the files in a local directory. The expected directory tree is:
 
 ```text
 <DIR_LEGACYSURVEY>/
-        dr9_north/
-            survey-bricks-dr9-north.fits.gz
+        dr11_north/
+            survey-bricks-dr11-north.fits.gz
             tractor/<AAA>/tractor-<brickname>.fits
-        dr10_south/
-            survey-bricks-dr10-south.fits.gz
+        dr11_south/
+            survey-bricks-dr11-south.fits.gz
             tractor/<AAA>/tractor-<brickname>.fits
 ```
 
@@ -38,8 +37,8 @@ dir_legacysurvey = Path("/path/to/legacysurvey")
 legacysurvey = LegacySurvey(dir_legacysurvey)
 ```
 
-During initialization, `LegacySurvey` loads a combined brick table from DR9 North
-and DR10 South:
+During initialization, `LegacySurvey` loads a combined brick table from DR11 North
+and South:
 
 ```python
 bricksinfo = legacysurvey.bricksinfo
@@ -50,11 +49,12 @@ The `bricksinfo` table contains one row per brick, with columns such as:
 
 | Column | Description |
 | --- | --- |
-| `release` | Data release, either `dr9` or `dr10` |
+| `release` | DR11 region, either `north` or `south` |
 | `AAA` | First three characters of the brick name |
 | `brickname` | Legacy Survey brick name |
 | `ra`, `dec` | Brick center coordinate in degrees |
 | `ra1`, `ra2`, `dec1`, `dec2` | Brick boundary in degrees |
+| `survey_primary` | Whether this brick is the survey-primary coverage |
 
 The combined table is cached as `legacysurvey_bricksinfo.parquet` in
 `dir_legacysurvey` after it is created for the first time.
@@ -125,7 +125,7 @@ Use `find_tractor_file()` to locate the local tractor file for one brick:
 
 ```python
 path = legacysurvey.find_tractor_file(
-    release="dr10",
+    release="south",
     brickname="3375m395",
 )
 print(path)
@@ -137,7 +137,7 @@ Use `load_tractor_catalog()` to read a tractor catalog into a
 ```python
 cat = legacysurvey.load_tractor_catalog(
     brickname="3375m395",
-    release="dr10",
+    release="south",
     columns=["ra", "dec", "type", "flux_g", "flux_r", "flux_z"],
 )
 cat.head()
@@ -149,8 +149,8 @@ Multi-dimensional FITS columns are expanded into separate columns with
 ### Collect Matches Around a Source List
 
 `collect_matches()` finds overlapping bricks, loads each local tractor catalog,
-and returns every Legacy Survey source within the search radius. DR9 and DR10
-are matched separately with `fast_match(mode="all")`. Nothing is written to disk.
+and returns every Legacy Survey source within the search radius. DR11 North and
+South are matched separately with `fast_match(mode="all")`. Nothing is written to disk.
 
 ```python
 matches = legacysurvey.collect_matches(
@@ -159,7 +159,7 @@ matches = legacysurvey.collect_matches(
     search_radius="1 arcmin",
     id=source_table["id"],
 )
-matches["dr10"].head()
+matches["south"].head()
 ```
 
 `search_radius` accepts a number (arcseconds), a string such as `"1 arcmin"`,
@@ -170,8 +170,8 @@ The returned object is a dict of DataFrames:
 
 | Key | Description |
 | --- | --- |
-| `dr9` | Matched DR9 tractor rows, with input `id`, `sep` (arcsec), and `ls_id` |
-| `dr10` | Matched DR10 tractor rows, with the same extra columns |
+| `north` | Matched DR11 North tractor rows, with input `id`, `sep` (arcsec), and `ls_id` |
+| `south` | Matched DR11 South tractor rows, with the same extra columns |
 
 ### Make Legacy Survey IDs
 
@@ -198,7 +198,7 @@ portal:
 
 ```python
 legacysurvey.download_image(
-    release="dr10",
+    release="south",
     brickname="3375m395",
     band="r",
     dir_output=Path("images"),

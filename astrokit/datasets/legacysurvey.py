@@ -1,8 +1,9 @@
 """
-Tools for working with the Legacy Survey datasets.
+Tools for working with the Legacy Survey DR11 datasets.
 
 @Author: Rui Zhu
 @Date: 2025-10-10
+@Update: 2026-09-03, switch to LS DR11 north/south.
 """
 import os
 import sys
@@ -31,6 +32,38 @@ from astrokit.toolbox import sec_to_hms
 from astrokit.toolbox.match import fast_match
 
 __all__ = ['LegacySurvey']
+
+_LS_RELEASES = ('north', 'south')
+_RELEASE_ALIASES = {
+    'north': 'north',
+    'south': 'south',
+    'dr11_north': 'north',
+    'dr11_south': 'south',
+    'dr11-north': 'north',
+    'dr11-south': 'south',
+}
+_TRACTOR_DIRNAME = {
+    'north': Path('dr11_north') / 'tractor',
+    'south': Path('dr11_south') / 'tractor',
+}
+_BRICKS_TABLE = {
+    'north': Path('dr11_north') / 'survey-bricks-dr11-north.fits.gz',
+    'south': Path('dr11_south') / 'survey-bricks-dr11-south.fits.gz',
+}
+_COADD_URL = {
+    'north': 'https://portal.nersc.gov/cfs/cosmo/data/legacysurvey/dr11/north/coadd',
+    'south': 'https://portal.nersc.gov/cfs/cosmo/data/legacysurvey/dr11/south/coadd',
+}
+_BRICKSINFO_CACHE = 'legacysurvey_bricksinfo.parquet'
+
+
+def _normalize_release(release):
+    key = str(release).lower()
+    if key not in _RELEASE_ALIASES:
+        raise ValueError(
+            f"Unknown release {release!r}; expected 'north' or 'south' (DR11)."
+        )
+    return _RELEASE_ALIASES[key]
 
 def _find_bricks_static(i, ra_x, dec_x, search_radius, bricksinfo):
     search_radius = _search_radius_to_arcsec(search_radius)
@@ -142,19 +175,19 @@ def _auto_figure_size(x_span, y_span, min_size=5.0, max_size=9.0):
 
 def _plot_bricks(ax, bricks, ra_center):
     release_style = {
-        'dr9': {
+        'north': {
             'edgecolor': '0.15',
             'facecolor': '0.65',
             'hatch': '///',
             'linestyle': '-',
-            'label': 'DR9',
+            'label': 'DR11 North',
         },
-        'dr10': {
+        'south': {
             'edgecolor': '0.15',
             'facecolor': '0.85',
             'hatch': '\\\\\\',
             'linestyle': '--',
-            'label': 'DR10',
+            'label': 'DR11 South',
         },
     }
     default_style = {
@@ -218,11 +251,8 @@ def _plot_bricks(ax, bricks, ra_center):
     return handles
 
 def _tractor_file_path(dir_data, release, brickname):
-    dir_tractor = {
-        'dr9': Path(dir_data) / 'dr9_north' / 'tractor',
-        'dr10': Path(dir_data) / 'dr10_south' / 'tractor',
-    }
-    return dir_tractor[release] / brickname[:3] / f'tractor-{brickname}.fits'
+    release = _normalize_release(release)
+    return Path(dir_data) / _TRACTOR_DIRNAME[release] / brickname[:3] / f'tractor-{brickname}.fits'
 
 
 def _read_tractor_catalog(path, columns=None, rows=None) -> pd.DataFrame:
@@ -378,40 +408,41 @@ class LegacySurvey:
         Parameters:
         -----------
         dir_legacysurvey : pathlib.Path
-            Directory containing the Legacy Survey data, organized as follows:
-            - dr9_north/survey-bricks-dr9-north.fits.gz
-            - dr10_south/survey-bricks-dr10-south.fits.gz
-            - dr9_north/tractor/000/tractor-0001p000.fits
-            - dr10_south/tractor/000/tractor-0001p000.fits
+            Directory containing the Legacy Survey DR11 data, organized as follows:
+            - dr11_north/survey-bricks-dr11-north.fits.gz
+            - dr11_south/survey-bricks-dr11-south.fits.gz
+            - dr11_north/tractor/000/tractor-0001p000.fits
+            - dr11_south/tractor/000/tractor-0001p000.fits
         """
         self.dir_data = Path(dir_legacysurvey)
         self.bricksinfo = self._load_bricksinfo()
 
     def _load_bricksinfo(self):
         """
-        Create a combined bricksinfo DataFrame from DR9 and DR10 datasets.
+        Create a combined bricksinfo DataFrame from DR11 North and South.
         """
-        path = self.dir_data / 'legacysurvey_bricksinfo.parquet'
+        path = self.dir_data / _BRICKSINFO_CACHE
         if path.exists():
             bricksinfo = pd.read_parquet(path)
-        else:
-            logger.info(f"Making bricksinfo to {path}")
-            bricksinfo_dr9 = Table.read(
-                self.dir_data / 'dr9_north' / 'survey-bricks-dr9-north.fits.gz',
+            releases = set(bricksinfo['release'].astype(str).unique())
+            if releases <= set(_LS_RELEASES) and 'survey_primary' in bricksinfo.columns:
+                return bricksinfo
+            logger.info(f"Rebuilding DR11 bricksinfo at {path}")
+
+        logger.info(f"Making bricksinfo to {path}")
+        frames = []
+        cols = ['brickname', 'ra', 'dec', 'ra1', 'ra2', 'dec1', 'dec2', 'survey_primary']
+        for release in _LS_RELEASES:
+            table = Table.read(
+                self.dir_data / _BRICKS_TABLE[release],
                 character_as_bytes=False
             )
-            bricksinfo_dr10 = Table.read(
-                self.dir_data / 'dr10_south' / 'survey-bricks-dr10-south.fits.gz',
-                character_as_bytes=False
-            )
-            cols = ['brickname', 'ra', 'dec', 'ra1', 'ra2', 'dec1', 'dec2']
-            df_dr9 = bricksinfo_dr9[cols].to_pandas()
-            df_dr10 = bricksinfo_dr10[cols].to_pandas()
-            df_dr9.insert(0, 'release', 'dr9')
-            df_dr10.insert(0, 'release', 'dr10')
-            bricksinfo = pd.concat([df_dr9, df_dr10], ignore_index=True)
-            bricksinfo.insert(1, 'AAA', bricksinfo['brickname'].str[:3])
-            bricksinfo.to_parquet(path, index=False)
+            df = table[cols].to_pandas()
+            df.insert(0, 'release', release)
+            frames.append(df)
+        bricksinfo = pd.concat(frames, ignore_index=True)
+        bricksinfo.insert(1, 'AAA', bricksinfo['brickname'].str[:3])
+        bricksinfo.to_parquet(path, index=False)
         return bricksinfo
 
     def find_tractor_file(self, release, brickname, silent=False):
@@ -439,7 +470,8 @@ class LegacySurvey:
         brickname : str
             The name of the brick (e.g., '0001p000').
         release : str
-            The data release ('dr9' or 'dr10').
+            The data release region ('north' or 'south').
+            Aliases such as 'dr11_north' and 'dr11_south' are also accepted.
         columns : list, optional
             List of columns to read from the tractor catalog. If None, all columns are read.
         """
@@ -706,7 +738,7 @@ class LegacySurvey:
         Bricks are selected with ``find_bricks_from_list``. Each brick is then
         matched only against nearby sources: tractor coordinates are read
         first, and the full catalog is loaded only if there is a match.
-        DR9 and DR10 are matched separately with ``fast_match(mode='all')``.
+        DR11 North and South are matched separately with ``fast_match(mode='all')``.
 
         Parameters
         ----------
@@ -725,12 +757,12 @@ class LegacySurvey:
         filter_primary : bool
             If True, discard ``type='DUP'`` and non-primary rows, remove
             ``id``/``sep``, and de-duplicate within each brick before retaining
-            it in memory. DR9 bricks duplicated by DR10 are skipped.
+            it in memory. Bricks with ``survey_primary=False`` are skipped.
 
         Returns
         -------
         dict
-            ``{'dr9': DataFrame, 'dr10': DataFrame}``. Each table contains the
+            ``{'north': DataFrame, 'south': DataFrame}``. Each table contains the
             input ``id``, matching ``sep`` (arcsec), ``ls_id``, and the tractor
             columns of every matched Legacy Survey source.
         """
@@ -783,18 +815,17 @@ class LegacySurvey:
             max_workers=workers,
             show_progress=show_progress,
         )
-        n_dr9 = int((bricks['release'] == 'dr9').sum()) if len(bricks) else 0
-        n_dr10 = int((bricks['release'] == 'dr10').sum()) if len(bricks) else 0
-        dr10_bricks = set(bricks.loc[bricks['release'] == 'dr10', 'brickname'])
+        n_north = int((bricks['release'] == 'north').sum()) if len(bricks) else 0
+        n_south = int((bricks['release'] == 'south').sum()) if len(bricks) else 0
         if not quiet:
-            logger.info(f"Overlapping bricks | {len(bricks):,} total (DR9 {n_dr9:,}, DR10 {n_dr10:,})")
+            logger.info(f"Overlapping bricks | {len(bricks):,} total (North {n_north:,}, South {n_south:,})")
 
         source_idx_per_brick = _source_indices_for_bricks(bricks, ra, dec, radius_arcsec)
         empty = pd.DataFrame(columns=['id', 'sep', 'ls_id'])
-        results = {'dr9': empty.copy(), 'dr10': empty.copy()}
+        results = {release: empty.copy() for release in _LS_RELEASES}
         dir_data = str(self.dir_data)
 
-        for release in ('dr9', 'dr10'):
+        for release in _LS_RELEASES:
             if len(bricks) == 0:
                 logger.warning(f"No bricks found for LS {release.upper()}.")
                 continue
@@ -808,7 +839,7 @@ class LegacySurvey:
             rel_indices = np.flatnonzero(rel_mask)
             tasks = []
             for row, brick_i in zip(bricks_rel.itertuples(index=False), rel_indices):
-                if filter_primary and release == 'dr9' and row.brickname in dr10_bricks:
+                if filter_primary and (not bool(row.survey_primary)):
                     continue
                 src_idx = source_idx_per_brick[brick_i]
                 if len(src_idx) == 0:
@@ -896,15 +927,13 @@ class LegacySurvey:
 
     def download_image(self, release, brickname, band, dir_output, silent=False):
         """
-        release: str, 'dr9' or 'dr10'
+        release: str, 'north' or 'south' (aliases: 'dr11_north', 'dr11_south')
         band: g, r, i, z, W1, W2, W3, W4
         """
         fname_fz = f"legacysurvey-{brickname}-image-{band}.fits.fz"
 
-        if release == 'dr10':
-            url_coadd = "https://portal.nersc.gov/cfs/cosmo/data/legacysurvey/dr10/south/coadd"
-        if release == 'dr9':
-            url_coadd = "https://portal.nersc.gov/cfs/cosmo/data/legacysurvey/dr9/north/coadd"
+        release = _normalize_release(release)
+        url_coadd = _COADD_URL[release]
         url = f"{url_coadd}/{brickname[:3]}/{brickname}/{fname_fz}"
 
         fname_output = f"{brickname}-{band}.fits.fz"
