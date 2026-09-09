@@ -8,7 +8,7 @@ Tools for working with the Legacy Survey DR11 datasets.
 import os
 import sys
 import time
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 import astropy.units as u
@@ -551,9 +551,10 @@ class LegacySurvey:
                     _consume(*self._match_one_brick(task))
             else:
                 with ThreadPoolExecutor(max_workers=n_workers) as ex:
-                    for item in _progress(ex.map(self._match_one_brick, tasks),
-                                          total=len(tasks), desc=region, show=show_progress):
-                        _consume(*item)
+                    futures = [ex.submit(self._match_one_brick, task) for task in tasks]
+                    for fut in _progress(as_completed(futures), total=len(futures),
+                                         desc=region, show=show_progress):
+                        _consume(*fut.result())
 
             if matched_frames:
                 results[region] = pd.concat(matched_frames, ignore_index=True)
@@ -564,7 +565,10 @@ class LegacySurvey:
                 extra.append(f'{n_error:,} errors')
             extra_txt = f" | {', '.join(extra)}" if extra else ''
             if not quiet:
-                logger.info(f'{region} | {len(results[region]):,} matches | {n_bricks:,} bricks{extra_txt}')
+                logger.info(
+                    f'{region} | {len(results[region]):,} matches | '
+                    f'{len(tasks):,} bricks read / {n_bricks:,} overlapping{extra_txt}'
+                )
 
         if not quiet:
             logger.success(f'Done | {sec_to_hms(time.time() - st_all)}')
