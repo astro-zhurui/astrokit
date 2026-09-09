@@ -6,6 +6,7 @@ __version__ = '0.1.1'
 import sys
 import yaml
 import socket
+from datetime import timedelta, timezone
 from pathlib import Path
 import importlib
 from loguru import logger
@@ -33,18 +34,24 @@ for path in [DIR_datasets]:
     if not path.exists():
         path.mkdir(parents=True, exist_ok=True)
 
+def _logger_format():
+    return (
+        "<fg #4169E1>[astrokit]</> "
+        "<fg #87CEEB>{time:YYYY-MM-DD HH:mm:ss}</> | "
+        "<level>{message}</level>"
+    )
+
+
+def _use_beijing_time(record):
+    record["time"] = record["time"].astimezone(timezone(timedelta(hours=8)))
+    return True
+
+
 def set_logger_config():
-    """
-    Set logger configuration.
-    """
-    from loguru import logger
+    """Set logger configuration (timestamps in Beijing time, UTC+8)."""
     logger.remove()
-    logger.add(
-        sink=sys.stdout, level="INFO", 
-        format=("<fg #4169E1>[astrokit]</> "
-                "<fg #87CEEB>{time:YYYY-MM-DD HH:mm:ss}</> "
-                "| <level>{message}</level>")
-        )
+    logger.add(sink=sys.stdout, level="INFO", format=_logger_format(), filter=_use_beijing_time)
+
 
 # lazy import submodules and Top level functions
 __all__ = [
@@ -120,11 +127,6 @@ def _auto_import_all(package_globals, package_name, package_file):
 
     package_globals['__all__'] = all_exports
 
-# default logger configuration
+# default logger configuration (Beijing time, UTC+8)
 logger.remove()
-logger.add(
-    sink=sys.stdout, level="INFO", 
-    format=("<fg #4169E1>[astrokit]</> "
-            "<fg #87CEEB>{time:YYYY-MM-DD HH:mm:ss}</> | "
-            "<level>{message}</level>")
-    )
+logger.add(sink=sys.stdout, level="INFO", format=_logger_format(), filter=_use_beijing_time)
