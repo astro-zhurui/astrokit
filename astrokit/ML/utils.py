@@ -54,6 +54,7 @@ def plot_confusion_matrix(y_true, y_pred, labels, percentage=True,
     """
     绘制混淆矩阵, 可以选择是否显示百分比(即, 每个类别的Recall)
     """
+    labels = np.asarray(labels)
     cm_counts = confusion_matrix(y_true, y_pred, labels=labels)
     exist_true_label = cm_counts.sum(axis=1) != 0
     cm_counts = cm_counts[exist_true_label]
