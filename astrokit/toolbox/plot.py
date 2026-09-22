@@ -128,24 +128,29 @@ def add_text(ax, text, fontsize=20, frameon=False, loc='upper right', **kwargs):
 
 def savefig(fname='unname.png', 
             dir_save=Path("/Users/rui/Downloads/"), 
-            dpi=300, bbox_inches="tight", **kwargs):
+            dpi=300, bbox_inches="tight", both=False, **kwargs):
     """
     save the figure to the path_dir
     
     Parameters
     ----------
-    fname : str
-        the name of the figure
-    path_dir : str or pathlib.Path, optional
+    fname : str or pathlib.Path
+        the name of the figure. The suffix sets the file format.
+    dir_save : str or pathlib.Path, optional
         the path to save the figure. The default is Path("/Users/rui/Downloads/").
-    dir_name : str, optional
+    both : bool, optional
+        If True, write both a png and a pdf, using the stem of ``fname``.
+        If False, save only the format given by ``fname``. The default is False.
 
     """
     if isinstance(dir_save, str):
         path = Path(dir_save)
     else:
         path = dir_save
-    plt.savefig(path / fname, dpi=dpi, bbox_inches=bbox_inches, facecolor='w', **kwargs)
+    fname = Path(fname)
+    targets = [fname.with_suffix(".png"), fname.with_suffix(".pdf")] if both else [fname]
+    for target in targets:
+        plt.savefig(path / target, dpi=dpi, bbox_inches=bbox_inches, facecolor='w', **kwargs)
 
 def bold_axis(ax, width=1.5):
     for spine in ax.spines.values():
