@@ -1,2 +1,4 @@
 /astrokit/datasets/data/dustmaps/
 __pycache__/
+.astrokit_config
+.astrokit_config.yaml

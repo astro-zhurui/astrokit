@@ -73,6 +73,7 @@ from ._top_level_map import _lazy_map
 # Static exports for type checkers. Runtime lookup stays in __getattr__.
 # `import x as x` re-exports the name (PEP 484); a bare import would stay private.
 if TYPE_CHECKING:
+    from .toolbox.email import send_email as send_email
     from .toolbox.calculate import (
         ABmagErr_to_flamErr as ABmagErr_to_flamErr,
         ABmagErr_to_fnuErr as ABmagErr_to_fnuErr,

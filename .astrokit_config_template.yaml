@@ -14,3 +14,15 @@ DIR_DOWNLOAD:  # Default save file path
   /Users/rui/Downloads
 DIR_DATA:  # Database in this equipment
   /Users/rui/Data
+
+# Email notifications: each user keeps their own credentials in ~/.astrokit_config.yaml.
+# Run chmod 600 ~/.astrokit_config.yaml before using ak.send_email().
+email:
+  smtp_host: smtp.example.org
+  smtp_port: 465
+  security: ssl  # ssl or starttls (usually port 587)
+  username: ""
+  password: ""  # client/app password; never commit real credentials
+  from_address: ""  # optional; defaults to username
+  display_name: astrokit
+  max_message_mb: 25

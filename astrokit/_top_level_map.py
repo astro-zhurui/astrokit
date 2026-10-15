@@ -1,4 +1,5 @@
 _lazy_map = {
+    'toolbox.email': ['send_email'],
     'toolbox.calculate': [
         'fnu_to_flam', 'flam_to_fnu',
         'fnu_to_ABmag', 'ABmag_to_fnu',
