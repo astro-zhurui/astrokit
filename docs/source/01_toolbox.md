@@ -93,3 +93,31 @@ recipients; retry only `.refused`. Connection loss during submission can leave
 delivery unconfirmed, so inspect the mailbox before resending. Invalid config,
 template, addresses, or oversized messages fail before submission. SMTP sends
 do not create an IMAP Sent-folder copy.
+
+## Publication plot style
+
+Call `ak.set_mpl_style()` before creating figures to apply the compact ApJ-style
+configuration: serif fonts, inward ticks on four sides, blue/orange-first colors,
+0.7 pt axes and 1.2 pt lines. Font sizes are 12 pt for text and ticks, 14 pt for
+axes titles and labels, and 11 pt for legends. Exports use 450 dpi and TrueType
+PDF/PS fonts.
+
+```python
+import astrokit as ak
+import matplotlib.pyplot as plt
+
+ak.set_mpl_style()
+fig, axes = plt.subplots(1, 2, figsize=(9, 3.6), constrained_layout=True)
+```
+
+Set figure sizes, panel groups, annotations and reference-sample line styles for
+the plot content. Override individual defaults through the existing arguments
+or an `rc` mapping; `rc` takes precedence:
+
+```python
+ak.set_mpl_style(label_size=16, tick_size=14, rc={"lines.linewidth": 1.5})
+```
+
+The original seven positional arguments remain supported. Calling the function
+with no arguments now selects the compact style. New settings apply to artists
+created afterward. Restart active notebook kernels after updating astrokit.

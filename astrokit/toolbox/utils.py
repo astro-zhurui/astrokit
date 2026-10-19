@@ -41,58 +41,99 @@ __all__ = [
     "get_device_name",
 ]
 def set_mpl_style(
-    fontsize=16,
-    title_size=18,
-    label_size=18,
-    tick_size=16,
-    legend_size=14,
-    font="Times New Roman",
+    fontsize=12,
+    title_size=14,
+    label_size=14,
+    tick_size=12,
+    legend_size=11,
+    font="serif",
     use_tex=False,
+    *,
+    rc=None,
 ):
-    """
-    Set matplotlib style for publication-quality plots.
+    """Apply the compact ApJ-style defaults to future matplotlib artists.
 
     Parameters
     ----------
-    fontsize : int
-        Base font size.
-    title_size : int
-        Axes title size.
-    label_size : int
-        Axes label size.
-    tick_size : int
-        Tick label size.
-    legend_size : int
-        Legend font size.
-    font : str
-        Font family.
-    use_tex : bool
-        Whether to use LaTeX rendering.
+    fontsize : float, optional
+        Base and annotation font size in points. Default is 12.
+    title_size, label_size : float, optional
+        Axes title and label sizes in points. Defaults are 14.
+    tick_size, legend_size : float, optional
+        Tick and legend sizes in points. Defaults are 12 and 11.
+    font : str or sequence of str, optional
+        Font family. Default is ``"serif"``, with Times New Roman,
+        STIXGeneral and DejaVu Serif as ordered fallbacks.
+    use_tex : bool, optional
+        Render text with LaTeX. Default is False; math uses STIX.
+    rc : mapping, optional
+        Additional matplotlib rcParams, applied after the named parameters.
+        All settings are validated before updating the global configuration.
+
+    Notes
+    -----
+    Sets inward ticks on four sides, blue/orange-first colors, 0.7 pt axes,
+    1.2 pt lines, a white background, 450 dpi exports and TrueType PDF/PS
+    fonts. Figure size, panel layout and data-specific colors are set per plot.
+    Existing artists retain their settings. Explicit arguments override the
+    defaults; the original seven positional arguments remain supported.
+
+    Examples
+    --------
+    >>> import astrokit as ak
+    >>> ak.set_mpl_style()
+    >>> ak.set_mpl_style(label_size=16, rc={"lines.linewidth": 1.5})
     """
-
-    mpl.rcParams.update({
-        # Font
+    params = {
         "font.family": font,
-        "mathtext.fontset": "stix",
+        "font.serif": ["Times New Roman", "STIXGeneral", "DejaVu Serif"],
         "font.size": fontsize,
-
-        # Axes
+        "mathtext.fontset": "stix",
+        "text.usetex": use_tex,
+        "text.color": "black",
+        "figure.facecolor": "white",
+        "figure.dpi": 140,
+        "axes.facecolor": "white",
+        "axes.edgecolor": "black",
+        "axes.labelcolor": "black",
         "axes.titlesize": title_size,
         "axes.labelsize": label_size,
-
-        # Ticks
+        "axes.linewidth": 0.7,
+        "axes.grid": False,
+        "axes.unicode_minus": True,
+        "axes.prop_cycle": mpl.cycler(color=[
+            "#0072B2", "#D55E00", "#009E73", "#CC79A7",
+            "#56B4E9", "#E69F00", "#F0E442", "#333333",
+        ]),
         "xtick.labelsize": tick_size,
         "ytick.labelsize": tick_size,
-
-        # Legend
+        "xtick.color": "black",
+        "ytick.color": "black",
+        "xtick.direction": "in",
+        "ytick.direction": "in",
+        "xtick.top": True,
+        "ytick.right": True,
+        "xtick.major.size": 3.5,
+        "ytick.major.size": 3.5,
+        "xtick.minor.size": 2,
+        "ytick.minor.size": 2,
+        "xtick.major.width": 0.7,
+        "ytick.major.width": 0.7,
+        "xtick.minor.width": 0.5,
+        "ytick.minor.width": 0.5,
+        "lines.linewidth": 1.2,
         "legend.fontsize": legend_size,
-
-        # Important!
-        "axes.unicode_minus": False,
-
-        # Optional LaTeX
-        "text.usetex": use_tex,
-    })
+        "legend.frameon": False,
+        "pdf.fonttype": 42,
+        "ps.fonttype": 42,
+        "savefig.dpi": 450,
+        "savefig.facecolor": "white",
+        "savefig.edgecolor": "white",
+        "savefig.transparent": False,
+    }
+    if rc is not None:
+        params.update(rc)
+    mpl.rcParams.update(mpl.RcParams(params))
 
 def show_internet_speed(interval=1):
     """Display real-time internet speed for all network interfaces."""
