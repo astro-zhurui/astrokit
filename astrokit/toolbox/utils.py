@@ -305,13 +305,65 @@ def value_to_KVD_string(value) -> str|None:
 
     return string
 
-def fits2df(path_fits):
+def fits2df(path_fits, columns=None, n_rows=None, hdu_name=None):
+    """Read a FITS table into pandas without parsing column units.
+
+    Parameters
+    ----------
+    path_fits : str or pathlib.Path
+        FITS file, including gzip-compressed files.
+    columns : sequence of str or str, optional
+        Columns to read, in output order. Defaults to all columns.
+    n_rows : int, optional
+        Number of leading rows to return. Defaults to all rows.
+    hdu_name : int or str, optional
+        Table extension. Defaults to the first table.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Native-endian values with decoded strings. Undefined logical values
+        become pandas.NA. FITS units are not retained or converted.
     """
-    读取fits中的table, 并转换成pandas的DataFrame
-    """
-    tbl = Table.read(path_fits, character_as_bytes=False)
-    df = tbl.to_pandas()
-    return df
+    with fits.open(path_fits, memmap=False, character_as_bytes=False) as hdul:
+        if hdu_name is None:
+            hdu = next((item for item in hdul if isinstance(item, (fits.BinTableHDU, fits.TableHDU))), None)
+            if hdu is None:
+                raise ValueError("No FITS table found")
+        else:
+            hdu = hdul[hdu_name]
+        total_rows = hdu.header["NAXIS2"]
+        if n_rows is None:
+            n_rows = total_rows
+        elif not 0 <= n_rows <= total_rows:
+            raise ValueError(f"n_rows must be between 0 and {total_rows}, got {n_rows}")
+        names = list(hdu.columns.names if columns is None else np.atleast_1d(columns))
+        missing = sorted(set(names) - set(hdu.columns.names))
+        if missing:
+            raise KeyError(f"Unknown column(s): {missing}")
+        table = Table()
+        for name in names:
+            column = hdu.columns[name]
+            if str(column.format).endswith("L"):
+                values = np.recarray.field(hdu.data, name)[:n_rows]
+                valid = (values == ord("T")) | (values == ord("F"))
+                table[name] = MaskedColumn(values == ord("T"), mask=~valid)
+                continue
+            values = hdu.data[name][:n_rows]
+            if column.null is not None:
+                table[name] = MaskedColumn(values, mask=values == column.null)
+            elif values.dtype.kind in "fc":
+                table[name] = MaskedColumn(values, mask=np.isnan(values))
+            elif values.dtype.kind in "SU":
+                values = np.char.rstrip(values)
+                table[name] = MaskedColumn(values, mask=values == (b"" if values.dtype.kind == "S" else ""))
+            else:
+                table[name] = values
+        df = table.to_pandas()
+        for name in names:
+            if str(hdu.columns[name].format).endswith("L") and np.any(table[name].mask):
+                df[name] = pd.array(df[name], dtype="boolean")
+        return df
 
 def read(path, n_rows=None, columns=None, hdu_name=None, fill=False, show_time=False):
     """
@@ -396,7 +448,8 @@ def read(path, n_rows=None, columns=None, hdu_name=None, fill=False, show_time=F
                     name=name,
                 )
             elif str(column.format).endswith("L"):
-                table_data[name] = rows[name] == ord("T")
+                valid = (rows[name] == ord("T")) | (rows[name] == ord("F"))
+                table_data[name] = MaskedColumn(rows[name] == ord("T"), mask=~valid)
             elif rows.dtype[name].kind in {"S", "U"} or str(column.format).endswith("A"):
                 table_data[name] = _decode_fits_text(rows[name])
             else:
