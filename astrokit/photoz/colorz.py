@@ -16,8 +16,6 @@ from loguru import logger
 
 from scipy.signal import savgol_filter
 
-import dask
-from dask.diagnostics import ProgressBar
 
 from astrokit.toolbox import crack
 from .utils import plot_zspec_zphot
@@ -457,6 +455,9 @@ def run(colorz_class, n_cpu=8):
     """
     以并行方式计算color-z
     """
+    import dask
+    from dask.diagnostics import ProgressBar
+
     if not hasattr(colorz_class, 'colorz_resampled'):
         colorz_class.resample_colorz_relation()
 
